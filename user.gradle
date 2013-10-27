@@ -1,0 +1,43 @@
+
+
+// Add desktop notifications
+apply plugin: 'announce'
+
+gradle.afterProject {project, projectState ->
+    if (projectState.failure) {
+        announce.announce ("Evaluation of $project FAILED\n${projectState.failure}", 'local')
+    }
+}
+
+gradle.addBuildListener(
+   ['buildStarted': {},
+    'projectsEvaluated': {},
+    'projectsLoaded': {},
+    'settingsEvaluated': {},
+    'buildFinished': { BuildResult result ->
+	if (result.failure) {
+	   announce.announce("Build FAILED with ${result.failure}", 'local')
+        } else {
+	   announce.announce("Build SUCCESSFUL", 'local')
+        }
+   }] as BuildListener
+)
+
+gradle.taskGraph.afterTask { Task task, TaskState state ->
+    if (state.failure) {
+        announce.announce ("Task $task FAILED\n${state.failure}", 'local')
+    }
+}
+
+// fast local install
+/*task fastInstall(dependsOn: install) {
+   description='Installs a non indy version of Groovy into local Maven repo, without docs nor sources'
+   doFirst {
+      allprojects {
+   	   [javadoc,groovydoc,javadocAll,groovydocAll,sourceJar, groovydocJar, javadocJar]*.enabled = false
+      }
+      rootProject.ext.skipIndy = true
+   }
+}
+
+*/

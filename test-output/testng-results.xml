@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="55" passed="55">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Command line suite" duration-ms="34" started-at="2013-07-08T21:11:27Z" finished-at="2013-07-08T21:11:27Z">
+    <groups>
+    </groups>
+    <test name="Command line test" duration-ms="34" started-at="2013-07-08T21:11:27Z" finished-at="2013-07-08T21:11:27Z">
+      <class name="Fibonacci_Test">
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="4" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[0]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[0]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[4]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[3]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[6]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[8]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[5]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[5]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[3]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[2]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[2]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[8]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[21]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="1" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[12]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[144]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[9]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[34]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[11]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[89]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[10]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[55]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterative(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="iterative" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[7]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[13]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterative -->
+        <test-method status="PASS" signature="iterator()[pri:0, instance:Fibonacci_Test@4439a788]" name="iterator" duration-ms="9" started-at="2013-07-08T23:11:27Z" finished-at="2013-07-08T23:11:27Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- iterator -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="1" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[0]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[0]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[4]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[3]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[2]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[3]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[2]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="1" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[5]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[5]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[9]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[34]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[11]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[89]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[12]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[144]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[10]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[55]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[6]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[8]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[7]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[13]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedBigIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedBigIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[8]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[21]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedBigIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="1" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[0]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[0]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[3]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[2]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[2]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[6]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[8]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[7]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[13]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[8]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[21]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[5]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[5]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[9]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[34]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[4]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[3]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[10]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[55]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[11]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[89]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="memoizedIntegerRecursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="memoizedIntegerRecursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[12]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[144]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- memoizedIntegerRecursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[2]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[0]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[0]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[1]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[3]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[2]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[4]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[3]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="1" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[5]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[5]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[7]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[13]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[8]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[21]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="0" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[6]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[8]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="1" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[9]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[34]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="1" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[10]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[55]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="1" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[11]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[89]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="recursive(java.math.BigInteger, java.math.BigInteger)[pri:0, instance:Fibonacci_Test@4439a788]" name="recursive" duration-ms="3" started-at="2013-07-08T23:11:27Z" data-provider="inputData" finished-at="2013-07-08T23:11:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[12]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[144]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- recursive -->
+        <test-method status="PASS" signature="sequenceInstanceAccess()[pri:0, instance:Fibonacci_Test@4439a788]" name="sequenceInstanceAccess" duration-ms="1" started-at="2013-07-08T23:11:27Z" finished-at="2013-07-08T23:11:27Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- sequenceInstanceAccess -->
+        <test-method status="PASS" signature="sequenceStaticAccess()[pri:0, instance:Fibonacci_Test@4439a788]" name="sequenceStaticAccess" duration-ms="1" started-at="2013-07-08T23:11:27Z" finished-at="2013-07-08T23:11:27Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- sequenceStaticAccess -->
+      </class> <!-- Fibonacci_Test -->
+    </test> <!-- Command line test -->
+  </suite> <!-- Command line suite -->
+</testng-results>

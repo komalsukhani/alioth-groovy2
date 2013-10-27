@@ -1,0 +1,90 @@
+  // access flags 0x1
+  public run()Ljava/lang/Object;
+   L0
+    INVOKESTATIC script1372700365988.$getCallSiteArray ()[Lorg/codehaus/groovy/runtime/callsite/CallSite;
+    ASTORE 1
+   L1
+    LINENUMBER 1 L1
+    ICONST_1
+    ANEWARRAY java/lang/Object
+    DUP
+    ICONST_0
+    BIPUSH 16
+    INVOKESTATIC java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+    AASTORE
+    INVOKESTATIC org/codehaus/groovy/runtime/ScriptBytecodeAdapter.createList ([Ljava/lang/Object;)Ljava/util/List;
+    LDC [I.class
+    INVOKESTATIC org/codehaus/groovy/runtime/ScriptBytecodeAdapter.castToType (Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+    CHECKCAST [I
+    ASTORE 2
+   L2
+    ALOAD 2
+    POP
+    INVOKESTATIC org/codehaus/groovy/runtime/BytecodeInterface8.isOrigInt ()Z
+    IFEQ L3
+    GETSTATIC script1372700365988.__$stMC : Z
+    IFNE L3
+    INVOKESTATIC org/codehaus/groovy/runtime/BytecodeInterface8.disabledStandardMetaClass ()Z
+    IFNE L3
+    GOTO L4
+   L3
+    LINENUMBER 2 L3
+    ALOAD 1
+    LDC 1
+    AALOAD
+    ALOAD 2
+    DUP
+    ASTORE 3
+    ICONST_0
+    DUP
+    ISTORE 4
+    INVOKESTATIC java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+    ALOAD 1
+    LDC 2
+    AALOAD
+    ALOAD 1
+    LDC 3
+    AALOAD
+    ALOAD 3
+    ILOAD 4
+    INVOKESTATIC java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+    INVOKEINTERFACE org/codehaus/groovy/runtime/callsite/CallSite.call (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+    SIPUSH 666
+    INVOKESTATIC java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+    INVOKEINTERFACE org/codehaus/groovy/runtime/callsite/CallSite.call (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+    DUP
+    ASTORE 5
+    INVOKEINTERFACE org/codehaus/groovy/runtime/callsite/CallSite.call (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+    POP
+    ALOAD 5
+    POP
+    GOTO L5
+   L4
+    LINENUMBER 2 L4
+    ICONST_0
+    ISTORE 6
+    ALOAD 2
+    DUP
+    ILOAD 6
+    INVOKESTATIC org/codehaus/groovy/runtime/BytecodeInterface8.intArrayGet ([II)I
+    SIPUSH 666
+    IOR
+    DUP
+    ISTORE 7
+    ILOAD 6
+    SWAP
+    INVOKESTATIC org/codehaus/groovy/runtime/BytecodeInterface8.intArraySet ([III)V
+    ILOAD 7
+    POP
+   L5
+    LINENUMBER 3 L5
+    ALOAD 2
+    ARETURN
+   L6
+    ACONST_NULL
+    ARETURN
+    LOCALVARIABLE this Lscript1372700365988; L0 L6 0
+    LOCALVARIABLE b [I L2 L6 2
+    MAXSTACK = 7
+    MAXLOCALS = 8
+
