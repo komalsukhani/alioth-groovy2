@@ -35,6 +35,7 @@ import org.codehaus.groovy.runtime.ReflectionMethodInvoker;
 import org.codehaus.groovy.syntax.Token;
 import org.codehaus.groovy.syntax.Types;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,15 +63,15 @@ import static org.codehaus.groovy.transform.ToStringASTTransformation.createToSt
 public class ImmutableASTTransformation extends AbstractASTTransformation {
 
     /*
-                      Currently leaving BigInteger and BigDecimal in list but see:
-                      http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6348370
+      Currently leaving BigInteger and BigDecimal in list but see:
+      http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6348370
 
-                      Also, Color is not final so while not normally used with child
-                      classes, it isn't strictly immutable. Use at your own risk.
+      Also, Color is not final so while not normally used with child
+      classes, it isn't strictly immutable. Use at your own risk.
 
-                      This list can by extended by providing "known immutable" classes
-                      via Immutable.knownImmutableClasses
-                     */
+      This list can by extended by providing "known immutable" classes
+      via Immutable.knownImmutableClasses
+     */
     private static List<String> immutableList = Arrays.asList(
             "java.lang.Boolean",
             "java.lang.Byte",
@@ -106,7 +107,6 @@ public class ImmutableASTTransformation extends AbstractASTTransformation {
     private static final ClassNode SORTEDMAP_CLASSNODE = ClassHelper.make(SortedMap.class);
     private static final ClassNode SET_CLASSNODE = ClassHelper.make(Set.class);
     private static final ClassNode MAP_CLASSNODE = ClassHelper.make(Map.class);
-
 
 
     public void visit(ASTNode[] nodes, SourceUnit source) {
@@ -425,11 +425,11 @@ public class ImmutableASTTransformation extends AbstractASTTransformation {
                 new IfStatement(
                         equalsNullExpr(initExpr),
                         new EmptyStatement(),
-                        assignStatement(fieldExpr, checkUnresolved(cNode, fNode, initExpr))),
-                assignStatement(fieldExpr, checkUnresolved(cNode, fNode, unknown)));
+                        assignStatement(fieldExpr, checkUnresolved(fNode, initExpr))),
+                assignStatement(fieldExpr, checkUnresolved(fNode, unknown)));
     }
 
-    private Expression checkUnresolved(ClassNode cNode, FieldNode fNode, Expression value) {
+    private Expression checkUnresolved(FieldNode fNode, Expression value) {
         Expression args = new TupleExpression(new MethodCallExpression(new VariableExpression("this"), "getClass", ArgumentListExpression.EMPTY_ARGUMENTS), new ConstantExpression(fNode.getName()), value);
         return new StaticMethodCallExpression(SELF_TYPE, "checkImmutable", args);
     }
@@ -453,12 +453,12 @@ public class ImmutableASTTransformation extends AbstractASTTransformation {
     }
 
     private boolean isKnownImmutableClass(ClassNode fieldType, List<String> knownImmutableClasses) {
+        if (inImmutableList(fieldType.getName()) || knownImmutableClasses.contains(fieldType.getName()))
+            return true;
         if (!fieldType.isResolved()) return false;
         return fieldType.isEnum() ||
                 ClassHelper.isPrimitiveType(fieldType) ||
-                fieldType.getAnnotations(MY_TYPE).size() != 0 ||
-                inImmutableList(fieldType.getName()) ||
-                knownImmutableClasses.contains(fieldType.getName());
+                fieldType.getAnnotations(MY_TYPE).size() != 0;
     }
 
     private boolean isKnownImmutable(String fieldName, List<String> knownImmutables) {
@@ -578,8 +578,22 @@ public class ImmutableASTTransformation extends AbstractASTTransformation {
 
         if (field == null || field instanceof Enum || inImmutableList(field.getClass().getName()) || knownImmutableClasses.contains(field.getClass()))
             return field;
-        if (field instanceof Collection) return DefaultGroovyMethods.asImmutable((Collection) field);
         if (field.getClass().getAnnotation(MY_CLASS) != null) return field;
+        if (field instanceof Collection) {
+            Field declaredField;
+            try {
+                declaredField = clazz.getDeclaredField(fieldName);
+                Class<?> fieldType = declaredField.getType();
+                if (Collection.class.isAssignableFrom(fieldType)) {
+                    return DefaultGroovyMethods.asImmutable((Collection) field);
+                }
+                // potentially allow Collection coercion for a constructor
+                if (fieldType.getAnnotation(MY_CLASS) != null) return field;
+                if (inImmutableList(fieldType.getName()) || knownImmutableClasses.contains(fieldType)) {
+                    return field;
+                }
+            } catch (NoSuchFieldException ignore) { }
+        }
         final String typeName = field.getClass().getName();
         throw new RuntimeException(createErrorMessage(clazz.getName(), fieldName, typeName, "constructing"));
     }

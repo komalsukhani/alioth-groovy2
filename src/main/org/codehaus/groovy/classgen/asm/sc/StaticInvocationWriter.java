@@ -93,7 +93,7 @@ public class StaticInvocationWriter extends InvocationWriter {
 
     @Override
     public void writeInvokeConstructor(final ConstructorCallExpression call) {
-        MethodNode mn = (MethodNode) call.getNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET);
+        MethodNode mn = call.getNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET);
         if (mn == null) {
             super.writeInvokeConstructor(call);
             return;
@@ -113,6 +113,32 @@ public class StaticInvocationWriter extends InvocationWriter {
         finnishConstructorCall(cn, ownerDescriptor, controller.getOperandStack().getStackLength() - before);
 
     }
+
+    @Override
+    public void writeSpecialConstructorCall(final ConstructorCallExpression call) {
+        MethodNode mn = call.getNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET);
+        if (mn==null) {
+            super.writeSpecialConstructorCall(call);
+            return;
+        }
+        ConstructorNode cn;
+        if (mn instanceof ConstructorNode) {
+            cn = (ConstructorNode) mn;
+        } else {
+            cn = new ConstructorNode(mn.getModifiers(), mn.getParameters(), mn.getExceptions(), mn.getCode());
+            cn.setDeclaringClass(mn.getDeclaringClass());
+        }
+        // load "this"
+        controller.getMethodVisitor().visitVarInsn(ALOAD, 0);
+        String ownerDescriptor = BytecodeHelper.getClassInternalName(cn.getDeclaringClass());
+        TupleExpression args = makeArgumentList(call.getArguments());
+        int before = controller.getOperandStack().getStackLength();
+        loadArguments(args.getExpressions(), cn.getParameters());
+        finnishConstructorCall(cn, ownerDescriptor, controller.getOperandStack().getStackLength() - before);
+        // on a special call, there's no object on stack
+        controller.getOperandStack().remove(1);
+    }
+
 
     @Override
     protected boolean writeDirectMethodCall(final MethodNode target, final boolean implicitThis, final Expression receiver, final TupleExpression args) {
@@ -166,7 +192,9 @@ public class StaticInvocationWriter extends InvocationWriter {
                         INVOKERHELER_RECEIVER,
                         target.isStatic() ? "invokeStaticMethod" : "invokeMethodSafe",
                         new ArgumentListExpression(
-                                receiver,
+                                target.isStatic() ? 
+                                        new ClassExpression(target.getDeclaringClass()) :
+                                        receiver,
                                 new ConstantExpression(target.getName()),
                                 arr
                         )
@@ -401,7 +429,9 @@ public class StaticInvocationWriter extends InvocationWriter {
             OperandStack operandStack = controller.getOperandStack();
             int counter = labelCounter.incrementAndGet();
             // if (receiver != null)
-            receiver.visit(controller.getAcg());
+            ExpressionAsVariableSlot slot = new ExpressionAsVariableSlot(controller, receiver);
+            slot.visit(controller.getAcg());
+            operandStack.box();
             Label ifnull = compileStack.createLocalLabel("ifnull_" + counter);
             mv.visitJumpInsn(IFNULL, ifnull);
             operandStack.remove(1); // receiver consumed by if()
@@ -409,7 +439,7 @@ public class StaticInvocationWriter extends InvocationWriter {
             mv.visitLabel(nonull);
             MethodCallExpression origMCE = (MethodCallExpression) origin;
             MethodCallExpression newMCE = new MethodCallExpression(
-                    origMCE.getObjectExpression(),
+                    new VariableSlotLoader(slot.getType(), slot.getIndex(), controller.getOperandStack()),
                     origMCE.getMethodAsString(),
                     origMCE.getArguments()
             );
@@ -419,6 +449,7 @@ public class StaticInvocationWriter extends InvocationWriter {
             newMCE.setImplicitThis(origMCE.isImplicitThis());
             newMCE.setSourcePosition(origMCE);
             newMCE.visit(controller.getAcg());
+            compileStack.removeVar(slot.getIndex());
             ClassNode returnType = operandStack.getTopOperand();
             if (ClassHelper.isPrimitiveType(returnType) && !ClassHelper.VOID_TYPE.equals(returnType)) {
                 operandStack.box();

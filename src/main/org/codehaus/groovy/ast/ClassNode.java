@@ -757,7 +757,7 @@ public class ClassNode extends AnnotatedNode implements Opcodes {
 
     public List<Statement> getObjectInitializerStatements() {
         if (objectInitializers == null)
-            objectInitializers = new ArrayList<Statement> ();
+            objectInitializers = new LinkedList<Statement> ();
         return objectInitializers;
     }
 
@@ -1125,7 +1125,8 @@ public class ClassNode extends AnnotatedNode implements Opcodes {
             return componentType.toString(showRedirect)+"[]";
         }
         String ret = getName();
-        if (genericsTypes != null) {
+        if (placeholder) ret = getUnresolvedName();
+        if (!placeholder && genericsTypes != null) {
             ret += " <";
             for (int i = 0; i < genericsTypes.length; i++) {
                 if (i != 0) ret += ", ";

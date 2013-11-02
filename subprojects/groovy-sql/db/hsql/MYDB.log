@@ -1,4 +1,0 @@
-/*C2*/SET SCHEMA PUBLIC
-create table FOOD ( type VARCHAR(100), name VARCHAR(100))
-INSERT INTO FOOD VALUES('cheese','edam')
-COMMIT
