@@ -1,5 +1,0 @@
-// This file is used to test the extension module framework
-moduleName=My test module
-moduleVersion=1.0-test
-extensionClasses=org.example.MyStringExtension
-staticExtensionClasses=
