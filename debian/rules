@@ -1,0 +1,71 @@
+#!/usr/bin/make -f
+
+export GRADLE_USER_HOME=$(CURDIR)/.gradlehome
+export LC_ALL=en_US.UTF-8
+DEB_GRADLE_OPTS := --project-prop finalRelease=true --stacktrace --offline
+UVERSION  := $(shell dpkg-parsechangelog|grep ^Version:|cut -f2 -d' '|sed 's/+dfsg-[^-]*$$//')
+MAVEN_REPO_URL := http://repo1.maven.org/maven2/
+MODULES := docgenerator servlet ant groovydoc xml swing sql jmx test console groovysh json testng jsr223 templates bsf
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	dh_auto_clean
+	-gradle $(DEB_GRADLE_OPTS) clean
+	# to-do: patch .gradle file to delete these files
+	-rm -rf .gradle .gradlehome buildSrc/.gradle buildSrc/target
+	mh_clean
+
+override_dh_auto_build:
+	dh_auto_build
+	gradle $(DEB_GRADLE_OPTS) dist
+	unzip target/distributions/groovy-binary-*.zip -d target/distributions/bin
+	unzip target/distributions/groovy-docs-*.zip -d target/distributions/doc
+
+override_dh_auto_install:
+	-rm -f target/libs/groovy-all-*-indy.jar
+	dh_auto_install
+	# embeddable groovy-all jar with indy feature is not installed through maven
+	dh_install \
+		target/distributions/bin/groovy-$(UVERSION)/embeddable/groovy-all-$(UVERSION)-indy.jar \
+		usr/share/groovy/embeddable
+	# groovy core
+	mh_installpom -o -v -pgroovy maven/groovy.pom
+	mh_installjar -pgroovy -l maven/groovy.pom target/libs/groovy-$(UVERSION).jar
+	# groovy-all
+	mh_installpom -o -v -pgroovy maven/groovy-all.pom
+	mh_installjar -pgroovy -l maven/groovy-all.pom \
+		target/distributions/bin/groovy-$(UVERSION)/embeddable/groovy-all-$(UVERSION).jar
+	# all the remaining groovy modules
+	for MOD in $(MODULES); do \
+	   mh_installpom -o -v -pgroovy maven/groovy-$$MOD.pom; \
+	   mh_installjar -pgroovy maven/groovy-$$MOD.pom \
+	      subprojects/groovy-$$MOD/target/libs/groovy-$$MOD-$(UVERSION).jar; \
+	done
+
+override_dh_link:
+	dh_link
+	dh_link usr/share/java/groovy-all.jar usr/share/groovy/embeddable/groovy-all-$(UVERSION).jar
+	dh_link usr/share/java/groovy.jar usr/share/groovy/lib/groovy-$(UVERSION).jar
+	for MOD in $(MODULES); do \
+		dh_link usr/share/maven-repo/org/codehaus/groovy/groovy-$$MOD/$(UVERSION)/groovy-$$MOD-$(UVERSION).jar \
+			usr/share/groovy/lib/groovy-$$MOD.jar; \
+	done
+
+get-orig-source:
+	-uscan --download-version $(UVERSION) --force-download --rename
+
+get-orig-pom:
+	test '! -d maven' && mkdir -p maven
+	# groovy core pom
+	curl $(MAVEN_REPO_URL)/org/codehaus/groovy/groovy/$(UVERSION)/groovy-$(UVERSION).pom \
+		--output maven/groovy.pom
+	# groovy-all pom
+	curl $(MAVEN_REPO_URL)/org/codehaus/groovy/groovy-all/$(UVERSION)/groovy-all-$(UVERSION).pom \
+		--output maven/groovy-all.pom
+	# all the remaining groovy modules
+	for MOD in $(MODULES); do \
+		curl $(MAVEN_REPO_URL)/org/codehaus/groovy/groovy-$$MOD/$(UVERSION)/groovy-$$MOD-$(UVERSION).pom \
+			--output maven/groovy-$$MOD.pom; \
+	done

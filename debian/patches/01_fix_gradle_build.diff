@@ -1,0 +1,331 @@
+Description: Build Groovy with libraries available in Debian
+Author: Miguel Landaeta <miguel@miguel.cc>
+Forwarded: no
+Last-Update: 2013-10-27
+
+--- groovy-2.1.6+dfsg.orig/build.gradle
++++ groovy-2.1.6+dfsg/build.gradle
+@@ -14,7 +14,8 @@ allprojects {
+     group = 'org.codehaus.groovy'
+     version = groovyVersion
+     repositories {
+-        mavenCentral()
++        //mavenCentral()
++        mavenRepo url: "file:///usr/share/maven-repo"
+     }
+ 
+     apply plugin: 'checkstyle'
+@@ -128,15 +129,15 @@ configurations {
+ 
+ dependencies {
+     compilerCompile "antlr:antlr:2.7.7"
+-    compilerCompile "org.ow2.asm:asm:4.0"
+-    compilerCompile "org.ow2.asm:asm-analysis:4.0"
+-    compilerCompile "org.ow2.asm:asm-commons:4.0"
+-    compilerCompile "org.ow2.asm:asm-tree:4.0"
+-    compilerCompile "org.ow2.asm:asm-util:4.0"
++    compilerCompile "org.ow2.asm:asm:4.x"
++    compilerCompile "org.ow2.asm:asm-analysis:4.x"
++    compilerCompile "org.ow2.asm:asm-commons:4.x"
++    compilerCompile "org.ow2.asm:asm-tree:4.x"
++    compilerCompile "org.ow2.asm:asm-util:4.x"
+ 
+     compilerCompile "commons-cli:commons-cli:1.2"
+-    compilerCompile "org.apache.ant:ant:1.8.4"
+-    compilerCompile("com.thoughtworks.xstream:xstream:1.4.2") {
++    compilerCompile "org.apache.ant:ant:debian"
++    compilerCompile("com.thoughtworks.xstream:xstream:debian") {
+         exclude(group: 'xpp3', module: 'xpp3_min')
+         exclude(group: 'junit', module: 'junit')
+         exclude(group: 'jmock', module: 'jmock')
+@@ -144,22 +145,22 @@ dependencies {
+     compilerCompile("jline:jline:1.0") {
+         exclude(group: 'junit', module: 'junit')
+     }
+-    compilerCompile "org.fusesource.jansi:jansi:1.6"
+-    compilerCompile("org.apache.ivy:ivy:2.2.0") {
++    compilerCompile "org.fusesource.jansi:jansi:debian"
++    compilerCompile("org.apache.ivy:ivy:debian") {
+         transitive = false
+     }
+     compilerCompile files("$buildDir/classes/compiler")
+ 
+     groovy files("$buildDir/classes/compiler")
+     groovy "antlr:antlr:2.7.7"
+-    groovy "org.ow2.asm:asm:4.0"
+-    groovy "org.ow2.asm:asm-analysis:4.0"
+-    groovy "org.ow2.asm:asm-commons:4.0"
+-    groovy "org.ow2.asm:asm-tree:4.0"
+-    groovy "org.ow2.asm:asm-util:4.0"
++    groovy "org.ow2.asm:asm:4.x"
++    groovy "org.ow2.asm:asm-analysis:4.x"
++    groovy "org.ow2.asm:asm-commons:4.x"
++    groovy "org.ow2.asm:asm-tree:4.x"
++    groovy "org.ow2.asm:asm-util:4.x"
+ 
+     compile "commons-cli:commons-cli:1.2"
+-    compile("com.thoughtworks.xstream:xstream:1.4.2") {
++    compile("com.thoughtworks.xstream:xstream:debian") {
+         exclude(group: 'xpp3', module: 'xpp3_min')
+         exclude(group: 'junit', module: 'junit')
+         exclude(group: 'jmock', module: 'jmock')
+@@ -167,32 +168,32 @@ dependencies {
+     compile("jline:jline:1.0") {
+         exclude(group: 'junit', module: 'junit')
+     }
+-    compile "org.fusesource.jansi:jansi:1.6"
+-    compile("org.apache.ivy:ivy:2.2.0") {
++    compile "org.fusesource.jansi:jansi:debian"
++    compile("org.apache.ivy:ivy:debian") {
+         transitive = false
+     }
+-    runtime "org.codehaus.gpars:gpars:1.0.0"
++    //runtime "org.codehaus.gpars:gpars:1.0.0"
+     testCompile "jmock:jmock:1.2.0"
+     testCompile "jmock:jmock-cglib:1.2.0"
+     testCompile "xmlunit:xmlunit:1.3"
+     testCompile "ch.qos.logback:logback-classic:0.9.21"
+     testCompile "log4j:log4j:1.2.16"
+     testCompile "org.slf4j:jcl-over-slf4j:1.6.0"
+-    testCompile "com.thoughtworks.qdox:qdox:1.12.1"
++    testCompile "com.thoughtworks.qdox:qdox:debian"
+ 
+-    tools "com.googlecode.jarjar:jarjar:1.3"
+-    tools("checkstyle:checkstyle:4.4") {
++    tools "com.googlecode.jarjar:jarjar:1.4-SNAPSHOT"
++    tools("com.puppycrawl.tools:checkstyle:5.6") {
+         exclude(module: 'junit')
+     }
+-    tools "redhill:simian:2.2.4"
++    //tools "redhill:simian:2.2.4"
+     tools("net.sourceforge.cobertura:cobertura:1.9.4.1") {
+         exclude(module: 'asm')
+         exclude(module: 'asm')
+         exclude(module: 'ant')
+     }
+-    tools "org.ow2.asm:asm-all:4.0"
+-    tools "com.thoughtworks.qdox:qdox:1.12.1"
+-    tools "biz.aQute:bnd:0.0.401"
++    tools "org.ow2.asm:asm-all:4.x"
++    tools "com.thoughtworks.qdox:qdox:debian"
++    tools "biz.aQute:bnd:debian"
+ 
+     examplesCompile "lucene:lucene:1.4.3"
+     examplesCompile "org.eclipse:osgi:3.5.0.v20090520"
+@@ -212,7 +213,7 @@ dependencies {
+ 
+ // TODO use antlr plugin
+ //    antlr "antlr:antlr:2.7.7"
+-    antlr "org.apache.ant:ant-antlr:1.8.4"
++    antlr "org.apache.ant:ant-antlr:debian"
+ 
+     // TODO remove once M12N refactoring finished
+     testCompile project(':groovy-ant')
+--- groovy-2.1.6+dfsg.orig/gradle/assemble.gradle
++++ groovy-2.1.6+dfsg/gradle/assemble.gradle
+@@ -303,17 +303,17 @@ ext.distSpec = copySpec {
+     from("$projectDir") {
+         include "LICENSE.txt", "NOTICE.txt"
+     }
+-    into("lib") {
+-        from jar.archivePath
+-        from({
+-            configurations.runtime.findAll { it.name.endsWith 'jar' } +
+-                    modules()*.jar.archivePath +
+-                    modules().configurations.runtime*.findAll {
+-                        it.name.endsWith('jar') && !it.name.contains('livetribe-jsr223') && !it.name.matches(/groovy-\d.*/)
+-                    }.flatten() as Set
+-        })
+-        from("src/bin/groovy.icns")
+-    }
++    //into("lib") {
++    //    from jar.archivePath
++    //    from({
++    //        configurations.runtime.findAll { it.name.endsWith 'jar' } +
++    //                modules()*.jar.archivePath +
++    //                modules().configurations.runtime*.findAll {
++    //                    it.name.endsWith('jar') && !it.name.contains('livetribe-jsr223') && !it.name.matches(/groovy-\d.*/)
++    //                }.flatten() as Set
++    //    })
++    //    from("src/bin/groovy.icns")
++    //}
+     into("indy") {
+         from { new File(jar.archivePath.parent, "${jar.baseName}-${jar.version}-indy.jar") }
+         from {
+--- groovy-2.1.6+dfsg.orig/gradle/docs.gradle
++++ groovy-2.1.6+dfsg/gradle/docs.gradle
+@@ -85,53 +85,53 @@ task docProjectVersionInfo(type: Copy) {
+ }
+ 
+ task docGDK {
+-//    ext.extraDocGDKclasses = []
+-    dependsOn([project(':groovy-groovydoc'), project(':groovy-docgenerator')]*.classes)
+-    // TODO don't hard-code these
+-    dependsOn([project(':groovy-sql'), project(':groovy-sql'), project(':groovy-swing')]*.classes)
+-    dependsOn docProjectVersionInfo
++////    ext.extraDocGDKclasses = []
++//    dependsOn([project(':groovy-groovydoc'), project(':groovy-docgenerator')]*.classes)
++//    // TODO don't hard-code these
++//    dependsOn([project(':groovy-sql'), project(':groovy-sql'), project(':groovy-swing')]*.classes)
++//    dependsOn docProjectVersionInfo
+     ext.destinationDir = "$buildDir/html/groovy-jdk"
+-    inputs.files sourceSets.tools.runtimeClasspath
+-    outputs.dir destinationDir
+-    doLast {task ->
+-        try {
+-            ant {
+-                java(classname: "org.codehaus.groovy.tools.DocGenerator", fork: "true", failonerror: "true",
+-                        classpath: (configurations.tools + groovydocAll.groovyClasspath).asPath,
+-                        errorproperty: 'edr',
+-                        outputproperty: 'odr') {
+-                    // either package name if in core or fully qualified path otherwise
+-                    arg(value: "org.codehaus.groovy.runtime.DefaultGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.runtime.DefaultGroovyStaticMethods")
+-                    arg(value: "org.codehaus.groovy.runtime.DateGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.runtime.EncodingGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.runtime.IOGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.runtime.ProcessGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.runtime.ResourceGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.runtime.SocketGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.runtime.StringGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.vmplugin.v5.PluginDefaultGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.vmplugin.v6.PluginDefaultGroovyMethods")
+-                    arg(value: "org.codehaus.groovy.vmplugin.v6.PluginStaticGroovyMethods")
+-                    // TODO don't hard-code these
+-                    arg(value: "subprojects/groovy-sql/src/main/java/org/codehaus/groovy/runtime/SqlGroovyMethods.java")
+-                    arg(value: "subprojects/groovy-swing/src/main/java/org/codehaus/groovy/runtime/SwingGroovyMethods.java")
+-                    arg(value: "subprojects/groovy-xml/src/main/java/org/codehaus/groovy/runtime/XmlGroovyMethods.java")
+-                }
+-            }
+-        } finally {
+-            if (ant.properties.odr) {
+-                logger.info "Out: " + ant.properties.odr
+-            }
+-            if (ant.properties.edr) {
+-                logger.error "Err: " + ant.properties.edr
+-            }
+-        }
+-        copy {
+-            into task.destinationDir
+-            from "src/tools/org/codehaus/groovy/tools/groovy.ico", "src/tools/org/codehaus/groovy/tools/stylesheet.css"
+-        }
+-    }
++//    inputs.files sourceSets.tools.runtimeClasspath
++//    outputs.dir destinationDir
++//    doLast {task ->
++//        try {
++//            ant {
++//                java(classname: "org.codehaus.groovy.tools.DocGenerator", fork: "true", failonerror: "true",
++//                        classpath: (configurations.tools + groovydocAll.groovyClasspath).asPath,
++//                        errorproperty: 'edr',
++//                        outputproperty: 'odr') {
++//                    // either package name if in core or fully qualified path otherwise
++//                    arg(value: "org.codehaus.groovy.runtime.DefaultGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.runtime.DefaultGroovyStaticMethods")
++//                    arg(value: "org.codehaus.groovy.runtime.DateGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.runtime.EncodingGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.runtime.IOGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.runtime.ProcessGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.runtime.ResourceGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.runtime.SocketGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.runtime.StringGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.vmplugin.v5.PluginDefaultGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.vmplugin.v6.PluginDefaultGroovyMethods")
++//                    arg(value: "org.codehaus.groovy.vmplugin.v6.PluginStaticGroovyMethods")
++//                    // TODO don't hard-code these
++//                    arg(value: "subprojects/groovy-sql/src/main/java/org/codehaus/groovy/runtime/SqlGroovyMethods.java")
++//                    arg(value: "subprojects/groovy-swing/src/main/java/org/codehaus/groovy/runtime/SwingGroovyMethods.java")
++//                    arg(value: "subprojects/groovy-xml/src/main/java/org/codehaus/groovy/runtime/XmlGroovyMethods.java")
++//                }
++//            }
++//        } finally {
++//            if (ant.properties.odr) {
++//                logger.info "Out: " + ant.properties.odr
++//            }
++//            if (ant.properties.edr) {
++//                logger.error "Err: " + ant.properties.edr
++//            }
++//        }
++//        copy {
++//            into task.destinationDir
++//            from "src/tools/org/codehaus/groovy/tools/groovy.ico", "src/tools/org/codehaus/groovy/tools/stylesheet.css"
++//        }
++//    }
+ }
+ 
+ // this will apply the javadoc fix tool to all generated javadocs
+--- groovy-2.1.6+dfsg.orig/gradle/utils.gradle
++++ groovy-2.1.6+dfsg/gradle/utils.gradle
+@@ -24,10 +24,11 @@ import static org.objectweb.asm.Opcodes.
+ 
+ buildscript {
+     repositories {
+-        mavenCentral()
++        //mavenCentral()
++        mavenRepo url: "file:///usr/share/maven-repo"
+     }
+     dependencies {
+-        classpath "org.ow2.asm:asm:4.0"
++        classpath "org.ow2.asm:asm:4.x"
+     }
+ }
+ 
+@@ -88,4 +89,4 @@ task exceptionUtils {
+             }
+         }
+     }
+-}
+\ No newline at end of file
++}
+--- groovy-2.1.6+dfsg.orig/subprojects/groovy-ant/build.gradle
++++ groovy-2.1.6+dfsg/subprojects/groovy-ant/build.gradle
+@@ -1,12 +1,12 @@
+ dependencies {
+     compile project(':')
+     groovy project(':')
+-    compile "org.apache.ant:ant:1.8.4"
+-    runtime("org.apache.ant:ant-junit:1.8.4") {
++    compile "org.apache.ant:ant:debian"
++    runtime("org.apache.ant:ant-junit:debian") {
+         exclude(group: 'junit', module: 'junit')
+     }
+-    runtime "org.apache.ant:ant-launcher:1.8.4"
+-    runtime "org.apache.ant:ant-antlr:1.8.4"
++    runtime "org.apache.ant:ant-launcher:debian"
++    runtime "org.apache.ant:ant-antlr:debian"
+     // for groovydoc ant command
+     compile project(':groovy-groovydoc')
+     testCompile project(':groovy-test')
+--- groovy-2.1.6+dfsg.orig/subprojects/groovy-bsf/build.gradle
++++ groovy-2.1.6+dfsg/subprojects/groovy-bsf/build.gradle
+@@ -2,7 +2,7 @@ dependencies {
+     compile("bsf:bsf:2.4.0") {
+         exclude(group: 'commons-logging', module: 'commons-logging')
+     }
+-    compile 'commons-logging:commons-logging:1.1.1'
++    compile 'commons-logging:commons-logging:debian'
+     compile project(':')
+     testCompile project(':groovy-test')
+ }
+--- groovy-2.1.6+dfsg.orig/subprojects/groovy-docgenerator/build.gradle
++++ groovy-2.1.6+dfsg/subprojects/groovy-docgenerator/build.gradle
+@@ -3,5 +3,5 @@ dependencies {
+     compile project(':groovy-templates')
+     groovy project(':')
+     testCompile project(':groovy-test')
+-    compile "com.thoughtworks.qdox:qdox:1.12.1"
++    compile "com.thoughtworks.qdox:qdox:debian"
+ }
+--- groovy-2.1.6+dfsg.orig/subprojects/groovy-servlet/build.gradle
++++ groovy-2.1.6+dfsg/subprojects/groovy-servlet/build.gradle
+@@ -1,8 +1,8 @@
+ dependencies {
+-    compile("javax.servlet:servlet-api:2.4") { dep ->
++    compile("javax.servlet:servlet-api:2.5") { dep ->
+         provided dep
+     }
+-    compile("javax.servlet:jsp-api:2.0") { dep ->
++    compile("javax.servlet.jsp:jsp-api:2.1") { dep ->
+         provided dep
+     }
+     compile project(':')

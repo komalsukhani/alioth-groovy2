@@ -1,0 +1,406 @@
+groovy (2.1.6+dfsg-1) experimental; urgency=low
+
+  * New upstream release. (Closes: #708193).
+  * Switch build system from Ant to Gradle.
+  * Remove obsolete DMUA field in d/control file.
+  * Update Uploaders list since I'm the only mantainer nowadays.
+    Thanks to all the previous maintainers for their work on this package.
+  * Update dependency lists.
+  * Bump Standards-Version to 3.9.5. No changes were required.
+  * Make copyright file compliant with format 1.0.
+  * Migrate maintenance to Alioth git repositorites and update Vcs-* fields.
+  * Add Maven metadata as a patch because it's not included anymore in the
+    upstream tarball. I added the target get-orig-pom in d/rules.
+  * Bump debhelper compat level to 9.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Fri, 01 Nov 2013 00:19:47 -0300
+
+groovy (1.8.6-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Mon, 13 Feb 2012 19:07:27 -0430
+
+groovy (1.8.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Sat, 24 Dec 2011 12:58:27 -0430
+
+groovy (1.8.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Sat, 12 Nov 2011 08:53:18 -0430
+
+groovy (1.8.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * Refresh patches.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Thu, 13 Oct 2011 21:36:25 -0430
+
+groovy (1.8.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Mon, 05 Sep 2011 22:31:51 -0430
+
+groovy (1.8.1-2) unstable; urgency=low
+
+  * Team upload.
+  
+  [Miguel Landaeta]
+  * Upload to unstable.
+
+  [tony mancill]
+  * Set DMUA flag.
+
+ -- tony mancill <tmancill@debian.org>  Tue, 09 Aug 2011 16:20:19 -0700
+
+groovy (1.8.1-1) experimental; urgency=low
+
+  * New upstream release.
+  * Update watch file.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Sun, 24 Jul 2011 11:12:10 +0200
+
+groovy (1.7.10-2) unstable; urgency=low
+
+  * Add ant-nodeps jar as dep in debian/rules due to changes in Ant 1.8.1.
+  * Bump Standards-Version to 3.9.2. No changes were required.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Wed, 04 May 2011 10:15:07 -0430
+
+groovy (1.7.10-1) unstable; urgency=low
+
+  * New upstream release.
+  * Use the location of java command instead of javac one to determine
+    JAVA_HOME. (Closes: #619844).
+  * Replace optional dependency of java5-runtime-headless with
+    sun-java6-jre since is not true that groovy will work with any Java 5
+    runtime available in Debian.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Wed, 23 Mar 2011 19:50:48 -0430
+
+groovy (1.7.9-1) unstable; urgency=low
+
+  * New upstream upload.
+  * Add optional Depends on java5-runtime-headless for
+    groovy. (Closes: #617772).
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Fri, 11 Mar 2011 08:38:53 -0430
+
+groovy (1.7.8-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Thu, 17 Feb 2011 08:29:10 -0430
+
+groovy (1.7.7-1) unstable; urgency=low
+
+  * New upstream release. 
+  * Update dates in debian/copyright file.
+  * Add call to mh_clean in clean target.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Sun, 06 Feb 2011 19:56:53 -0430
+
+groovy (1.7.6-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+  * Fix section of grape manpage.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Thu, 16 Dec 2010 19:22:04 -0430
+
+groovy (1.7.5-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+  * Revert Depends on default-jdk. Set correct JAVA_HOME in startGroovy script.
+  * Update dates in debian/copyright file.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Thu, 11 Nov 2010 19:52:27 -0430
+
+groovy (1.7.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * Add Depends on default-jdk. (Closes: 580160).
+  * Bump debhelper compatibility level to 7.
+  * Bump Standards-Version to 3.9.1.
+    debian/copyright was updated to include the full text of BSD license,
+    references to /usr/share/common-licenses/BSD are now deprecated.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Thu, 05 Aug 2010 19:38:10 -0430
+
+groovy (1.7.3-1) UNRELEASED; urgency=low
+
+  [ Steffen Moeller ]
+  * New upstream release, refreshed patches.
+  * Bumped policy to 3.9.0, no changes required
+
+  [ Miguel Landaeta ]
+  * Add myself as Uploader.
+  * Add Build-Depends and Depends on libjansi-java.
+  * Refresh patches/0002-ant-build.diff.patch.
+  * Add mh_clean invocation to clean target.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Thu, 05 Aug 2010 14:49:05 -0430
+
+groovy (1.7.2-1) UNRELEASED; urgency=low
+
+  [ Torsten Werner ]
+  UNRELEASED, FTBFS: needs jansi
+  * New upstream release
+  * Change maintainers into Maintainers.
+  * Update patches and convert them to dep3 format.
+
+  [ Thierry Carrez ]
+  * debian/control, debian/rules: (Build-)Depend on libservlet2.5-java
+    instead of libservlet2.4-java
+  * debian/control: Remove useless runtime dependency on libclassworlds-java
+
+ -- Thierry Carrez <thierry.carrez@ubuntu.com>  Wed, 09 Jun 2010 10:53:24 +0200
+
+groovy (1.7.0-3) unstable; urgency=low
+
+  * Replace asm2 with asm3 in debian/maven.rules. (Closes: #571356)
+
+ -- Torsten Werner <twerner@debian.org>  Sun, 28 Feb 2010 11:33:39 +0100
+
+groovy (1.7.0-2) unstable; urgency=low
+
+  * Replace asm2 with asm3 in debian/groovy.links (Closes: #571369)
+  * Replace asm2 with asm3 in patches/ant-build.diff
+
+ -- Varun Hiremath <varun@debian.org>  Fri, 26 Feb 2010 16:39:51 -0500
+
+groovy (1.7.0-1) unstable; urgency=low
+
+  * New upstream release
+  * Switch to source format 3.0 (quilt)
+  * debian/control:
+    - Switch to default-jdk
+    - Replace Build-Depends: libasm2* with libasm3*
+    - Bump Standards-Version to 3.8.4
+  * Update all the patches
+
+ -- Varun Hiremath <varun@debian.org>  Wed, 17 Feb 2010 18:25:49 -0500
+
+groovy (1.6.4-4) unstable; urgency=low
+
+  [ Varun Hiremath ]
+  * Fix debian/copyright file (Closes: #543565)
+  * Bump Standards-Version to 3.8.3
+
+  [ Torsten Werner ]
+  * Remove Build-Depends: bnd and add a patch disable-bn.diff because bnd is
+    not ready for main yet. (Closes: #543130)
+
+ -- Torsten Werner <twerner@debian.org>  Wed, 16 Sep 2009 13:25:12 +0200
+
+groovy (1.6.4-3) unstable; urgency=low
+
+  * Patch startGroovy to use Debian paths (Closes: #540688)
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Fri, 14 Aug 2009 14:26:04 +0100
+
+groovy (1.6.4-2) unstable; urgency=low
+
+  * Update Depends: libcommons-cli-java (>= 1.2). (Closes: #530623)
+
+ -- Torsten Werner <twerner@debian.org>  Sun, 09 Aug 2009 11:24:02 +0200
+
+groovy (1.6.4-1) experimental; urgency=low
+
+  * New upstream release
+  * Add myself to Uploaders
+  * Fix classpath for bnd task in the build
+  * Add ant to Suggests: for the groovy package as
+    Ant can be embedded in some Groovy scripts
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Sun, 02 Aug 2009 23:12:29 +0100
+
+groovy (1.6.3-2) experimental; urgency=low
+
+  * Change the section to java
+  * Update the build to use most of the original ant build script
+  * Remove build.diff patch as it is not useful anymore.
+  * Use BND to add the OSGi metadata to the jar.
+  * Add bnd, libqdox-java, libjarjar-java to Build-Depends
+  * Link ivy.jar into the Groovy lib folder (Closes: #526472)
+  * Add Build-Depends on maven-repo-helper
+  * Deploy groovy jars into the Maven repository
+  * Add embeddable jar groovy-all.jar
+  * Add the Groovy documentation (gapi) and the Groovy changes
+    to the JDK (groovy-jdk) specification.
+  * Move the classloader configuration to /etc/groovy.
+  * Bump Standards-Version to 3.8.2:
+    - Add a README.source to describe patch system
+    - move API documentation to /usr/share/doc/groovy/api
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Fri, 17 Jul 2009 00:33:18 +0100
+
+groovy (1.6.3-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Torsten Werner <twerner@debian.org>  Tue, 19 May 2009 21:49:37 +0200
+
+groovy (1.6.2-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Varun Hiremath <varun@debian.org>  Wed, 06 May 2009 14:05:59 -0400
+
+groovy (1.6.0-1) unstable; urgency=low
+
+  [ Torsten Werner ]
+  * New upstream release (Closes: #521648)
+  * Remove Build-Depends: libclassworlds-java.
+  * Switch to source and target version 1.5.
+
+  [ Varun Hiremath ]
+  * Fix build.xml file
+  * Add ivy to Build-Depends
+  * Remove unnecessary Depends -- collections3, mx4j and xpp3
+  * Add build.diff patch to fix a build error
+  * Use quilt to manage patches
+  * Update manpage (Closes: #507862)
+
+ -- Varun Hiremath <varun@debian.org>  Wed, 01 Apr 2009 19:24:19 -0400
+
+groovy (1.5.7-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Torsten Werner <twerner@debian.org>  Thu, 04 Dec 2008 11:15:20 +0100
+
+groovy (1.5.6-2) unstable; urgency=low
+
+  * Build the package with openjdk-6-jdk now.
+  * Move package to main.
+  * Change Depends: openjdk-6-jre-headless | java5-runtime-headless.
+  * Bump up Standards-Version: 3.8.0 (no changes needed).
+
+ -- Torsten Werner <twerner@debian.org>  Mon, 11 Aug 2008 19:21:53 +0200
+
+groovy (1.5.6-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Varun Hiremath <varun@debian.org>  Thu, 01 May 2008 10:40:25 +0530
+
+groovy (1.5.5-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Varun Hiremath <varun@debian.org>  Mon, 14 Apr 2008 14:53:28 +0530
+
+groovy (1.5.4-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Varun Hiremath <varun@debian.org>  Sun, 10 Feb 2008 17:29:48 +0530
+
+groovy (1.5.2-1) unstable; urgency=low
+  
+  * New upstream release
+  * Add antlr to Build-Depends-Indep and groovy Depends (Closes: #463147)
+  * Bump debhelper compat to 6
+
+ -- Varun Hiremath <varun@debian.org>  Wed, 30 Jan 2008 09:41:16 +0530
+
+groovy (1.5.1-1) unstable; urgency=low
+
+  * New upstream release
+  * Fix hyphens in groovy manpage
+
+ -- Varun Hiremath <varun@debian.org>  Sat, 05 Jan 2008 03:42:21 +0530
+
+groovy (1.5.0-2) unstable; urgency=low
+
+  * Set source=1.4 and target=1.4 for javac. (Closes: #458001)
+
+ -- Torsten Werner <twerner@debian.org>  Fri, 28 Dec 2007 12:58:00 +0100
+
+groovy (1.5.0-1) unstable; urgency=low
+
+  [ Varun Hiremath ]
+  * New upstream release (Closes: #367010)
+  * debian/control:
+    + Set Debian Java maintainers as Maintainer (Closes: #382815)
+    + Add myself and Torsten to Uploaders
+    + Add sun-java6-jdk, libxstream-java to Build-Depends
+    + Add Homepage, Vcs-{Svn, Browser} headers
+    + Bump up the Standards-Version to 3.7.3
+    + Add Suggests for the binary and doc packages
+  * Add debian/watch, debian/orig-tar.sh to create orig.tar.gz
+  * Write a new debian/build.xml and add debian/ant.properties
+  * debian/rules:
+    + call javadoc to build docs
+    + use sun-java6-jdk to build
+  * Clean up javadoc installation.
+  * Add some missing links in debian/groovy.links
+  * Add manpages
+
+  [ Torsten Werner ]
+  * Switch to libservlet2.4-java.
+  * Add Build-Depends: libjline-java.
+  * Remove the (binary only) PDF file from orig.tar.gz.
+
+ -- Torsten Werner <twerner@debian.org>  Sat, 15 Dec 2007 15:21:00 +0100
+
+groovy (0.1.0beta10-3) unstable; urgency=low
+
+  * Fixed dependencies to ant after ant reorganisation into main.
+    (closes: #331647)
+
+ -- Marcus Crafter <crafterm@debian.org>  Tue, 18 Oct 2005 12:35:43 +0200
+
+groovy (0.1.0beta10-2) unstable; urgency=low
+
+  * Added missing dependency to bzip2. Thanks for Andreas Jochens
+    <aj@andaco.de> for the bug report.
+    (closes: #302574)
+
+ -- Marcus Crafter <crafterm@debian.org>  Sat,  2 Apr 2005 20:32:48 +0200
+
+groovy (0.1.0beta10-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Marcus Crafter <crafterm@debian.org>  Wed,  9 Mar 2005 17:11:18 +0100
+
+groovy (0.1.0beta8-4) unstable; urgency=low
+
+  * Improved website mirror in groovy-doc package by increasing the mirrored
+    link depth to 2. This catches many more articles from the Groovy wiki
+    which would be of interest for offline reading.
+  * Fixed broken doc-base links, added doc-base link for the website mirror.
+  * Added examples.
+
+ -- Marcus Crafter <crafterm@debian.org>  Mon,  3 Jan 2005 21:34:18 +0100
+
+groovy (0.1.0beta8-3) unstable; urgency=low
+
+  * Added a shallow copy of the Groovy website to the groovy-doc package,
+    which contains various articles, language references and documents for
+    offline use. Rearranged javadoc generation to fit in with the website.
+
+ -- Marcus Crafter <crafterm@debian.org>  Mon,  3 Jan 2005 00:37:10 +0100
+
+groovy (0.1.0beta8-2) unstable; urgency=low
+
+  * Updated build to include Groovy API javadoc, and Groovy JDK
+    documentation.
+  * Split package into a software and documentation package.
+  * Added doc-base details for groovy-doc package for the javadocs and
+    groovy API.
+
+ -- Marcus Crafter <crafterm@debian.org>  Sun,  2 Jan 2005 14:33:52 +0100
+
+groovy (0.1.0beta8-1) unstable; urgency=low
+
+  * Initial Release.
+    (closes: #268029)
+
+ -- Marcus Crafter <crafterm@debian.org>  Sat, 18 Dec 2004 22:45:06 +0100
