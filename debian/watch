@@ -1,3 +1,4 @@
 version=3
-opts=uversionmangle=s/-(rc|beta)-([0-9])+/~$1$2/,dversionmangle=s/\+dfsg// \
-http://dist.groovy.codehaus.org/distributions/ groovy-src-(.*).zip debian debian/orig-tar.sh
+opts=uversionmangle=s/(\d)[_\.\-\+]?((RC|rc|pre|dev|beta|alpha|b|a)[\-\.]?\d*)$/$1~$2/,dversionmangle=s/\+dfsg// \
+http://groovy.codehaus.org/Download .*/groovy-src-(\d.*)\.(?:tgz|tbz2|txz|tar\.(?:gz|bz2|xz)|zip) \
+debian debian/orig-tar.sh

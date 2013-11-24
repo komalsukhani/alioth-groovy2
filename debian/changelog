@@ -1,3 +1,15 @@
+groovy (2.1.9+dfsg-1) experimental; urgency=low
+
+  * New upstream release.
+  * Update watch file. Thanks to Bart Martens for the improved file.
+  * Remove GPars symlink from /usr/share/groovy/lib directory.
+    (Closes: #728562).
+  * Refresh patches:
+    - 01_fix_gradle_build.diff
+    - 03_add_maven_poms.diff
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Sun, 24 Nov 2013 18:14:43 -0300
+
 groovy (2.1.6+dfsg-1) experimental; urgency=low
 
   * New upstream release. (Closes: #708193).
