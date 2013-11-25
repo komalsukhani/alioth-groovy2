@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
-
 package groovy.transform.stc
 
 /**
- * Units tests aimed at testing the behaviour of {@link DelegatesTo} in combination
+ * Units tests aimed at testing the behavior of {@link DelegatesTo} in combination
  * with static type checking.
  *
  * @author Cedric Champeau
+ * @author <a href="mailto:blackdrag@gmx.org">Jochen "blackdrag" Theodorou</a>
  */
 class DelegatesToSTCTest extends StaticTypeCheckingTestCase {
     void testShouldChooseMethodFromOwner() {
@@ -479,4 +475,259 @@ class DelegatesToSTCTest extends StaticTypeCheckingTestCase {
 
         '''
     }
+
+    void testDelegatesToGenericTypeArgument() {
+        assertScript '''
+            public <T> Object map(@DelegatesTo.Target List<T> target, @DelegatesTo(genericTypeIndex=0) Closure arg) {
+                arg.delegate = target.join('')
+                arg()
+            }
+            def test() {
+                def result
+                map(['f','o','o']) {
+                    result = toUpperCase()
+                }
+
+                result
+            }
+            assert 'FOO'==test()
+        '''
+    }
+
+    void testDelegatesToGenericTypeArgumentAndActualArgumentNotUsingGenerics() {
+        assertScript '''import groovy.transform.InheritConstructors
+            @InheritConstructors
+            class MyList extends LinkedList<String> {}
+
+            public <T> Object map(@DelegatesTo.Target List<T> target, @DelegatesTo(genericTypeIndex=0) Closure arg) {
+                arg.delegate = target.join('')
+                arg()
+            }
+            def test() {
+                def result
+                def mylist = new MyList(['f','o','o'])
+                map(mylist) {
+                    result = toUpperCase()
+                }
+
+                result
+            }
+            assert 'FOO'==test()
+        '''
+    }
+
+    void testDelegatesToGenericTypeArgumentWithMissingGenerics() {
+        shouldFailWithMessages '''
+            public Object map(@DelegatesTo.Target List target, @DelegatesTo(genericTypeIndex=0) Closure arg) {
+                arg.delegate = target.join('')
+                arg()
+            }
+            def test() {
+                def result
+                map(['f','o','o']) {
+                    result = toUpperCase()
+                }
+
+                result
+            }
+            assert 'FOO'==test()
+        ''', 'Cannot use @DelegatesTo(genericTypeIndex=0) with a type that doesn\'t use generics', 'Cannot find matching method'
+    }
+
+    void testDelegatesToGenericTypeArgumentOutOfBounds() {
+        shouldFailWithMessages '''
+            public <T> Object map(@DelegatesTo.Target List<T> target, @DelegatesTo(genericTypeIndex=1) Closure arg) {
+                arg.delegate = target.join('')
+                arg()
+            }
+            def test() {
+                def result
+                map(['f','o','o']) {
+                    result = toUpperCase()
+                }
+
+                result
+            }
+            assert 'FOO'==test()
+        ''', 'Index of generic type @DelegatesTo(genericTypeIndex=1) greater than those of the selected type', 'Cannot find matching method'
+    }
+
+    void testDelegatesToGenericTypeArgumentWithNegativeIndex() {
+        shouldFailWithMessages '''
+            public <T> Object map(@DelegatesTo.Target List<T> target, @DelegatesTo(genericTypeIndex=-1) Closure arg) {
+                arg.delegate = target.join('')
+                arg()
+            }
+            def test() {
+                def result
+                map(['f','o','o']) {
+                    result = toUpperCase()
+                }
+
+                result
+            }
+            assert 'FOO'==test()
+        ''', 'Index of generic type @DelegatesTo(genericTypeIndex=-1) lower than those of the selected type', 'Cannot find matching method'
+    }
+
+    void testDelegatesToGenericTypeArgumentUsingMap() {
+        assertScript '''
+            public <K,V> void transform(@DelegatesTo.Target Map<K, V> map, @DelegatesTo(genericTypeIndex = 1) Closure<?> closure) {
+                map.keySet().each {
+                    closure.delegate = map[it]
+                    map[it] = closure()
+                }
+            }
+            def map = [1: 'a', 2: 'b', 3: 'c']
+            transform(map) {
+                toUpperCase()
+            }
+            assert map == [1: 'A', 2: 'B', 3: 'C']
+        '''
+    }
+
+    void testDelegatesToGenericTypeArgumentUsingMapAndWrongIndex() {
+        shouldFailWithMessages '''
+            public <K,V> void transform(@DelegatesTo.Target Map<K, V> map, @DelegatesTo(genericTypeIndex = 0) Closure<?> closure) {
+                map.keySet().each {
+                    closure.delegate = map[it]
+                    map[it] = closure()
+                }
+            }
+            def map = [1: 'a', 2: 'b', 3: 'c']
+            transform(map) {
+                toUpperCase()
+            }
+            assert map == [1: 'A', 2: 'B', 3: 'C']
+        ''', 'Cannot find matching method'
+    }
+
+    // GROOVY-6165
+    void testDelegatesToGenericArgumentTypeAndTypo() {
+        shouldFailWithMessages '''import groovy.transform.*
+
+        @TupleConstructor
+        class Person { String name }
+
+        public <T> List<T> names(
+            @DelegatesTo.Target List<T> list,
+            @DelegatesTo(genericTypeIndex = 0) Closure modify) {
+                list.collect {
+                    modify.delegate = it
+                    modify()
+                }
+        }
+
+        def test(List<Person> persons) {
+            def names = names(persons) {
+                getname().toUpperCase()
+            }
+            assert names == ['GUILLAUME', 'CEDRIC']
+        }
+
+        test([new Person('Guillaume'), new Person('Cedric')])
+        ''', 'Cannot find matching method'
+    }
+
+    // GROOVY-6323, GROOVY-6325, GROOVY-6332
+    void testStaticContextAndProperty() {
+        assertScript '''
+            class MyCar {
+                String brand
+                String model
+            }
+
+            class MyCarMain {
+                MyCar configureCar(@DelegatesTo(MyCar) Closure closure) {
+                    def car = new MyCar()
+                    closure.delegate = car
+                    closure.resolveStrategy = Closure.DELEGATE_FIRST
+                    closure()
+                    car
+                }
+                static void main(String[] args) {
+                    def main = new MyCarMain()
+                    def car = main.configureCar {
+                        brand = "BMW"
+                        model = brand + " X5"
+                    }
+                    assert car.model == "BMW X5"
+                }
+            }
+            MyCarMain.main()
+        '''
+
+        assertScript '''
+            class MyCar {
+                private String _brand
+                private String _model
+
+                String getBrand() {
+                    return _brand
+                }
+
+                void setBrand(String brand) {
+                    _brand = brand
+                }
+
+                String getModel() {
+                    return _model
+                }
+
+                void setModel(String model) {
+                    _model = model
+                }
+            }
+
+            class MyCarMain {
+                MyCar configureCar(@DelegatesTo(value = MyCar, strategy = Closure.DELEGATE_FIRST) Closure closure) {
+                    def car = new MyCar()
+                    closure.delegate = car
+                    closure.resolveStrategy = Closure.DELEGATE_FIRST
+                    closure()
+                    car
+                }
+
+                static void main(String[] args) {
+                    def main = new MyCarMain()
+                    def car = main.configureCar {
+                        brand = "BMW"
+                        model = brand
+                    }
+                    assert car.model == "BMW"
+                }
+            }
+            MyCarMain.main()
+        '''
+
+        assertScript '''
+            class Car {
+              private String _brand
+              String getBrand() { _brand }
+              void setBrand(String brand) { _brand = brand }
+            }
+
+            class Builder {
+              def <T> T configure(@DelegatesTo.Target Class<T> target, @DelegatesTo(genericTypeIndex=0) Closure cl) {
+                def obj = target.newInstance() 
+                cl.delegate = obj
+                cl.resolveStrategy = Closure.DELEGATE_FIRST
+                cl.call()
+                obj 
+              }
+            }
+
+            class Main {
+              void run() {
+                def builder = new Builder()
+                def car = builder.configure(Car) {
+                  brand = brand 
+                }
+              }
+            }
+
+            new Main().run()
+        '''
+    }
+
 }

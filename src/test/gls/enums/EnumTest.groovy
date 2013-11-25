@@ -409,24 +409,6 @@ class EnumTest extends CompilableTestSupport {
         """
     }
 
-    void testNamedArguments() {
-        // this test is a result of GROOVY-4219 and should be changed once
-        // GROOVY-4582 is implemented.
-        shouldNotCompile """
-            enum ImageSortField {
-                FILENAME(field: null, name: null),
-                TIME(field: null, name: null)
-                
-                def field
-                def name
-            
-                public String toString(){
-                    name
-                }
-            }
-        """
-    }
-
     void testOverridingMethodsWithExplicitConstructor() {
         // GROOVY-6065
         assertScript """
@@ -496,6 +478,67 @@ class EnumTest extends CompilableTestSupport {
             assert "foo1" == MyEnum.INSTANCE.foo()
         """
     }
+
+    void testLenientTypeDefinitions() {
+        // GROOVY-4794
+        assertScript """
+            enum E {
+              enConst {
+                @Lazy pi = 3.14
+                def twopi = 6.28
+                def foo(){ "" + pi + " " + twopi }
+                public bar(){ "" + twopi + " " + pi }
+              }
+            }
+            assert E.enConst.foo() == '3.14 6.28'
+            assert E.enConst.bar() == '6.28 3.14'
+        """
+    }
+
+    void testNamedArgs() {
+        // GROOVY-4485
+        assertScript """
+            enum ExportFormat {
+                EXCEL_OOXML(mime: "application/vnd.ms-excel", extension: "xlsx"),
+                EXCEL_BINARY(mime: "application/vnd.ms-excel", extension: "xls"),
+                EXCEL_HTML(mime: "application/vnd.ms-excel", extension: "xls"),
+                FOO() // dummy const for testing
+                String mime, extension = 'default'
+            }
+
+            assert ExportFormat.EXCEL_BINARY.extension == 'xls'
+            ExportFormat.values().each{
+                assert it == ExportFormat.FOO || it.mime == 'application/vnd.ms-excel'
+            }
+            assert ExportFormat.EXCEL_HTML.ordinal() == 2
+            assert ExportFormat.FOO.extension == 'default'
+        """
+    }
+
+    void testGenericMethodOverriding() {
+        // GROOVY-6250
+        assertScript """
+            interface IVisitor<InputType, OutputType> {
+                OutputType visitMe(InputType input)
+            }
+
+            class ConcreteVisitor implements IVisitor<Void, String> {
+                String visitMe(Void v) { 'I have been visited!' }
+            }
+
+            enum MyEnum {
+                ENUM1 {
+                    @Override
+                    <I, O> O accept(IVisitor<I, O> visitor, I input) {
+                        visitor.visitMe(input)
+                    }
+                }
+                abstract <I, O> O accept(IVisitor<I, O> visitor, I input)
+            }
+
+            assert MyEnum.ENUM1.accept(new ConcreteVisitor(), null) == 'I have been visited!'
+        """
+    }
 }
 
 enum UsCoin {
@@ -509,12 +552,12 @@ enum EmptyEnum{}
 
 enum GroovyColors3161 {
     red, blue, green
-    static def ALL_COLORS = [red, blue, green]
+    static ALL_COLORS = [red, blue, green]
 }
 
 enum GroovyColors3161B {
     red, blue, green,
-    static def ALL_COLORS = [red, blue, green]
+    static ALL_COLORS = [red, blue, green]
 }
 
 enum Foo3284 {

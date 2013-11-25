@@ -143,17 +143,15 @@ class GroovyClosureMethodsTest extends GroovyTestCase {
     }
 
     void testRunAfter() {
-        def timer = new Timer()
-        boolean status = false
-        timer.runAfter(2000) {
-            println "Running after 2 seconds wait"
-            status = true
+        boolean modifiedByRunAfter = false
+        new Timer().runAfter(50) {
+            modifiedByRunAfter = true
         }
-        println "I should run first"
-        assert status == false
-        Thread.sleep(3000)
-        println "I should run last"
-        assert status == true
+        assert modifiedByRunAfter == false
+        for(int i = 0; !modifiedByRunAfter && i < 10; i++) {
+           Thread.sleep 100
+        }
+        assert modifiedByRunAfter
     }
 
     void testSplitEachLine() {

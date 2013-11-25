@@ -19,10 +19,37 @@ import groovy.ui.Console
 import groovy.ui.ConsoleActions
 import groovy.ui.view.BasicMenuBar
 import groovy.ui.view.MacOSXMenuBar
+import java.util.prefs.Preferences
+import org.junit.rules.TemporaryFolder
 
+import javax.swing.SwingUtilities
 import java.awt.Color
 
 class SwingBuilderConsoleTest extends GroovySwingTestCase {
+
+    TemporaryFolder temporaryFolder
+    Preferences testPreferences
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp()
+        temporaryFolder = new TemporaryFolder()
+        temporaryFolder.create()
+
+        // create a temporary preferences object instead of using the local Console preferences
+        testPreferences = Preferences.userRoot().node('/swingBuilder/console/tests')
+        Preferences.metaClass.static.userNodeForPackage = { Class c ->
+            testPreferences
+        }
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        temporaryFolder.delete()
+
+        super.tearDown()
+    }
+
     void testTabbedPane() {
         testInEDT {
 
@@ -339,4 +366,70 @@ class SwingBuilderConsoleTest extends GroovySwingTestCase {
         }
     }
 
+    void testAutoSaveOnRunMenuBarCheckbox() {
+        testInEDT {
+            def binding = new Binding()
+            binding.setVariable("controller", new Console())
+
+            final consoleActions = new ConsoleActions()
+
+            def swing = new SwingBuilder()
+
+            final console = new Console()
+            final scriptFile = temporaryFolder.newFile('test.groovy')
+            console.scriptFile = scriptFile
+
+            swing.controller = console
+
+            swing.build(consoleActions)
+            console.run()
+
+            console.inputEditor.textEditor.text = "'hello world!'"
+            console.saveOnRun(new EventObject([selected: true]))
+
+            assert console.prefs.getBoolean('saveOnRun', false)
+
+            console.runScript(new EventObject([:]))
+
+            assert scriptFile.text == console.inputEditor.textEditor.text
+        }
+    }
+
+    void testDoNotShowOriginalStackTrace() {
+        testInEDT {
+            SwingUtilities.metaClass.static.invokeLater = { Runnable runnable ->
+                runnable.run()
+            }
+            Thread.metaClass.static.start = { Runnable runnable ->
+                runnable.run()
+            }
+
+            // in case the static final var has been already initialized
+            Console.prefs = testPreferences
+
+            try {
+                def binding = new Binding()
+                binding.setVariable("controller", new Console())
+
+                final consoleActions = new ConsoleActions()
+                final console = new Console()
+
+                def swing = new SwingBuilder()
+                swing.controller = console
+
+                swing.build(consoleActions)
+                console.run()
+
+                console.inputArea.text = 'throw new Exception()'
+                console.runScript(new EventObject([:]))
+
+                def doc = console.outputArea.document
+                assert doc.getText(0, doc.getLength()) =~ /java.lang.Exception/
+            } finally {
+                GroovySystem.metaClassRegistry.removeMetaClass(Thread)
+                GroovySystem.metaClassRegistry.removeMetaClass(SwingUtilities)
+                GroovySystem.metaClassRegistry.removeMetaClass(Preferences)
+            }
+        }
+    }
 }

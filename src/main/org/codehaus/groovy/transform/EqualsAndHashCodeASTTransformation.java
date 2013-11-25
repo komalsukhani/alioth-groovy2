@@ -37,6 +37,7 @@ import org.codehaus.groovy.ast.stmt.Statement;
 import org.codehaus.groovy.classgen.Verifier;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.syntax.Token;
 import org.codehaus.groovy.syntax.Types;
 import org.codehaus.groovy.util.HashCodeHelper;
@@ -52,6 +53,7 @@ public class EqualsAndHashCodeASTTransformation extends AbstractASTTransformatio
     static final ClassNode MY_TYPE = ClassHelper.make(MY_CLASS);
     static final String MY_TYPE_NAME = "@" + MY_TYPE.getNameWithoutPackage();
     private static final ClassNode HASHUTIL_TYPE = ClassHelper.make(HashCodeHelper.class);
+    private static final ClassNode INVOKERHELPER_TYPE = ClassHelper.make(InvokerHelper.class);
     private static final Token ASSIGN = Token.newSymbol(Types.ASSIGN, -1, -1);
     private static final Token LOGICAL_OR = Token.newSymbol(Types.LOGICAL_OR, -1, -1);
     private static final Token LOGICAL_AND = Token.newSymbol(Types.LOGICAL_AND, -1, -1);
@@ -101,7 +103,7 @@ public class EqualsAndHashCodeASTTransformation extends AbstractASTTransformatio
             body.addStatement(new IfStatement(
                     isZeroExpr(hash),
                     calculateHashStatements(cNode, hash, includeFields, callSuper, excludes, includes),
-                    new EmptyStatement()
+                    EmptyStatement.INSTANCE
             ));
             body.addStatement(new ReturnStatement(hash));
         } else {
@@ -127,8 +129,8 @@ public class EqualsAndHashCodeASTTransformation extends AbstractASTTransformatio
         for (PropertyNode pNode : pList) {
             if (shouldSkip(pNode.getName(), excludes, includes)) continue;
             // _result = HashCodeHelper.updateHash(_result, getProperty()) // plus self-reference checking
-            String getterName = "get" + Verifier.capitalize(pNode.getName());
-            Expression getter = new MethodCallExpression(VariableExpression.THIS_EXPRESSION, getterName, MethodCallExpression.NO_ARGUMENTS);
+            Expression getter = new StaticMethodCallExpression(INVOKERHELPER_TYPE, "getProperty",
+                    new TupleExpression(new VariableExpression("this"), new ConstantExpression(pNode.getName())));
             final Expression args = new TupleExpression(result, getter);
             final Expression current = new StaticMethodCallExpression(HASHUTIL_TYPE, "updateHash", args);
             body.addStatement(new IfStatement(identicalExpr(getter, new VariableExpression("this")),
@@ -161,10 +163,6 @@ public class EqualsAndHashCodeASTTransformation extends AbstractASTTransformatio
         return body;
     }
 
-    private static boolean shouldSkip(String name, List<String> excludes, List<String> includes) {
-        return (excludes != null && excludes.contains(name)) || name.contains("$") || (includes != null && !includes.isEmpty() && !includes.contains(name));
-    }
-
     private static void createCanEqual(ClassNode cNode) {
         boolean hasExistingCanEqual = hasDeclaredMethod(cNode, "canEqual", 1);
         if (hasExistingCanEqual && hasDeclaredMethod(cNode, "_canEqual", 1)) return;
@@ -195,7 +193,7 @@ public class EqualsAndHashCodeASTTransformation extends AbstractASTTransformatio
             body.addStatement(returnFalseIfNotInstanceof(cNode, other));
             body.addStatement(new IfStatement(
                     new BooleanExpression(new MethodCallExpression(other, "canEqual", VariableExpression.THIS_EXPRESSION)),
-                    new EmptyStatement(),
+                    EmptyStatement.INSTANCE,
                     new ReturnStatement(ConstantExpression.FALSE)
             ));
         } else {
@@ -235,7 +233,7 @@ public class EqualsAndHashCodeASTTransformation extends AbstractASTTransformatio
         if (callSuper) {
             body.addStatement(new IfStatement(
                     isTrueExpr(new MethodCallExpression(VariableExpression.SUPER_EXPRESSION, "equals", other)),
-                    new EmptyStatement(),
+                    EmptyStatement.INSTANCE,
                     new ReturnStatement(ConstantExpression.FALSE)
             ));
         }

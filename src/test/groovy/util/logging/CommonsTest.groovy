@@ -135,19 +135,76 @@ class CommonsTest extends GroovyTestCase {
 
     public void testLogGuards() {
         Class clazz = new GroovyClassLoader().parseClass('''
-            def traceCalled = false
+
+            class LogDecorator extends groovy.util.Proxy {
+                boolean isTraceEnabled() { false }
+            }
+
             @groovy.util.logging.Commons
             class MyClass {
+                boolean traceCalled = false
+                MyClass() {
+                    log = new LogDecorator().wrap(log) as org.apache.commons.logging.Log
+                }
 
                 def loggingMethod() {
                     log.trace (traceCalled = true)
                 }
             }
-            new MyClass().loggingMethod()
-            return traceCalled''')
+            def o = new MyClass()
+            o.loggingMethod()
+            o.traceCalled''')
 
         Script s = (Script) clazz.newInstance()
         def result = s.run()
         assert !result
+    }
+
+    void testDefaultCategory() {
+        PrintStream savedSystemOut = System.out
+        try {
+            ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()
+            System.out = new PrintStream(redirectedSystemOut)
+
+            Class clazz = new GroovyClassLoader().parseClass("""
+            @groovy.util.logging.Commons
+            class MyClass {
+                static loggingMethod() {
+                  log.error("error called")
+                }
+            }""")
+            def s = clazz.newInstance()
+
+            s.loggingMethod()
+
+            assert redirectedSystemOut.toString().contains('MyClass')
+        }
+        finally {
+            System.out = savedSystemOut
+        }
+    }
+
+    public void testCustomCategory() {
+        PrintStream savedSystemOut = System.out
+        try {
+            ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()
+            System.out = new PrintStream(redirectedSystemOut)
+
+            Class clazz = new GroovyClassLoader().parseClass("""
+            @groovy.util.logging.Commons(category='customCategory')
+            class MyClass {
+                static loggingMethod() {
+                  log.error("error called")
+                }
+            }""")
+            def s = clazz.newInstance()
+
+            s.loggingMethod()
+
+            assert redirectedSystemOut.toString().contains('customCategory')
+        }
+        finally {
+            System.out = savedSystemOut
+        }
     }
 }

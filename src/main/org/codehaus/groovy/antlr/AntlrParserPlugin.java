@@ -703,8 +703,6 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
             element = element.getNextSibling();
         }
         String identifier = identifier(element);
-        int savedLine = element.getLine();
-        int savedColumn = element.getColumn();
         Expression init = null;
         element = element.getNextSibling();
 
@@ -723,9 +721,8 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
             }
 
             if (innerClass != null) {
-                // we have to handle an enum that defines a class for a constant
-                // for example the constant having overwriting a method. we need 
-                // to configure the inner class 
+                // we have to handle an enum constant with a class overriding
+                // a method in which case we need to configure the inner class
                 innerClass.setSuperClass(classNode.getPlainNodeReference());
                 innerClass.setModifiers(classNode.getModifiers() | Opcodes.ACC_FINAL);
                 // we use a ClassExpression for transportation to EnumVisitor
@@ -754,7 +751,7 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
                 }
             }
         }
-        FieldNode enumField = EnumHelper.addEnumConstant(classNode, identifier, init, savedLine, savedColumn);
+        FieldNode enumField = EnumHelper.addEnumConstant(classNode, identifier, init);
         enumField.addAnnotations(annotations);
         configureAST(enumField, node);
         enumConstantBeingDef = false;
@@ -2554,7 +2551,7 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
             TupleExpression te = (TupleExpression) arguments;
             List<Expression> expressions = te.getExpressions();
             if (expressions.size() == 0) return null;
-            Expression last = (Expression) expressions.remove(expressions.size() - 1);
+            Expression last = expressions.remove(expressions.size() - 1);
             if (last instanceof AnonymousInnerClassCarrier) {
                 AnonymousInnerClassCarrier carrier = (AnonymousInnerClassCarrier) last;
                 return carrier.innerClass;

@@ -112,6 +112,20 @@ class GroovyMethodsTest extends GroovyTestCase {
         assert lists.combinations() as Set == [['a', 3], ['b', 3]] as Set
     }
 
+    void testCombinationsWithAction() {
+        def lists = [[2, 3],[4, 5, 6]]
+        def expected = [8, 12, 10, 15, 12, 18]
+        assert lists.combinations {x,y -> x*y } as Set == expected as Set
+    }
+
+    void testEachCombination() {
+        def lists = [[2, 3],[4, 5, 6]]
+        Set expected = [8, 12, 10, 15, 12, 18]
+        Set collector = []
+        lists.eachCombination {x,y -> collector << x*y }
+        assert collector == expected
+    }
+
     void testTranspose() {
         def list1 = [['a', 'b'], [1, 2, 3]]
         def list2 = [['a', 'b', 'c'], [1, 2]]
@@ -525,32 +539,36 @@ class GroovyMethodsTest extends GroovyTestCase {
 
     void testObjectSleep() {
         long start = System.currentTimeMillis()
-        sleep 1000
+        long sleeptime = 200
+        sleep sleeptime
         long slept = System.currentTimeMillis() - start
-        long epsilon = 120
-        assert (slept > 1000 - epsilon) && (slept < 1000 + epsilon):   \
-               "should have slept for 1s (+/- " + epsilon + "ms) but was ${slept}ms"
+        assert (slept >= sleeptime):   \
+               "Should have slept for at least $sleeptime ms (+/- epsilon ms) but slept only $slept ms"
     }
 
     void testObjectSleepInterrupted() {
         def interruptor = new groovy.TestInterruptor(Thread.currentThread())
         new Thread(interruptor).start()
         long start = System.currentTimeMillis()
-        sleep 1000
+        long sleeptime = 200
+        sleep sleeptime
         long slept = System.currentTimeMillis() - start
-        long epsilon = 150
-        assert (slept > 1000 - epsilon) && (slept < 1000 + epsilon):   \
-               "should have slept for 1s (+/- " + epsilon + "ms) but was ${slept}ms"
+        assert (slept >= sleeptime):   \
+               "Should have slept for at least $sleeptime ms (+/- epsilon ms) but slept only $slept ms"
     }
 
-    void testObjectSleepWithOnInterruptHandler() {
+    void testObjectSleepWithOnInterruptHandlerStopSleeping() {
         def log = ''
         def interruptor = new groovy.TestInterruptor(Thread.currentThread())
         new Thread(interruptor).start()
         long start = System.currentTimeMillis()
-        sleep(2000) {log += it.toString()}
+        long sleeptime = 3000
+        sleep(sleeptime) {
+            log += it.toString()
+            true
+        }
         long slept = System.currentTimeMillis() - start
-        assert slept < 2000, "should have been interrupted but slept ${slept}ms > 2s"
+        assert slept < sleeptime, "should have been interrupted but slept $slept ms > $sleeptime ms"
         assertEquals 'java.lang.InterruptedException: sleep interrupted', log.toString()
     }
 
@@ -559,13 +577,14 @@ class GroovyMethodsTest extends GroovyTestCase {
         def interruptor = new groovy.TestInterruptor(Thread.currentThread())
         new Thread(interruptor).start()
         long start = System.currentTimeMillis()
-        sleep(2000) {
+        long sleeptime = 500
+        sleep(sleeptime) {
             log += it.toString()
             false // continue sleeping
         }
         long slept = System.currentTimeMillis() - start
-        short allowedError = 4 // ms
-        assert slept + allowedError >= 2000, "should have slept for at least 2s but only slept for ${slept}ms"
+        short allowedError = 10 // ms
+        assert slept + allowedError >= sleeptime, "should have slept for at least $sleeptime ms but only slept for $slept ms"
         assertEquals 'java.lang.InterruptedException: sleep interrupted', log.toString()
     }
 
@@ -916,6 +935,11 @@ class GroovyMethodsTest extends GroovyTestCase {
                 ['g', 'f', 'r', 'o'],
                 ['g', 'f', 'o', 'r'],
         ] as Set
+    }
+
+    void testPermutationsWithAction() {
+            def items = [1, 2, 3]
+            assert items.permutations { it.collect { 2*it } } as Set == [[2, 4, 6], [2, 6, 4], [4, 2, 6], [4, 6, 2], [6, 2, 4], [6, 4, 2]] as Set
     }
 
     void testStringTranslate() {

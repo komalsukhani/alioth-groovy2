@@ -7,16 +7,9 @@
 Building
 ---
 
-_Starting from Groovy 2.0-0-rc-1, the Ant build is no longer supported_
-
 To build you will need:
 
 * [JDK 1.7+](http://www.oracle.com/technetwork/java/javase/downloads)
-
-
-For detailed instructions please see:
-
-* [http://groovy.codehaus.org/Building+Groovy+from+Source](http://groovy.codehaus.org/Building+Groovy+from+Source)
 
 To build everything using Gradle (the command below will download Gradle automatically, you do not need to download it first).
 
@@ -30,15 +23,15 @@ To build everything and launch unit tests, use
 
 To build from IntelliJ IDEA
 
-    ./gradlew idea
-    ./gradlew jarAll
+    ./gradlew jarAll idea
 
 Then open the generated project in IDEA.
 
-To build from Eclipse:
+To build from Eclipse
 
-TBD
+    ./gradlew jarAll eclipse
 
+Then open the generated project and the generated subprojects in Eclipse.
 
 InvokeDynamic support
 ---

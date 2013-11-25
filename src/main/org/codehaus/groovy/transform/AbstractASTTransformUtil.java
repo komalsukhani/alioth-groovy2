@@ -61,14 +61,14 @@ public abstract class AbstractASTTransformUtil implements Opcodes {
         return new IfStatement(
                 notEqualClasses(cNode, other),
                 new ReturnStatement(new ConstantExpression(Boolean.FALSE)),
-                new EmptyStatement()
+                EmptyStatement.INSTANCE
         );
     }
 
     public static Statement returnFalseIfNotInstanceof(ClassNode cNode, Expression other) {
         return new IfStatement(
                 isInstanceof(cNode, other),
-                new EmptyStatement(),
+                EmptyStatement.INSTANCE,
                 new ReturnStatement(new ConstantExpression(Boolean.FALSE))
         );
     }
@@ -77,7 +77,7 @@ public abstract class AbstractASTTransformUtil implements Opcodes {
         return new IfStatement(
                 equalsNullExpr(other),
                 new ReturnStatement(new ConstantExpression(Boolean.FALSE)),
-                new EmptyStatement()
+                EmptyStatement.INSTANCE
         );
     }
 
@@ -85,7 +85,7 @@ public abstract class AbstractASTTransformUtil implements Opcodes {
         return new IfStatement(
                 identicalExpr(self, other),
                 new ReturnStatement(new ConstantExpression(Boolean.TRUE)),
-                new EmptyStatement()
+                EmptyStatement.INSTANCE
         );
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractASTTransformUtil implements Opcodes {
         return new IfStatement(
                 notEqualsPropertyExpr(pNode, other),
                 new ReturnStatement(new ConstantExpression(Boolean.FALSE)),
-                new EmptyStatement()
+                EmptyStatement.INSTANCE
         );
     }
 
@@ -106,7 +106,7 @@ public abstract class AbstractASTTransformUtil implements Opcodes {
         return new IfStatement(
                 notEqualsFieldExpr(fNode, other),
                 new ReturnStatement(new ConstantExpression(Boolean.FALSE)),
-                new EmptyStatement()
+                EmptyStatement.INSTANCE
         );
     }
 
@@ -270,7 +270,7 @@ public abstract class AbstractASTTransformUtil implements Opcodes {
                 equalsNullExpr(value),
                 new IfStatement(
                         equalsNullExpr(initExpr),
-                        new EmptyStatement(),
+                        EmptyStatement.INSTANCE,
                         assignStatement(fieldExpr, initExpr)),
                 assignStatement(fieldExpr, value));
     }

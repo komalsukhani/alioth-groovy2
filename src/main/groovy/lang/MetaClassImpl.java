@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012 the original author or authors.
+ * Copyright 2003-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,11 +90,10 @@ import java.util.*;
  *
  * @author <a href="mailto:james@coredevelopers.net">James Strachan</a>
  * @author Guillaume Laforge
- * @author Jochen Theodorou
+ * @author <a href="mailto:blackdrag@gmx.org">Jochen "blackdrag" Theodorou</a>
  * @author Graeme Rocher
  * @author Alex Tkachman
  * @author Roshan Dawrani
- * @version $Revision$
  * @see groovy.lang.MetaClass
  */
 public class MetaClassImpl implements MetaClass, MutableMetaClass {
@@ -1521,7 +1520,6 @@ public class MetaClassImpl implements MetaClass, MutableMetaClass {
     /**
      * This is a helper class introduced in Groovy 2.1.0, which is used only by
      * indy. This class is for internal use only.
-     * @author <a href="mailto:blackdrag@gmx.org">Jochen "blackdrag" Theodorou</a>
      * @since Groovy 2.1.0
      */
     public final static class MetaConstructor extends MetaMethod {
@@ -1552,7 +1550,6 @@ public class MetaClassImpl implements MetaClass, MutableMetaClass {
     /**
      * This is a helper method added in Groovy 2.1.0, which is used only by indy.
      * This method is for internal use only.
-     * @author <a href="mailto:blackdrag@gmx.org">Jochen "blackdrag" Theodorou</a> 
      * @since Groovy 2.1.0
      */
     public MetaMethod retrieveConstructor(Object[] arguments) {

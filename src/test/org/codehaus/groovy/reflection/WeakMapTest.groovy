@@ -24,7 +24,7 @@ class WeakMapTest extends GroovyTestCase{
 
            ReflectionCache.isAssignableFrom s.class, s.class.superclass
            if (i % 50 == 0)
-             shell = null 
+             shell = null
 
            if (shell != null)
              shell.classLoader.clearCache()

@@ -877,6 +877,11 @@ public class AsmClassGenerator extends ClassGenerator {
         }
     }
 
+    private boolean isThisOrSuperInStaticContext(Expression objectExpression) {
+        if (controller.isInClosure()) return false;
+        return controller.isStaticContext() && isThisOrSuper(objectExpression);
+    }
+
     public void visitPropertyExpression(PropertyExpression expression) {
         Expression objectExpression = expression.getObjectExpression();
         OperandStack operandStack = controller.getOperandStack();
@@ -886,11 +891,11 @@ public class AsmClassGenerator extends ClassGenerator {
             //operandStack.box();
             adapter = setProperty;
             if (isGroovyObject(objectExpression)) adapter = setGroovyObjectProperty;
-            if (controller.isStaticContext() && isThisOrSuper(objectExpression)) adapter = setProperty;
+            if (isThisOrSuperInStaticContext(objectExpression)) adapter = setProperty;
         } else {
             adapter = getProperty;
             if (isGroovyObject(objectExpression)) adapter = getGroovyObjectProperty;
-            if (controller.isStaticContext() && isThisOrSuper(objectExpression)) adapter = getProperty;
+            if (isThisOrSuperInStaticContext(objectExpression)) adapter = getProperty;
         }
         visitAttributeOrProperty(expression, adapter);
         if (controller.getCompileStack().isLHS()) {

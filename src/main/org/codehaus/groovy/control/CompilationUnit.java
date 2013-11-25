@@ -1038,9 +1038,7 @@ public class CompilationUnit extends ProcessingUnit {
             } catch (CompilationFailedException e) {
                 // fall through, getErrorReporter().failIfErrors() will trigger
             } catch (NullPointerException npe) {
-                GroovyBugError gbe = new GroovyBugError("unexpected NullpointerException", npe);
-                changeBugText(gbe, context);
-                throw gbe;
+                throw npe;
             } catch (GroovyBugError e) {
                 changeBugText(e, context);
                 throw e;
