@@ -17,6 +17,7 @@ package groovy.transform.stc
 
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
+import org.codehaus.groovy.transform.stc.GroovyTypeCheckingExtensionSupport
 
 /**
  * Units tests for type checking extensions.
@@ -447,4 +448,47 @@ class TypeCheckingExtensionsTest extends StaticTypeCheckingTestCase {
         }
     }
 
+    void testAmbiguousMethodCall() {
+        // fail with error from type checker
+        extension = null
+        shouldFailWithMessages '''
+            int foo(Integer x) { 1 }
+            int foo(String s) { 2 }
+            int foo(Date d) { 3 }
+            assert foo(null) == 2
+        ''', 'Reference to method is ambiguous'
+        // fail with error from runtime
+        extension = 'groovy/transform/stc/AmbiguousMethods.groovy'
+        shouldFail { assertScript '''
+            int foo(Integer x) { 1 }
+            int foo(String s) { 2 }
+            int foo(Date d) { 3 }
+            assert foo(null) == 2
+        '''}
+    }
+
+    void testIncompatibleReturnType() {
+        extension = null
+        shouldFailWithMessages '''
+            Date foo() { '1' }
+            true
+        ''', 'Cannot return value of type'
+        extension = 'groovy/transform/stc/IncompatibleReturnTypeTestExtension.groovy'
+        assertScript '''
+            Date foo() { '1' }
+            true
+        '''
+    }
+
+    void testPrecompiledExtension() {
+        extension = null
+        assertScript '''
+            println 'Everything is ok'
+        '''
+        extension = 'groovy.transform.stc.PrecompiledExtension'
+        shouldFailWithMessages '''
+            println 'Everything is ok'
+        ''', 'Error thrown from extension'
+
+    }
 }

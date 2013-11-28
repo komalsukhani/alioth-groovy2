@@ -21,23 +21,20 @@ import org.codehaus.groovy.GroovyBugError;
 import org.codehaus.groovy.ast.*;
 import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.ast.stmt.EmptyStatement;
+import org.codehaus.groovy.ast.stmt.ReturnStatement;
 import org.codehaus.groovy.classgen.asm.InvocationWriter;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilationUnit;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
-import org.codehaus.groovy.control.messages.ExceptionMessage;
 import org.codehaus.groovy.control.messages.SimpleMessage;
 import org.codehaus.groovy.runtime.InvokerHelper;
-import org.codehaus.groovy.runtime.InvokerInvocationException;
 import org.objectweb.asm.Opcodes;
 
 import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.logging.Logger;
 
 /**
  * Base class for type checking extensions written in Groovy. Compared to its superclass, {@link TypeCheckingExtension},
@@ -58,12 +55,14 @@ public class GroovyTypeCheckingExtensionSupport extends TypeCheckingExtension {
                 put("unresolvedVariable", "handleUnresolvedVariableExpression");
                 put("unresolvedProperty", "handleUnresolvedProperty");
                 put("unresolvedAttribute", "handleUnresolvedAttribute");
+                put("ambiguousMethods", "handleAmbiguousMethods");
                 put("methodNotFound", "handleMissingMethod");
                 put("afterVisitMethod", "afterVisitMethod");
                 put("beforeVisitMethod", "beforeVisitMethod");
                 put("afterVisitClass", "afterVisitClass");
                 put("beforeVisitClass", "beforeVisitClass");
                 put("incompatibleAssignment", "handleIncompatibleAssignment");
+                put("incompatibleReturnType", "handleIncompatibleReturnType");
                 put("setup","setup");
                 put("finish", "finish");
             }}
@@ -82,6 +81,9 @@ public class GroovyTypeCheckingExtensionSupport extends TypeCheckingExtension {
     private boolean handled = false;
     private final CompilationUnit compilationUnit;
 
+    private boolean debug = false;
+    private final static Logger LOG = Logger.getLogger(GroovyTypeCheckingExtensionSupport.class.getName());
+
     /**
      * Builds a type checking extension relying on a Groovy script (type checking DSL).
      *
@@ -98,6 +100,10 @@ public class GroovyTypeCheckingExtensionSupport extends TypeCheckingExtension {
         this.compilationUnit = compilationUnit;
     }
 
+    public void setDebug(final boolean debug) {
+        this.debug = debug;
+    }
+
     @Override
     public void setup() {
         CompilerConfiguration config = new CompilerConfiguration();
@@ -109,41 +115,63 @@ public class GroovyTypeCheckingExtensionSupport extends TypeCheckingExtension {
         config.addCompilationCustomizers(ic);
         final GroovyClassLoader transformLoader = compilationUnit!=null?compilationUnit.getTransformLoader():typeCheckingVisitor.getSourceUnit().getClassLoader();
 
-        ClassLoader cl = typeCheckingVisitor.getSourceUnit().getClassLoader();
-        // cast to prevent incorrect @since 1.7 warning
-        InputStream is = ((ClassLoader)transformLoader).getResourceAsStream(scriptPath);
-        if (is == null) {
-            // fallback to the source unit classloader
-            is = cl.getResourceAsStream(scriptPath);
-        }
-        if (is == null) {
-            // fallback to the compiler classloader
-            cl = GroovyTypeCheckingExtensionSupport.class.getClassLoader();
-            is = cl.getResourceAsStream(scriptPath);
-        }
-        if (is == null) {
-            // if the input stream is still null, we've not found the extension
+        // since Groovy 2.2, it is possible to use FQCN for type checking extension scripts
+        TypeCheckingDSL script = null;
+        try {
+            Class<?> clazz = transformLoader.loadClass(scriptPath, false, true);
+            if (TypeCheckingDSL.class.isAssignableFrom(clazz)) {
+                script = (TypeCheckingDSL) clazz.newInstance();
+            }
+        } catch (ClassNotFoundException e) {
+            // silent
+        } catch (InstantiationException e) {
             context.getErrorCollector().addFatalError(
-                    new SimpleMessage("Static type checking extension '" + scriptPath + "' was not found on the classpath.",
+                    new SimpleMessage("Static type checking extension '" + scriptPath + "' could not be loaded.",
+                            config.getDebug(), typeCheckingVisitor.getSourceUnit()));
+        } catch (IllegalAccessException e) {
+            context.getErrorCollector().addFatalError(
+                    new SimpleMessage("Static type checking extension '" + scriptPath + "' could not be loaded.",
                             config.getDebug(), typeCheckingVisitor.getSourceUnit()));
         }
-        try {
-            GroovyShell shell = new GroovyShell(transformLoader, new Binding(), config);
-            TypeCheckingDSL parse = (TypeCheckingDSL) shell.parse(
-                    new InputStreamReader(is, typeCheckingVisitor.getSourceUnit().getConfiguration().getSourceEncoding())
-            );
-            parse.extension = this;
-            parse.run();
+        if (script==null) {
+            ClassLoader cl = typeCheckingVisitor.getSourceUnit().getClassLoader();
+            // cast to prevent incorrect @since 1.7 warning
+            InputStream is = ((ClassLoader)transformLoader).getResourceAsStream(scriptPath);
+            if (is == null) {
+                // fallback to the source unit classloader
+                is = cl.getResourceAsStream(scriptPath);
+            }
+            if (is == null) {
+                // fallback to the compiler classloader
+                cl = GroovyTypeCheckingExtensionSupport.class.getClassLoader();
+                is = cl.getResourceAsStream(scriptPath);
+            }
+            if (is == null) {
+                // if the input stream is still null, we've not found the extension
+                context.getErrorCollector().addFatalError(
+                        new SimpleMessage("Static type checking extension '" + scriptPath + "' was not found on the classpath.",
+                                config.getDebug(), typeCheckingVisitor.getSourceUnit()));
+            }
+            try {
+                GroovyShell shell = new GroovyShell(transformLoader, new Binding(), config);
+                script = (TypeCheckingDSL) shell.parse(
+                        new InputStreamReader(is, typeCheckingVisitor.getSourceUnit().getConfiguration().getSourceEncoding())
+                );
+            } catch (CompilationFailedException e) {
+                throw new GroovyBugError("An unexpected error was thrown during custom type checking", e);
+            } catch (UnsupportedEncodingException e) {
+                throw new GroovyBugError("Unsupported encoding found in compiler configuration", e);
+            }
+        }
+        if (script!=null) {
+            script.extension = this;
+            script.run();
             List<Closure> list = eventHandlers.get("setup");
             if (list != null) {
                 for (Closure closure : list) {
                     safeCall(closure);
                 }
             }
-        } catch (CompilationFailedException e) {
-            throw new GroovyBugError("An unexpected error was thrown during custom type checking", e);
-        } catch (UnsupportedEncodingException e) {
-            throw new GroovyBugError("Unsupported encoding found in compiler configuration", e);
         }
     }
 
@@ -399,6 +427,18 @@ public class GroovyTypeCheckingExtensionSupport extends TypeCheckingExtension {
     }
 
     @Override
+    public boolean handleIncompatibleReturnType(final ReturnStatement returnStatement, ClassNode inferredReturnType) {
+        setHandled(false);
+        List<Closure> list = eventHandlers.get("handleIncompatibleReturnType");
+        if (list != null) {
+            for (Closure closure : list) {
+                safeCall(closure, returnStatement, inferredReturnType);
+            }
+        }
+        return handled;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public List<MethodNode> handleMissingMethod(final ClassNode receiver, final String name, final ArgumentListExpression argumentList, final ClassNode[] argumentTypes, final MethodCall call) {
         List<Closure> onMethodSelection = eventHandlers.get("handleMissingMethod");
@@ -411,6 +451,30 @@ public class GroovyTypeCheckingExtensionSupport extends TypeCheckingExtension {
                         methodList.add((MethodNode) result);
                     } else if (result instanceof Collection) {
                         methodList.addAll((Collection<? extends MethodNode>) result);
+                    } else {
+                        throw new GroovyBugError("Type checking extension returned unexpected method list: " + result);
+                    }
+                }
+            }
+        }
+        return methodList;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<MethodNode> handleAmbiguousMethods(final List<MethodNode> nodes, final Expression origin) {
+        List<Closure> onMethodSelection = eventHandlers.get("handleAmbiguousMethods");
+        List<MethodNode> methodList = nodes;
+        if (onMethodSelection != null) {
+            Iterator<Closure> iterator = onMethodSelection.iterator();
+            while (methodList.size()>1 && iterator.hasNext() ) {
+                final Closure closure = iterator.next();
+                Object result = safeCall(closure, methodList, origin);
+                if (result != null) {
+                    if (result instanceof MethodNode) {
+                        methodList = Collections.singletonList((MethodNode) result);
+                    } else if (result instanceof Collection) {
+                        methodList = new LinkedList<MethodNode>((Collection<? extends MethodNode>) result);
                     } else {
                         throw new GroovyBugError("Type checking extension returned unexpected method list: " + result);
                     }
@@ -485,6 +549,94 @@ public class GroovyTypeCheckingExtensionSupport extends TypeCheckingExtension {
         clone.setDelegate(typeCheckingVisitor);
         clone.setResolveStrategy(Closure.DELEGATE_FIRST);
         return clone.call();
+    }
+
+    /**
+     * Used to instruct the type checker that the call is a dynamic method call.
+     * Calling this method automatically sets the handled flag to true. The expected
+     * return type of the dynamic method call is Object.
+     * @param call the method call which is a dynamic method call
+     * @return a virtual method node with the same name as the expected call
+     */
+    public MethodNode makeDynamic(MethodCall call) {
+        return makeDynamic(call, ClassHelper.OBJECT_TYPE);
+    }
+
+    /**
+     * Used to instruct the type checker that the call is a dynamic method call.
+     * Calling this method automatically sets the handled flag to true.
+     * @param call the method call which is a dynamic method call
+     * @param returnType the expected return type of the dynamic call
+     * @return a virtual method node with the same name as the expected call
+     */
+    public MethodNode makeDynamic(MethodCall call, ClassNode returnType) {
+        TypeCheckingContext.EnclosingClosure enclosingClosure = context.getEnclosingClosure();
+        MethodNode enclosingMethod = context.getEnclosingMethod();
+        ((ASTNode)call).putNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION, returnType);
+        if (enclosingClosure!=null) {
+            enclosingClosure.getClosureExpression().putNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION, Boolean.TRUE);
+        } else {
+            enclosingMethod.putNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION, Boolean.TRUE);
+        }
+        setHandled(true);
+        if (debug) {
+            LOG.info("Turning "+call.getText()+" into a dynamic method call returning "+returnType.toString(false));
+        }
+        return new MethodNode(call.getMethodAsString(), 0, returnType, Parameter.EMPTY_ARRAY, ClassNode.EMPTY_ARRAY, EmptyStatement.INSTANCE);
+    }
+
+    /**
+     * Instructs the type checker that a property access is dynamic, returning an instance of an Object.
+     * Calling this method automatically sets the handled flag to true.
+     * @param pexp the property or attribute expression
+     */
+    public void makeDynamic(PropertyExpression pexp) {
+        makeDynamic(pexp, ClassHelper.OBJECT_TYPE);
+    }
+
+    /**
+     * Instructs the type checker that a property access is dynamic.
+     * Calling this method automatically sets the handled flag to true.
+     * @param pexp the property or attribute expression
+     * @param returnType the type of the property
+     */
+    public void makeDynamic(PropertyExpression pexp, ClassNode returnType) {
+        context.getEnclosingMethod().putNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION, Boolean.TRUE);
+        pexp.putNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION, returnType);
+        storeType(pexp, returnType);
+        setHandled(true);
+        if (debug) {
+            LOG.info("Turning '"+pexp.getText()+"' into a dynamic property access of type "+returnType.toString(false));
+        }
+    }
+
+    /**
+     * Instructs the type checker that an unresolved variable is a dynamic variable of type Object.
+     * Calling this method automatically sets the handled flag to true.
+     * @param vexp the dynamic variable
+     */
+    public void makeDynamic(VariableExpression vexp) {
+        makeDynamic(vexp, ClassHelper.OBJECT_TYPE);
+    }
+
+    /**
+     * Instructs the type checker that an unresolved variable is a dynamic variable.
+     * @param returnType the type of the dynamic variable
+     * Calling this method automatically sets the handled flag to true.
+     * @param vexp the dynamic variable
+     */
+    public void makeDynamic(VariableExpression vexp, ClassNode returnType) {
+        context.getEnclosingMethod().putNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION, Boolean.TRUE);
+        vexp.putNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION, returnType);
+        storeType(vexp, returnType);
+        setHandled(true);
+        if (debug) {
+            LOG.info("Turning '"+vexp.getText()+"' into a dynamic variable access of type "+returnType.toString(false));
+        }
+    }
+
+    public void log(String message) {
+        LOG.info(message);
     }
 
     // -------------------------------------

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012 the original author or authors.
+ * Copyright 2003-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,7 @@ import javax.swing.event.DocumentListener
  * @author Hamlet D'Arcy, AST browser
  * @author Roshan Dawrani
  * @author Paul King
+ * @author Andre Steingress
  */
 class Console implements CaretListener, HyperlinkListener, ComponentListener, FocusListener {
 
@@ -115,6 +116,12 @@ class Console implements CaretListener, HyperlinkListener, ComponentListener, Fo
     // Safer thread interruption
     boolean threadInterrupt = prefs.getBoolean('threadInterrupt', false)
     Action threadInterruptAction
+
+    boolean saveOnRun = prefs.getBoolean('saveOnRun', false)
+    Action saveOnRunAction
+
+    //to allow loading classes dynamically when using @Grab (GROOVY-4877, GROOVY-5871)
+    boolean useScriptClassLoaderForScriptExecution = false
 
     // Maximum size of history
     int maxHistory = 10
@@ -190,13 +197,14 @@ options:
             return
         }
 
-        // allow the full stack traces to bubble up to the root logger
-        java.util.logging.Logger.getLogger(StackTraceUtils.STACK_LOG_NAME).useParentHandlers = true
+        // full stack trace should not be logged to the output window - GROOVY-4663
+        java.util.logging.Logger.getLogger(StackTraceUtils.STACK_LOG_NAME).useParentHandlers = false
 
         //when starting via main set the look and feel to system
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
 
         def console = new Console(Console.class.classLoader?.getRootLoader())
+        console.useScriptClassLoaderForScriptExecution = true
         console.run()
         if (args.length == 1) console.loadScriptFile(args[0] as File)
     }
@@ -218,6 +226,7 @@ options:
         try {
             System.setProperty("groovy.full.stacktrace", System.getProperty("groovy.full.stacktrace",
                     Boolean.toString(prefs.getBoolean('fullStackTraces', false))))
+
         } catch (SecurityException se) {
             fullStackTracesAction.enabled = false;
         }
@@ -878,7 +887,16 @@ options:
     // actually run the script
 
     void runScript(EventObject evt = null) {
-        runScriptImpl(false)
+        if (saveOnRun && scriptFile != null)  {
+            if (fileSave(evt)) runScriptImpl(false)
+        } else {
+            runScriptImpl(false)
+        }
+    }
+
+    void saveOnRun(EventObject evt = null)  {
+        saveOnRun = evt.source.selected
+        prefs.putBoolean('saveOnRun', saveOnRun)
     }
 
     void runSelectedScript(EventObject evt = null) {
@@ -951,7 +969,20 @@ options:
                 if(beforeExecution) {
                     beforeExecution()
                 }
-                def result = shell.run(record.getTextToRun(selected), name, [])
+                def result
+                if(useScriptClassLoaderForScriptExecution) {
+                    ClassLoader savedThreadContextClassLoader = Thread.currentThread().contextClassLoader
+                    try {
+                        Thread.currentThread().contextClassLoader = shell.classLoader
+                        result = shell.run(record.getTextToRun(selected), name, [])
+                    }
+                    finally {
+                        Thread.currentThread().contextClassLoader = savedThreadContextClassLoader
+                    }
+                }
+                else {
+                    result = shell.run(record.getTextToRun(selected), name, [])
+                }
                 if(afterExecution) {
                     afterExecution()
                 }

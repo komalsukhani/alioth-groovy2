@@ -17,6 +17,7 @@
 package org.codehaus.groovy.tools.shell.commands
 
 import groovy.inspect.swingui.ObjectBrowser
+import org.codehaus.groovy.tools.shell.Groovysh
 
 import java.awt.HeadlessException
 import javax.swing.UIManager
@@ -34,21 +35,21 @@ import org.codehaus.groovy.tools.shell.util.SimpleCompletor
 class InspectCommand
     extends CommandSupport
 {
-    InspectCommand(final Shell shell) {
+    InspectCommand(final Groovysh shell) {
         super(shell, 'inspect', '\\n')
     }
     
     def lafInitialized = false
     def headless
     
-    protected List createCompletors() {
+    protected List createCompleters() {
         return [
             new InspectCommandCompletor(binding),
             null
         ]
     }
 
-    Object execute(final List args) {
+    Object execute(final List<String> args) {
         assert args != null
         
         log.debug("Inspecting w/args: $args")

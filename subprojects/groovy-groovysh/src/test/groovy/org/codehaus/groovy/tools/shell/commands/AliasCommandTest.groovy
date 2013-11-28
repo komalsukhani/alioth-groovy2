@@ -16,22 +16,17 @@
 
 package org.codehaus.groovy.tools.shell.commands
 
-import org.codehaus.groovy.tools.shell.CommandException
-
 /**
  * Tests for the {@link AliasCommand} class.
  *
- * @version $Id$
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  */
 class AliasCommandTest
     extends CommandTestSupport
 {
     void testAlias() {
-        try {
-            shell << 'alias'
-            fail()
-        }
-        catch (CommandException expected) {}
+        shell.execute('alias')
+        shell.execute('alias foo bar')
+        shell.execute('alias history foo') // cannot rebind
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012 the original author or authors.
+ * Copyright 2003-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,22 @@
  */
 package org.codehaus.groovy.classgen;
 
-import org.codehaus.groovy.ast.*;
+import org.codehaus.groovy.ast.AnnotatedNode;
+import org.codehaus.groovy.ast.ClassCodeVisitorSupport;
+import org.codehaus.groovy.ast.ClassHelper;
+import org.codehaus.groovy.ast.ClassNode;
+import org.codehaus.groovy.ast.EnumConstantClassNode;
+import org.codehaus.groovy.ast.FieldNode;
+import org.codehaus.groovy.ast.InnerClassNode;
+import org.codehaus.groovy.ast.MethodNode;
+import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.expr.*;
-import org.codehaus.groovy.ast.stmt.*;
+import org.codehaus.groovy.ast.stmt.BlockStatement;
+import org.codehaus.groovy.ast.stmt.EmptyStatement;
+import org.codehaus.groovy.ast.stmt.ExpressionStatement;
+import org.codehaus.groovy.ast.stmt.IfStatement;
+import org.codehaus.groovy.ast.stmt.ReturnStatement;
+import org.codehaus.groovy.ast.stmt.Statement;
 import org.codehaus.groovy.control.CompilationUnit;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
@@ -30,7 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnumVisitor extends ClassCodeVisitorSupport {
-
     // some constants for modifiers
     private static final int FS = Opcodes.ACC_FINAL | Opcodes.ACC_STATIC;
     private static final int PS = Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC;
@@ -309,9 +321,10 @@ public class EnumVisitor extends ClassCodeVisitorSupport {
                 }
             } else {
                 ListExpression oldArgs = (ListExpression) field.getInitialExpression();
+                List<MapEntryExpression> savedMapEntries = new ArrayList<MapEntryExpression>();
                 for (Expression exp : oldArgs.getExpressions()) {
                     if (exp instanceof MapEntryExpression) {
-                        addError(exp, "The usage of a map entry expression to initialize an Enum is currently not supported, please use an explicit map instead.");
+                        savedMapEntries.add((MapEntryExpression) exp);
                         continue;
                     }
 
@@ -344,6 +357,9 @@ public class EnumVisitor extends ClassCodeVisitorSupport {
                         }
                     }
                     args.addExpression(exp);
+                }
+                if (savedMapEntries.size() > 0) {
+                    args.getExpressions().add(2, new MapExpression(savedMapEntries));
                 }
             }
             field.setInitialValueExpression(null);

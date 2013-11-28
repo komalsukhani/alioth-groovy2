@@ -1339,20 +1339,9 @@ public class StringGroovyMethods extends DefaultGroovyMethodsSupport {
      * @since 1.0
      */
     public static CharSequence getAt(CharSequence text, Range range) {
-        int from = normaliseIndex(DefaultTypeTransformation.intUnbox(range.getFrom()), text.length());
-        int to = normaliseIndex(DefaultTypeTransformation.intUnbox(range.getTo()), text.length());
-
-        boolean reverse = range.isReverse();
-        // If this is a backwards range, reverse the arguments to substring.
-        if (from > to) {
-            int tmp = from;
-            from = to;
-            to = tmp;
-            reverse = !reverse;
-        }
-
-        CharSequence sequence = text.subSequence(from, to + 1);
-        return reverse ? reverse((String) sequence) : sequence;
+        RangeInfo info = subListBorders(text.length(), range);
+        CharSequence sequence = text.subSequence(info.from, info.to);
+        return info.reverse ? reverse((String) sequence) : sequence;
     }
 
     /**
@@ -1530,20 +1519,9 @@ public class StringGroovyMethods extends DefaultGroovyMethodsSupport {
      * @since 1.0
      */
     public static String getAt(String text, Range range) {
-        int from = normaliseIndex(DefaultTypeTransformation.intUnbox(range.getFrom()), text.length());
-        int to = normaliseIndex(DefaultTypeTransformation.intUnbox(range.getTo()), text.length());
-
-        // If this is a backwards range, reverse the arguments to substring.
-        boolean reverse = range.isReverse();
-        if (from > to) {
-            int tmp = to;
-            to = from;
-            from = tmp;
-            reverse = !reverse;
-        }
-
-        String answer = text.substring(from, to + 1);
-        if (reverse) {
+        RangeInfo info = subListBorders(text.length(), range);
+        String answer = text.substring(info.from, info.to);
+        if (info.reverse) {
             answer = reverse(answer);
         }
         return answer;
@@ -2092,10 +2070,20 @@ public class StringGroovyMethods extends DefaultGroovyMethodsSupport {
 
     /**
      * Remove a part of a String. This replaces the first occurrence
-     * of target within self with '' and returns the result. If
-     * target is a regex Pattern, the first occurrence of that
-     * pattern will be removed (using regex matching), otherwise
-     * the first occurrence of target.toString() will be removed.
+     * of the regex pattern within self with '' and returns the result. 
+     *
+     * @param self   a String
+     * @param pattern a Pattern representing the part to remove
+     * @return a String minus the part to be removed
+     * @since 2.2.0
+     */
+    public static String minus(String self, Pattern pattern) {
+        return pattern.matcher(self).replaceFirst("");
+    }
+
+    /**
+     * Remove a part of a String. This replaces the first occurrence
+     * of target.toString() within self with '' and returns the result. 
      *
      * @param self   a String
      * @param target an object representing the part to remove
@@ -2103,9 +2091,6 @@ public class StringGroovyMethods extends DefaultGroovyMethodsSupport {
      * @since 1.0
      */
     public static String minus(String self, Object target) {
-        if (target instanceof Pattern) {
-            return ((Pattern)target).matcher(self).replaceFirst("");
-        }
         String text = DefaultGroovyMethods.toString(target);
         int index = self.indexOf(text);
         if (index == -1) return self;
@@ -2448,6 +2433,18 @@ public class StringGroovyMethods extends DefaultGroovyMethodsSupport {
      */
     public static String plus(String left, Object value) {
         return left + DefaultGroovyMethods.toString(value);
+    }
+
+    /**
+     * Appends the String representation of the given operand to this string.
+     *
+     * @param left  a String
+     * @param value any CharSequence
+     * @return the new string with the object appended
+     * @since 2.2
+     */
+    public static String plus(String left, CharSequence value) {
+        return left+value;
     }
 
     /**

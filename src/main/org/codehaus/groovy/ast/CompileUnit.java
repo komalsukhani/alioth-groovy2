@@ -19,6 +19,7 @@ import groovy.lang.GroovyClassLoader;
 
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -139,7 +140,7 @@ public class CompileUnit {
                             " the script body based on the file name. Solutions are to change the file name or to change the class name.\n";
                 }
             } else {
-                txt += "The sources " + nodeSource.getName() + " and " + storedSource.getName() + " are containing both a class of the name " + node.getName() + ".\n";
+                txt += "The sources " + nodeSource.getName() + " and " + storedSource.getName() + " each contain a class with the name " + node.getName() + ".\n";
             }
             nodeSource.getErrorCollector().addErrorAndContinue(
                     new SyntaxErrorMessage(new SyntaxException(txt, node.getLineNumber(), node.getColumnNumber(), node.getLastLineNumber(), node.getLastColumnNumber()), nodeSource)
@@ -182,5 +183,9 @@ public class CompileUnit {
     
     public void addGeneratedInnerClass(InnerClassNode icn) {
         generatedInnerClasses.put(icn.getName(), icn);
+    }
+
+    public Map<String, InnerClassNode> getGeneratedInnerClasses() {
+        return Collections.unmodifiableMap(generatedInnerClasses);
     }
 }

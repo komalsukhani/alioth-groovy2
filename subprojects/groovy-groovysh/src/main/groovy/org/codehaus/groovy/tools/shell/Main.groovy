@@ -20,10 +20,8 @@ import org.codehaus.groovy.tools.shell.util.HelpFormatter
 import org.codehaus.groovy.tools.shell.util.Logger
 import org.codehaus.groovy.tools.shell.util.MessageSource
 import org.codehaus.groovy.tools.shell.util.NoExitSecurityManager
-import java.util.concurrent.Callable
 import org.fusesource.jansi.Ansi
 import org.fusesource.jansi.AnsiConsole
-import jline.Terminal
 
 /**
  * Main CLI entry-point for <tt>groovysh</tt>.
@@ -47,7 +45,7 @@ class Main
         IO io = new IO()
         Logger.io = io
 
-        def cli = new CliBuilder(usage : 'groovysh [options] [...]', formatter: new HelpFormatter(), writer: io.out)
+        CliBuilder cli = new CliBuilder(usage : 'groovysh [options] [...]', formatter: new HelpFormatter(), writer: io.out)
 
         cli.classpath(messages['cli.option.classpath.description'])
         cli.cp(longOpt: 'classpath', messages['cli.option.cp.description'])
@@ -60,7 +58,7 @@ class Main
         cli.D(longOpt: 'define', args: 1, argName: 'NAME=VALUE', messages['cli.option.define.description'])
         cli.T(longOpt: 'terminal', args: 1, argName: 'TYPE', messages['cli.option.terminal.description'])
 
-        def options = cli.parse(args)
+        OptionAccessor options = cli.parse(args)
 
         if (options.h) {
             cli.usage()
@@ -102,7 +100,10 @@ class Main
             setColor(value)
         }
 
-        def code
+        int code
+
+        // Boot up the shell... :-)
+        final Groovysh shell = new Groovysh(io)
 
         // Add a hook to display some status when shutting down...
         addShutdownHook {
@@ -114,15 +115,15 @@ class Main
                 // Give the user a warning when the JVM shutdown abnormally, normal shutdown
                 // will set an exit code through the proper channels
 
-                io.err.println()
-                io.err.println('@|red WARNING:|@ Abnormal JVM shutdown detected')
+
+                println('WARNING: Abnormal JVM shutdown detected')
             }
 
-            io.flush()
+            if (shell.history) {
+                shell.history.flush()
+            }
         }
 
-        // Boot up the shell... :-)
-        Groovysh shell = new Groovysh(io)
 
         SecurityManager psm = System.getSecurityManager()
         System.setSecurityManager(new NoExitSecurityManager())
@@ -174,7 +175,7 @@ class Main
         }
     }
 
-    static void setColor(value) {
+    static void setColor(Boolean value) {
         if (value == null) {
             value = true // --color is the same as --color=true
         }
@@ -203,10 +204,4 @@ class Main
     }
 }
 
-class AnsiDetector
-    implements Callable<Boolean>
-{
-    public Boolean call() throws Exception {
-        return Terminal.getTerminal().isANSISupported()
-    }
-}
+

@@ -40,6 +40,10 @@ public class FilteredNodeChildren extends NodeChildren {
         this.closure = closure;
     }
 
+    public GPathResult pop() {
+        return this.parent.parent;
+    }
+
     public Iterator nodeIterator() {
         return new NodeIterator(this.parent.nodeIterator()) {
             protected Object getNextNode(final Iterator iter) {

@@ -16,10 +16,9 @@
 
 package org.codehaus.groovy.tools.shell.commands
 
-import jline.FileNameCompletor
-
+import jline.console.completer.FileNameCompleter
 import org.codehaus.groovy.tools.shell.CommandSupport
-import org.codehaus.groovy.tools.shell.Shell
+import org.codehaus.groovy.tools.shell.Groovysh
 
 /**
  * The 'load' command.
@@ -30,17 +29,17 @@ import org.codehaus.groovy.tools.shell.Shell
 class LoadCommand
     extends CommandSupport
 {
-    LoadCommand(final Shell shell) {
+    LoadCommand(final Groovysh shell) {
         super(shell, 'load', '\\l')
 
         alias('.', '\\.')
     }
 
-    protected List createCompletors() {
-        return [ new FileNameCompletor() ]
+    protected List createCompleters() {
+        return [ new FileNameCompleter() ]
     }
 
-    Object execute(final List args) {
+    Object execute(final List<String> args) {
         assert args != null
         
         if (args.size() == 0) {
@@ -76,8 +75,8 @@ class LoadCommand
             io.out.println("Loading: $url")
         }
 
-        url.eachLine {
-            shell << it
+        url.eachLine { String it ->
+            shell << it as String
         }
     }
 }

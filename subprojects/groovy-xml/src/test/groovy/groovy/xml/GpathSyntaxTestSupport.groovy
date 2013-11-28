@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012 the original author or authors.
+ * Copyright 2003-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import groovy.xml.XmlUtil
  * @author Paul King
  */
 class GpathSyntaxTestSupport {
-    private static sampleXml = '''
+    private static final sampleXml = '''
 <characters>
     <character id="1" name="Wallace">
         <likes>cheese</likes>
@@ -39,7 +39,7 @@ class GpathSyntaxTestSupport {
 </characters>
 '''
 
-    private static nestedXml = '''
+    private static final nestedXml = '''
 <root>
     <a><z/><z/><y/></a>
     <b><z/></b>
@@ -177,11 +177,11 @@ class GpathSyntaxTestSupport {
         def groupLikesByFirstLetter
         def likes = root.character.likes.collect{ it }
         if (isSlurper(root)) {
-            groupLikesByFirstLetter = likes.groupBy{ like ->
-                root.character.find{ it.likes[0].text() == like.text() }.@name.toString()[0]
-            }
-            // TODO: Broken? Why doesn't below work?
-            //groupLikesByFirstLetter = likes.groupBy{ it.parent().@name.toString()[0] }
+            //groupLikesByFirstLetter = likes.groupBy{ like ->
+            //    root.character.find{ it.likes[0].text() == like.text() }.@name.toString()[0]
+            //}
+            // TODO: Broken? Why doesn't below work? FIX with GROOVY-6125
+            groupLikesByFirstLetter = likes.groupBy{ it.parent().@name.toString()[0] }
         } else {
             groupLikesByFirstLetter = likes.groupBy{ it.parent().'@name'[0] }
         }
@@ -282,10 +282,14 @@ class GpathSyntaxTestSupport {
         assert gromit.likes[0].parent() == gromit
         assert gromit.likes[0].'..' == gromit
         assert gromit.likes[0].parent().parent() == root
+        assert root.character.likes.find{ it.text() == 'sleep' }.parent() == gromit
         assert gromit.parent() == root
         if (isSlurper(root)) {
             // additional slurper shorthand
             assert gromit.likes.parent() == gromit
+            assert gromit.likes.findAll{ it.text() == 'sleep' } == gromit
+            // pop() method to backtrack on GPath
+            assert gromit.'..'.pop() == gromit
         }
         if (isSlurper(root)) {
             assert root.parent() == root
@@ -363,9 +367,8 @@ class GpathSyntaxTestSupport {
 
         // XmlSlurper replacements are deferred so can't check here
         if (!isSlurper(root)) {
-            assert r.name() == 'n'
-            assert r.'@type' == 'string'
-            assert r.hello.text() == 'world'
+            assert r.name() == 'c'
+            assert r.'@a1' == '4'
         }
     }
 
@@ -396,9 +399,8 @@ class GpathSyntaxTestSupport {
 
         // XmlSlurper replacements are deferred so can't check here
         if (!isSlurper(root)) {
-            assert r.name() == 'n'
-            assert r.'@type' == 'int'
-            assert r.text() == '330'
+            assert r.name() == 'c'
+            assert r.'@a1' == '4'
         }
     }
 

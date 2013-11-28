@@ -99,7 +99,7 @@ class XmlSlurperTest extends GroovyTestCase {
         def input = "<doc><sec>Hello<p>World</p></sec></doc>"
         def replaceSlurper = new XmlSlurper().parseText(input)
         replaceSlurper.sec.replaceNode { node ->
-            t() { delegate.mkp.yield node.getBody() }
+            t { delegate.mkp.yield node.getBody() }
         }
         def outputSlurper = new StreamingMarkupBuilder()
         String output = outputSlurper.bind { mkp.yield replaceSlurper }
@@ -140,4 +140,20 @@ class XmlSlurperTest extends GroovyTestCase {
         assert root.ChildElement.@'two:ItemId'[0].namespaceURI() == 'http://www.ivan.com/ns2'
     }
 
+    // GROOVY-5931
+    void testIterableGPathResult() {
+        def xml = """
+        <RootElement>
+            <ChildElement ItemId="FirstItemId">Child element data</ChildElement>
+        </RootElement>"""
+
+        def root = new XmlSlurper().parseText(xml)
+
+        assert root instanceof Iterable
+        assert root.ChildElement instanceof Iterable
+        assert root.ChildElement.@'ItemId' instanceof Iterable
+
+        // execute a DGM on the Iterable
+        assert root.first() == 'Child element data'
+    }
 }

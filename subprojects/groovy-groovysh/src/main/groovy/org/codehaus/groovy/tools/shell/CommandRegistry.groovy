@@ -33,10 +33,10 @@ class CommandRegistry
     //
     
     /** A list of all of the registered commands. */
-    final List commands = []
+    final List<Command> commands = []
 
     /** A set of all of the command names and shortcuts to ensure they are unique. */
-    private final Set names = new TreeSet()
+    private final Set<String> names = new TreeSet<String>()
     
     Command register(final Command command) {
         assert command
@@ -52,10 +52,12 @@ class CommandRegistry
         commands << command
         
         // Hookup context for alias commands
-        command.registry = this
+        if (command instanceof CommandSupport) {
+            ((CommandSupport) command).registry = this
+        }
 
         // Add any standard aliases for the command if any
-        command.aliases?.each { this << it }
+        command.aliases?.each {Command it -> this << it }
         
         if (log.debugEnabled) {
             log.debug("Registered command: $command.name")
@@ -93,15 +95,15 @@ class CommandRegistry
         }
     }
     
-    List commands() {
+    List<Command> commands() {
         return commands
     }
-    
-    def getProperty(final String name) {
+
+    Command getProperty(final String name) {
         return find(name)
     }
     
-    Iterator iterator() {
+    Iterator<Command> iterator() {
         return commands().iterator()
     }
 }

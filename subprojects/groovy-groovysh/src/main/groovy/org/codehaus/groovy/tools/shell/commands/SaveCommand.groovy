@@ -16,10 +16,9 @@
 
 package org.codehaus.groovy.tools.shell.commands
 
-import jline.FileNameCompletor
-
+import jline.console.completer.FileNameCompleter
 import org.codehaus.groovy.tools.shell.CommandSupport
-import org.codehaus.groovy.tools.shell.Shell
+import org.codehaus.groovy.tools.shell.Groovysh
 
 /**
  * The 'save' command.
@@ -30,18 +29,18 @@ import org.codehaus.groovy.tools.shell.Shell
 class SaveCommand
     extends CommandSupport
 {
-    SaveCommand(final Shell shell) {
+    SaveCommand(final Groovysh shell) {
         super(shell, 'save', '\\s')
     }
 
-    protected List createCompletors() {
+    protected List createCompleters() {
         return [
-            new FileNameCompletor(),
+            new FileNameCompleter(),
             null
         ]
     }
 
-    Object execute(final List args) {
+    Object execute(final List<String> args) {
         assert args != null
         
         if (args.size() != 1) {

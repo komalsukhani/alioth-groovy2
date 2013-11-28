@@ -28,6 +28,11 @@ import antlr.collections.AST
 import antlr.RecognitionException
 import antlr.TokenStreamException
 
+
+interface Parsing {
+    ParseStatus parse(final Collection<String> buffer);
+}
+
 /**
  * Provides a facade over the parser to recognize valid Groovy syntax.
  *
@@ -39,30 +44,30 @@ class Parser
 
     private static final Logger log = Logger.create(Parser.class)
 
-    private final def delegate
+    private final Parsing delegate
 
     Parser() {
-        def f = Preferences.parserFlavor
+        String flavor = Preferences.getParserFlavor()
 
-        log.debug("Using parser flavor: $f")
+        log.debug("Using parser flavor: $flavor")
         
-        switch (f) {
-            case 'relaxed':
+        switch (flavor) {
+            case Preferences.PARSER_RELAXED:
                 delegate = new RelaxedParser()
                 break
 
-            case 'rigid':
+            case Preferences.PARSER_RIGID:
                 delegate = new RigidParser()
                 break
 
             default:
-                log.error("Invalid parser flavor: $f; using default")
+                log.error("Invalid parser flavor: $flavor; using default: $Preferences.PARSER_RIGID")
                 delegate = new RigidParser()
                 break
         }
     }
     
-    ParseStatus parse(final List buffer) {
+    ParseStatus parse(final Collection<String> buffer) {
         return delegate.parse(buffer)
     }
 }
@@ -70,7 +75,7 @@ class Parser
 /**
  * A relaxed parser, which tends to allow more, but won't really catch valid syntax errors.
  */
-final class RelaxedParser
+final class RelaxedParser implements Parsing
 {
     private final Logger log = Logger.create(this.class)
 
@@ -78,7 +83,7 @@ final class RelaxedParser
 
     private String[] tokenNames
 
-    ParseStatus parse(final List buffer) {
+    ParseStatus parse(final Collection<String> buffer) {
         assert buffer
 
         sourceBuffer = new SourceBuffer()
@@ -95,15 +100,15 @@ final class RelaxedParser
             return new ParseStatus(ParseCode.COMPLETE)
         }
         catch (e) {
-            switch (e.class) {
+            switch (e.getClass()) {
                 case TokenStreamException:
                 case RecognitionException:
-                    log.debug("Parse incomplete: $e (${e.class.name})")
+                    log.debug("Parse incomplete: $e (${e.getClass().getName()})")
     
                     return new ParseStatus(ParseCode.INCOMPLETE)
 
                 default:
-                    log.debug("Parse error: $e (${e.class.name})")
+                    log.debug("Parse error: $e (${e.getClass().getName()})")
 
                     return new ParseStatus(e)
             }
@@ -111,7 +116,7 @@ final class RelaxedParser
     }
 
     protected AST doParse(final UnicodeEscapingReader reader) throws Exception {
-        def lexer = new GroovyLexer(reader)
+        GroovyLexer lexer = new GroovyLexer(reader)
         reader.setLexer(lexer)
 
         def parser = GroovyRecognizer.make(lexer)
@@ -126,13 +131,13 @@ final class RelaxedParser
 /**
  * A more rigid parser which catches more syntax errors, but also tends to barf on stuff that is really valid from time to time.
  */
-final class RigidParser
+final class RigidParser implements Parsing
 {
     static final String SCRIPT_FILENAME = 'groovysh_parse'
 
     private final Logger log = Logger.create(this.class)
 
-    ParseStatus parse(final List buffer) {
+    ParseStatus parse(final Collection<String> buffer) {
         assert buffer
 
         String source = buffer.join(Parser.NEWLINE)
