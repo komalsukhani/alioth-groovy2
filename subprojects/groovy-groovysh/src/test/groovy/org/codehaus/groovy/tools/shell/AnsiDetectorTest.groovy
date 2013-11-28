@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007 the original author or authors.
+ * Copyright 2003-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package org.codehaus.groovy.tools.shell.commands
+package org.codehaus.groovy.tools.shell
 
-/**
- * Tests for the {@link AliasCommand} class.
- *
- * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
- */
-class AliasCommandTest
-    extends CommandTestSupport
-{
-    void testAlias() {
-        shell.execute('alias')
-        shell.execute('alias foo bar')
-        shell.execute('alias history foo') // cannot rebind
+class AnsiDetectorTest extends GroovyTestCase {
+
+    void testAnsiCall() {
+        AnsiDetector det = new AnsiDetector()
+        assert det.call() instanceof Boolean
     }
+
 }

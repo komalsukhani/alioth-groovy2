@@ -42,14 +42,14 @@ class InspectCommand
     def lafInitialized = false
     def headless
     
-    protected List createCompletors() {
+    protected List createCompleters() {
         return [
             new InspectCommandCompletor(binding),
             null
         ]
     }
 
-    Object execute(final List args) {
+    Object execute(final List<String> args) {
         assert args != null
         
         log.debug("Inspecting w/args: $args")

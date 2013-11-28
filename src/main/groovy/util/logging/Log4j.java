@@ -27,6 +27,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Locale;
 
 /**
  * This local transform adds a logging ability to your program using
@@ -86,7 +87,7 @@ public @interface Log4j {
             if (!"trace".equals(methodName)) {
                 AttributeExpression logLevelExpression = new AttributeExpression(
                         new ClassExpression(classNode(PRIORITY_NAME)),
-                        new ConstantExpression(methodName.toUpperCase()));
+                        new ConstantExpression(methodName.toUpperCase(Locale.ENGLISH)));
                 ArgumentListExpression args = new ArgumentListExpression();
                 args.addExpression(logLevelExpression);
                 condition = new MethodCallExpression(logVariable, "isEnabledFor", args);

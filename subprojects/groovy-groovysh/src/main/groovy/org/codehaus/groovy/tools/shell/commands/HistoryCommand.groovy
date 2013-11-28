@@ -35,7 +35,7 @@ class HistoryCommand
         super(shell, 'history', '\\H', [ 'show', 'clear', 'flush', 'recall' ], 'show')
     }
 
-    protected List createCompletors() {
+    protected List createCompleters() {
         def loader = {
             def list = []
 
@@ -50,7 +50,7 @@ class HistoryCommand
         ]
     }
 
-    Object execute(List args) {
+    Object execute(List<String> args) {
         if (!history) {
             fail("Shell does not appear to be interactive; Can not query history")
         }
