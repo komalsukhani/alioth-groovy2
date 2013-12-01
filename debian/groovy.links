@@ -23,7 +23,7 @@
 /usr/share/java/ivy.jar                    /usr/share/groovy/lib/ivy.jar
 /usr/share/java/jansi.jar                  /usr/share/groovy/lib/jansi.jar
 /usr/share/java/jcommander.jar             /usr/share/groovy/lib/jcommander.jar
-/usr/share/java/jline.jar                  /usr/share/groovy/lib/jline.jar
+/usr/share/java/jline2.jar                 /usr/share/groovy/lib/jline2.jar
 /usr/share/java/junit4.jar                 /usr/share/groovy/lib/junit4.jar
 /usr/share/java/jsp-api-2.1.jar            /usr/share/groovy/lib/jsp-api-2.1.jar
 /usr/share/java/jsr166y.jar                /usr/share/groovy/lib/jsr166y.jar

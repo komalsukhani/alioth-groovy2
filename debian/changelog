@@ -1,3 +1,14 @@
+groovy (2.2.1+dfsg-1) experimental; urgency=low
+
+  * New upstream release.
+  * Refresh patches:
+    - 01_fix_gradle_build.diff
+    - 03_add_maven_poms.diff
+  * Update dependencies lists:
+    - libjline-java is replaced with libjline2-java.
+
+ -- Miguel Landaeta <miguel@miguel.cc>  Sun, 01 Dec 2013 16:21:56 -0300
+
 groovy (2.1.9+dfsg-1) experimental; urgency=low
 
   * New upstream release.

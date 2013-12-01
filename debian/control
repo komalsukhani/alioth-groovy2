@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 9)
 Build-Depends-Indep: default-jdk, gradle (>= 1.4~), ant, ant-optional,
  maven-repo-helper, libasm4-java, libbsf-java, libcommons-cli-java,
  libcommons-logging-java, junit4, libservlet2.5-java, libxstream-java,
- libjline-java, antlr, ivy, libqdox-java, libjansi-java, unzip,
+ libjline2-java, antlr, ivy, libqdox-java, libjansi-java, unzip,
  libjarjar-java (>= 1.4+svn142-3~), libcobertura-java, locales-all
 Standards-Version: 3.9.5
 Homepage: http://groovy.codehaus.org/
@@ -18,7 +18,7 @@ Package: groovy
 Architecture: all
 Depends: ${misc:Depends}, antlr, libasm4-java, libbsf-java,
  libcommons-cli-java, libcommons-logging-java, junit4, libservlet2.5-java,
- libjline-java, libxstream-java, ivy, libjansi-java,
+ libjline2-java, libxstream-java, ivy, libjansi-java,
  default-jre-headless | java6-runtime, libqdox-java
 Recommends: libgpars-groovy-java (>= 1.0~), ant, ant-optional,
  libjcommander-java, testng
