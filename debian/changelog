@@ -1,3 +1,10 @@
+groovy (2.2.1+dfsg-2) experimental; urgency=low
+
+  * Fix Maven coordinates. (Closes: #733051).
+  * Update maintainer email address.
+
+ -- Miguel Landaeta <nomadium@debian.org>  Wed, 25 Dec 2013 14:28:19 -0300
+
 groovy (2.2.1+dfsg-1) experimental; urgency=low
 
   * New upstream release.

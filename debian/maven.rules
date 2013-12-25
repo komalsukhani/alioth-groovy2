@@ -1,2 +1,4 @@
 junit junit jar s/.*/3.x/ * *
 org.testng testng jar s/.*/6.x/ * *
+org.ow2.asm * jar s/.*/4.x/ * *
+s/javax\.servlet/javax.servlet.jsp/ jsp-api jar s/.*/debian/ * *
