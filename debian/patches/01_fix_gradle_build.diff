@@ -70,12 +70,12 @@ Last-Update: 2013-12-01
 -    def antVersion = '1.9.2'
 -    def asmVersion = '4.1'
 +    def antVersion = 'debian'
-+    def asmVersion = '4.x'
++    def asmVersion = 'debian'
      def antlrVersion = '2.7.7'
 -    def bndVersion = '0.0.401'
 -    def checkstyleVersion = '4.4'
 +    def bndVersion = 'debian'
-+    def checkstyleVersion = '5.6'
++    def checkstyleVersion = 'debian'
      def coberturaVersion = '1.9.4.1'
      def commonsCliVersion = '1.2'
      def commonsHttpClientVersion = '3.1'
@@ -406,7 +406,7 @@ Last-Update: 2013-12-01
      }
      dependencies {
 -        classpath 'org.ow2.asm:asm:4.1'
-+        classpath 'org.ow2.asm:asm:4.x'
++        classpath 'org.ow2.asm:asm:debian'
      }
  }
  
