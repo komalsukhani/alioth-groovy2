@@ -1,7 +1,7 @@
 Description: Build Groovy with libraries available in Debian
 Author: Miguel Landaeta <nomadium@debian.org>
 Forwarded: no
-Last-Update: 2013-12-01
+Last-Update: 2014-05-08
 
 --- groovy-2.2.1+dfsg.orig/build.gradle
 +++ groovy-2.2.1+dfsg/build.gradle
@@ -70,7 +70,7 @@ Last-Update: 2013-12-01
 -    def antVersion = '1.9.2'
 -    def asmVersion = '4.1'
 +    def antVersion = 'debian'
-+    def asmVersion = 'debian'
++    def asmVersion = '4.x'
      def antlrVersion = '2.7.7'
 -    def bndVersion = '0.0.401'
 -    def checkstyleVersion = '4.4'
@@ -406,7 +406,7 @@ Last-Update: 2013-12-01
      }
      dependencies {
 -        classpath 'org.ow2.asm:asm:4.1'
-+        classpath 'org.ow2.asm:asm:debian'
++        classpath 'org.ow2.asm:asm:4.x'
      }
  }
  
