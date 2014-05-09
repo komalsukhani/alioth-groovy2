@@ -15,7 +15,7 @@ Last-Update: 2013-10-27
  SCRIPT_PATH="$0"
  
 +: ${JAVA_HOME:="/usr/lib/jvm/default-java"}
-+: ${GROOVY_HOME:="/usr/share/groovy"}
++: ${GROOVY_HOME:="/usr/share/groovy2"}
 +
  # Use the maximum available, or set MAX_FD != -1 to use that value.
  MAX_FD="maximum"

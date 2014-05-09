@@ -1,4 +1,4 @@
-Source: groovy
+Source: groovy2
 Section: java
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
@@ -11,10 +11,10 @@ Build-Depends-Indep: default-jdk, gradle (>= 1.4~), ant, ant-optional,
  libjarjar-java (>= 1.4+svn142-3~), libcobertura-java, locales-all
 Standards-Version: 3.9.5
 Homepage: http://groovy.codehaus.org/
-Vcs-Git: git://anonscm.debian.org/pkg-java/groovy.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/groovy.git
+Vcs-Git: git://anonscm.debian.org/pkg-java/groovy2.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/groovy2.git
 
-Package: groovy
+Package: groovy2
 Architecture: all
 Depends: ${misc:Depends}, antlr, libasm4-java, libbsf-java,
  libcommons-cli-java, libcommons-logging-java, junit4, libservlet2.5-java,
@@ -37,7 +37,7 @@ Description: Agile dynamic language for the Java Virtual Machine
  dynamically as an alternative language such as for scripting Java objects,
  templating or writing unit test cases. 
 
-Package: groovy-doc
+Package: groovy2-doc
 Section: doc
 Architecture: all
 Depends: ${misc:Depends}

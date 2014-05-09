@@ -1,0 +1,10 @@
+target/distributions/bin/groovy-*/conf/*             /etc/groovy2
+target/distributions/bin/groovy-*/bin/groovydoc      /usr/share/groovy2/bin
+target/distributions/bin/groovy-*/bin/groovy         /usr/share/groovy2/bin
+target/distributions/bin/groovy-*/bin/groovysh       /usr/share/groovy2/bin
+target/distributions/bin/groovy-*/bin/java2groovy    /usr/share/groovy2/bin
+target/distributions/bin/groovy-*/bin/groovyConsole  /usr/share/groovy2/bin
+target/distributions/bin/groovy-*/bin/grape          /usr/share/groovy2/bin
+target/distributions/bin/groovy-*/bin/groovyc        /usr/share/groovy2/bin
+target/distributions/bin/groovy-*/bin/startGroovy    /usr/share/groovy2/bin
+target/distributions/bin/groovy-*/indy               /usr/share/groovy2

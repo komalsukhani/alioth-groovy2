@@ -1,9 +1,11 @@
 #!/usr/bin/make -f
 
+include /usr/share/dpkg/default.mk
+
 export GRADLE_USER_HOME=$(CURDIR)/.gradlehome
 export LC_ALL=en_US.UTF-8
 DEB_GRADLE_OPTS := --project-prop finalRelease=true --stacktrace --offline
-UVERSION  := $(shell dpkg-parsechangelog|grep ^Version:|cut -f2 -d' '|sed 's/+dfsg-[^-]*$$//')
+UVERSION := $(shell echo $(DEB_VERSION_UPSTREAM) | sed 's/+dfsg//')
 MAVEN_REPO_URL := http://repo1.maven.org/maven2/
 MODULES := docgenerator servlet ant groovydoc xml swing sql jmx test console groovysh json testng jsr223 templates bsf
 
@@ -29,28 +31,28 @@ override_dh_auto_install:
 	# embeddable groovy-all jar with indy feature is not installed through maven
 	dh_install \
 		target/distributions/bin/groovy-$(UVERSION)/embeddable/groovy-all-$(UVERSION)-indy.jar \
-		usr/share/groovy/embeddable
+		usr/share/groovy2/embeddable
 	# groovy core
-	mh_installpom -o -v -pgroovy maven/groovy.pom
-	mh_installjar -pgroovy -l maven/groovy.pom target/libs/groovy-$(UVERSION).jar
+	mh_installpom -o -v -pgroovy2 maven/groovy.pom
+	mh_installjar -pgroovy2 -l -s -j2.x maven/groovy.pom target/libs/groovy-$(UVERSION).jar
 	# groovy-all
-	mh_installpom -o -v -pgroovy maven/groovy-all.pom
-	mh_installjar -pgroovy -l maven/groovy-all.pom \
+	mh_installpom -o -v -pgroovy2 maven/groovy-all.pom
+	mh_installjar -pgroovy2 -l -s -j2.x maven/groovy-all.pom \
 		target/distributions/bin/groovy-$(UVERSION)/embeddable/groovy-all-$(UVERSION).jar
 	# all the remaining groovy modules
 	for MOD in $(MODULES); do \
-	   mh_installpom -o -v -pgroovy maven/groovy-$$MOD.pom; \
-	   mh_installjar -pgroovy maven/groovy-$$MOD.pom \
+	   mh_installpom -o -v -pgroovy2 maven/groovy-$$MOD.pom; \
+	   mh_installjar -pgroovy2 -j2.x maven/groovy-$$MOD.pom \
 	      subprojects/groovy-$$MOD/target/libs/groovy-$$MOD-$(UVERSION).jar; \
 	done
 
 override_dh_link:
 	dh_link
-	dh_link usr/share/java/groovy-all.jar usr/share/groovy/embeddable/groovy-all-$(UVERSION).jar
-	dh_link usr/share/java/groovy.jar usr/share/groovy/lib/groovy-$(UVERSION).jar
+	dh_link usr/share/java/groovy-all-2.x.jar usr/share/groovy2/embeddable/groovy-all-$(UVERSION).jar
+	dh_link usr/share/java/groovy-2.x.jar usr/share/groovy2/lib/groovy-$(UVERSION).jar
 	for MOD in $(MODULES); do \
 		dh_link usr/share/maven-repo/org/codehaus/groovy/groovy-$$MOD/$(UVERSION)/groovy-$$MOD-$(UVERSION).jar \
-			usr/share/groovy/lib/groovy-$$MOD.jar; \
+			usr/share/groovy2/lib/groovy-$$MOD.jar; \
 	done
 
 get-orig-source:

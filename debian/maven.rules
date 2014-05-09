@@ -1,3 +1,4 @@
+org.codehaus.groovy * * s/.*/2.x/ * *
 junit junit jar s/.*/3.x/ * *
 org.testng testng jar s/.*/6.x/ * *
 org.ow2.asm * jar s/.*/4.x/ * *

@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # called by uscan with '--upstream-version' <version> <file>
-TAR=../groovy_$2+dfsg.orig.tar.gz
+TAR=../groovy2_$2+dfsg.orig.tar.gz
 DIR=groovy-$2
 
 # clean up the upstream tarball
