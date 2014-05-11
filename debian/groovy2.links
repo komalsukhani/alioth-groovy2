@@ -1,11 +1,3 @@
-/usr/share/groovy2/bin/grape               /usr/bin/grape2
-/usr/share/groovy2/bin/groovy              /usr/bin/groovy2
-/usr/share/groovy2/bin/groovyc             /usr/bin/groovyc2
-/usr/share/groovy2/bin/groovyConsole       /usr/bin/groovyConsole2
-/usr/share/groovy2/bin/groovysh            /usr/bin/groovysh2
-/usr/share/groovy2/bin/groovydoc           /usr/bin/groovydoc2
-/usr/share/groovy2/bin/java2groovy         /usr/bin/java2groovy2
-/usr/share/groovy2/bin/startGroovy         /usr/bin/startGroovy2
 /usr/share/java/ant.jar                    /usr/share/groovy2/lib/ant.jar
 /usr/share/java/ant-antlr.jar              /usr/share/groovy2/lib/ant-antlr.jar
 /usr/share/java/ant-junit.jar              /usr/share/groovy2/lib/ant-junit.jar
@@ -31,9 +23,9 @@
 /usr/share/java/servlet-api-2.5.jar        /usr/share/groovy2/lib/servlet-api-2.5.jar
 /usr/share/java/testng.jar                 /usr/share/groovy2/lib/testng.jar
 /usr/share/java/xstream.jar                /usr/share/groovy2/lib/xstream.jar
-/usr/share/man/man1/groovy2.1.gz           /usr/share/man/man1/startGroovy2.1.gz
-/usr/share/man/man1/groovy2.1.gz           /usr/share/man/man1/groovysh2.1.gz
-/usr/share/man/man1/groovy2.1.gz           /usr/share/man/man1/java2groovy2.1.gz
-/usr/share/man/man1/groovy2.1.gz           /usr/share/man/man1/groovyConsole2.1.gz
-/usr/share/man/man1/groovy2.1.gz           /usr/share/man/man1/groovydoc2.1.gz
+/usr/share/groovy2/man/man1/groovy.1.gz    /usr/share/groovy2/man/man1/startGroovy.1.gz
+/usr/share/groovy2/man/man1/groovy.1.gz    /usr/share/groovy2/man/man1/groovysh.1.gz
+/usr/share/groovy2/man/man1/groovy.1.gz    /usr/share/groovy2/man/man1/java2groovy.1.gz
+/usr/share/groovy2/man/man1/groovy.1.gz    /usr/share/groovy2/man/man1/groovyConsole.1.gz
+/usr/share/groovy2/man/man1/groovy.1.gz    /usr/share/groovy2/man/man1/groovydoc.1.gz
 /etc/groovy2                               /usr/share/groovy2/conf
