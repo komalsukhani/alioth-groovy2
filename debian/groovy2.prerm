@@ -1,12 +1,13 @@
 #!/bin/sh
 set -e
 
+GROOVY_HOME=/usr/share/groovy2
 
 remove_groovy_alternatives() {
     for cmd in groovy groovyc grape \
         startGroovy groovysh java2groovy groovyConsole groovydoc; do
-            if [ -L "/usr/bin/$cmd" ]; then
-                update-alternatives --remove $cmd /usr/bin/$cmd
+            if [ -f "$GROOVY_HOME/bin/$cmd" ]; then
+                update-alternatives --verbose --remove $cmd $GROOVY_HOME/bin/$cmd
             fi
     done
 }
