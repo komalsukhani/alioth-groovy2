@@ -1,18 +1,28 @@
 Description: Build Groovy with libraries available in Debian
 Author: Miguel Landaeta <nomadium@debian.org>
 Forwarded: no
-Last-Update: 2014-05-08
+Last-Update: 2014-05-11
 
---- groovy-2.2.1+dfsg.orig/build.gradle
-+++ groovy-2.2.1+dfsg/build.gradle
-@@ -3,14 +3,17 @@ apply from: 'gradle/indy.gradle'
+--- groovy2-2.2.2+dfsg.orig/build.gradle
++++ groovy2-2.2.2+dfsg/build.gradle
+@@ -1,28 +1,22 @@
+ apply from: 'gradle/filter.gradle'
+ apply from: 'gradle/indy.gradle'
+-if (JavaVersion.current().java6Compatible) {
+-    apply from: 'gradle/bintray.gradle'
+-}
  
  buildscript {
      repositories {
+-        jcenter()
+-        maven {
+-            name 'Bintray Asciidoctor repo'
+-            url 'http://dl.bintray.com/content/aalmiray/asciidoctor'
+-        }
 +        /*
-         mavenCentral()
-         mavenRepo name: 'Bintray Asciidoctor repo', url: 'http://dl.bintray.com/content/aalmiray/asciidoctor'
-         mavenRepo name: 'Bintray JCenter', url: 'http://jcenter.bintray.com'
++        mavenCentral()
++        mavenRepo name: 'Bintray Asciidoctor repo', url: 'http://dl.bintray.com/content/aalmiray/asciidoctor'
++        mavenRepo name: 'Bintray JCenter', url: 'http://jcenter.bintray.com'
 +        */
 +        mavenRepo url: "file:///usr/share/maven-repo"
      }
@@ -20,22 +30,29 @@ Last-Update: 2014-05-08
      dependencies {
 -        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.5.0'
 -        classpath 'net.saliman:gradle-cobertura-plugin:1.1.2'
+-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.3'
 +        //classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.5.0'
 +        //classpath 'net.saliman:gradle-cobertura-plugin:1.1.2'
      }
  }
  
-@@ -27,7 +30,8 @@ allprojects {
+-File javaHome = new File(System.getProperty('java.home'))
+-logger.lifecycle "Using Java from $javaHome (version ${System.getProperty('java.version')})"
+-
+ // TODO use antlr plugin
+ //apply plugin: 'antlr'
+ 
+@@ -36,7 +30,8 @@ allprojects {
      group = 'org.codehaus.groovy'
      version = groovyVersion
      repositories {
--        mavenCentral()
+-        jcenter()
 +        //mavenCentral()
 +        mavenRepo url: "file:///usr/share/maven-repo"
      }
  
      apply plugin: 'checkstyle'
-@@ -40,6 +44,7 @@ allprojects {
+@@ -49,6 +44,7 @@ allprojects {
          // do nothing on JDK 5 as gradle fails to create a proxy for the AsciidoctorTask
          logger.warn 'You must run on JDK 6+ to be able to generate the Asciidoc documentation.'
      } else {
@@ -43,7 +60,7 @@ Last-Update: 2014-05-08
          apply plugin: 'asciidoctor'
  
          asciidoctor {
-@@ -49,6 +54,7 @@ allprojects {
+@@ -58,6 +54,7 @@ allprojects {
  
          // skip the asciidoctor task if there's no directory with asciidoc files
          asciidoctor.onlyIf { project.file('src/spec/doc').exists() }
@@ -51,7 +68,16 @@ Last-Update: 2014-05-08
      }
  
      // don't fail build on CodeNarc tasks
-@@ -119,8 +125,11 @@ subprojects {
+@@ -69,7 +66,7 @@ allprojects {
+         ignoreFailures = true
+         configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
+     }
+-
++    
+     if (useIndy()) {
+         tasks.withType(GroovyCompile) {
+             groovyOptions.optimizationOptions.indy = true
+@@ -128,8 +125,11 @@ subprojects {
  repositories {
      // todo Some repos are needed only for some configs. Declare them just for the configuration once Gradle allows this.
  //    mavenCentral() // default, tools
@@ -63,7 +89,7 @@ Last-Update: 2014-05-08
  }
  
  // todo do we need compile and runtime scope for examples?
-@@ -134,30 +143,30 @@ configurations {
+@@ -143,30 +143,30 @@ configurations {
  }
  
  dependencies {
@@ -103,7 +129,7 @@ Last-Update: 2014-05-08
  
      compilerCompile "antlr:antlr:$antlrVersion"
      compilerCompile "org.ow2.asm:asm:$asmVersion"
-@@ -197,7 +206,7 @@ dependencies {
+@@ -206,7 +206,7 @@ dependencies {
      compile("org.apache.ivy:ivy:$ivyVersion") {
          transitive = false
      }
@@ -112,7 +138,7 @@ Last-Update: 2014-05-08
      testCompile "jmock:jmock:$jmockVersion"
      testCompile "jmock:jmock-cglib:$jmockVersion"
      testCompile "xmlunit:xmlunit:$xmlunitVersion"
-@@ -208,10 +217,10 @@ dependencies {
+@@ -217,10 +217,10 @@ dependencies {
      testCompile "com.thoughtworks.qdox:qdox:$qdoxVersion"
  
      tools "com.googlecode.jarjar:jarjar:$jarjarVersion"
@@ -125,7 +151,51 @@ Last-Update: 2014-05-08
      tools("net.sourceforge.cobertura:cobertura:$coberturaVersion") {
          exclude(module: 'asm')
          exclude(module: 'asm')
-@@ -497,6 +506,7 @@ if (file('user.gradle').exists()) {
+@@ -290,7 +290,7 @@ sourceSets {
+             ]
+             fileTree('src/main/groovy/ui').matching {
+                 exclude 'GroovyMain.java', 'GroovySocketServer.java'
+-            }.visit { details ->
++            }.visit {details ->
+                 exclude "groovy/ui/$details.path"
+             }
+             if (!useIndy()) {
+@@ -408,11 +408,9 @@ apply from: 'gradle/utils.gradle'
+ def isJava16() {
+     System.properties['java.version'].contains('1.6')
+ }
+-
+ def isJava15() {
+     System.properties['java.version'].contains('1.5')
+ }
+-
+ def modules() {
+     subprojects.findAll { it.name =~ /groovy-(?!all-tests)/ }
+ }
+@@ -454,7 +452,7 @@ compileCompilerJava {
+ }
+ 
+ compileJava {
+-    dependsOn compilerClasses, compilerDgmConverter, ensureGrammars
++    dependsOn compilerClasses,compilerDgmConverter,ensureGrammars
+     options.fork(memoryMaximumSize: javacMain_mx)
+ }
+ 
+@@ -491,10 +489,10 @@ apply from: 'gradle/eclipse.gradle'
+ // Define a GroovyDoc task which depends on the generated groovydoc tool
+ apply from: 'gradle/groovydoc.gradle'
+ if (isJava15()) {
+-    // do nothing on JDK 5 as sardine is built for Java 6
+-    logger.warn 'You must run on JDK 6+ to be able to deploy to codehaus.'
++  // do nothing on JDK 5 as sardine is built for Java 6
++  logger.warn 'You must run on JDK 6+ to be able to deploy to codehaus.'
+ } else {
+-    apply from: 'gradle/codehaus.gradle'
++  apply from: 'gradle/codehaus.gradle'
+ }
+ 
+ classes {
+@@ -508,6 +506,7 @@ if (file('user.gradle').exists()) {
      apply from: 'user.gradle'
  }
  
@@ -133,7 +203,7 @@ Last-Update: 2014-05-08
  allprojects {
      apply plugin: 'cobertura'
      cobertura {
-@@ -504,10 +514,13 @@ allprojects {
+@@ -515,10 +514,13 @@ allprojects {
          coverageReportDir = file("$buildDir/reports/cobertura")
      }
  }
@@ -147,8 +217,8 @@ Last-Update: 2014-05-08
  
  // produce warning if running on 1.5 or 1.6
  if (isJava15() || isJava16()) {
---- groovy-2.2.1+dfsg.orig/gradle/assemble.gradle
-+++ groovy-2.2.1+dfsg/gradle/assemble.gradle
+--- groovy2-2.2.2+dfsg.orig/gradle/assemble.gradle
++++ groovy2-2.2.2+dfsg/gradle/assemble.gradle
 @@ -315,17 +315,17 @@ ext.distSpec = copySpec {
      from("$projectDir") {
          include 'LICENSE.txt', 'NOTICE.txt'
@@ -178,8 +248,8 @@ Last-Update: 2014-05-08
      into('indy') {
          from { new File(jar.archivePath.parent, "${jar.baseName}-${jar.version}-indy.jar") }
          from {
---- groovy-2.2.1+dfsg.orig/gradle/codehaus.gradle
-+++ groovy-2.2.1+dfsg/gradle/codehaus.gradle
+--- groovy2-2.2.2+dfsg.orig/gradle/codehaus.gradle
++++ groovy2-2.2.2+dfsg/gradle/codehaus.gradle
 @@ -1,44 +1,44 @@
 -import com.github.sardine.*
 -import com.github.sardine.impl.*
@@ -263,8 +333,8 @@ Last-Update: 2014-05-08
 +//        }
 +//    }
  }
---- groovy-2.2.1+dfsg.orig/gradle/docs.gradle
-+++ groovy-2.2.1+dfsg/gradle/docs.gradle
+--- groovy2-2.2.2+dfsg.orig/gradle/docs.gradle
++++ groovy2-2.2.2+dfsg/gradle/docs.gradle
 @@ -4,12 +4,14 @@ task doc(dependsOn: ['asciidocAll', 'ass
  }
  
@@ -394,8 +464,83 @@ Last-Update: 2014-05-08
  }
  
  // this will apply the javadoc fix tool to all generated javadocs
---- groovy-2.2.1+dfsg.orig/gradle/utils.gradle
-+++ groovy-2.2.1+dfsg/gradle/utils.gradle
+--- groovy2-2.2.2+dfsg.orig/gradle/test.gradle
++++ groovy2-2.2.2+dfsg/gradle/test.gradle
+@@ -2,11 +2,7 @@ import org.apache.tools.ant.taskdefs.con
+ 
+ allprojects {
+     test {
+-        if (JavaVersion.current().isJava8Compatible()) {
+-            jvmArgs '-ea', "-Xms${groovyJUnit_ms}", "-Xmx${groovyJUnit_mx}"
+-        } else {
+-            jvmArgs '-ea', "-Xms${groovyJUnit_ms}", "-Xmx${groovyJUnit_mx}", "-XX:PermSize=${groovyJUnit_permSize}", "-XX:MaxPermSize=${groovyJUnit_maxPermSize}"
+-        }
++        jvmArgs '-ea', "-Xms${groovyJUnit_ms}", "-Xmx${groovyJUnit_mx}", "-XX:PermSize=${groovyJUnit_permSize}", "-XX:MaxPermSize=${groovyJUnit_maxPermSize}"
+         def headless = System.properties['java.awt.headless']
+         if (headless == 'true') {
+             systemProperties 'java.awt.headless': 'true'
+@@ -54,8 +50,7 @@ test {
+ }
+ 
+ boolean isRunningOnCI() {
+-    def path = new File('.').absolutePath
+-    path.contains('ci.codehaus.org') || path.contains('teamcity')
++    new File('.').absolutePath.contains('ci.codehaus.org')
+ }
+ 
+ logger.lifecycle "Detected ${isRunningOnCI() ? 'Continuous Integration environment' : 'development environment'}"
+--- groovy2-2.2.2+dfsg.orig/gradle/upload.gradle
++++ groovy2-2.2.2+dfsg/gradle/upload.gradle
+@@ -1,39 +1,26 @@
+-boolean isUsingBintray = rootProject.hasProperty('bintrayUser') && rootProject.bintrayUser &&
+-        rootProject.hasProperty('bintrayPassword') && rootProject.bintrayPassword
+-
+-if (isUsingBintray) {
+-    logger.lifecycle 'Deployment environment set to Bintray'
+-}
+-
+ allprojects {
+     apply plugin: 'maven'
+     apply from: "${rootProject.projectDir}/gradle/pomconfigurer.gradle"
+ 
+-
+     configurations {
+         deployerJars
+     }
+ 
+-    if (!isUsingBintray) {
+-        dependencies {
+-            deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
+-        }
++    dependencies {
++        deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
+     }
+ 
+     uploadArchives {
+         repositories {
+             mavenDeployer {
++                def credentials = [
++                        userName: System.getProperty('groovy.deploy.username'),
++                        password: System.getProperty('groovy.deploy.password')
++                ]
+                 configuration = configurations.deployerJars
++                repository(id:'codehaus.org',url: uri('dav:https://dav.codehaus.org/repository/groovy'), authentication: credentials)
++                snapshotRepository(id:'codehaus.org',url: uri('dav:https://dav.codehaus.org/snapshots.repository/groovy'), authentication: credentials)
+                 pom pomConfigureClosure
+-
+-                if (!isUsingBintray) {
+-                    def credentials = [
+-                            userName: System.getProperty('groovy.deploy.username'),
+-                            password: System.getProperty('groovy.deploy.password')
+-                    ]
+-                    repository(id:'codehaus.org',url: uri('dav:https://dav.codehaus.org/repository/groovy'), authentication: credentials)
+-                    snapshotRepository(id:'codehaus.org',url: uri('dav:https://dav.codehaus.org/snapshots.repository/groovy'), authentication: credentials)
+-                }
+             }
+         }
+     }
+--- groovy2-2.2.2+dfsg.orig/gradle/utils.gradle
++++ groovy2-2.2.2+dfsg/gradle/utils.gradle
 @@ -24,10 +24,11 @@ import static org.objectweb.asm.Opcodes.
  
  buildscript {
@@ -410,8 +555,8 @@ Last-Update: 2014-05-08
      }
  }
  
---- groovy-2.2.1+dfsg.orig/subprojects/groovy-ant/build.gradle
-+++ groovy-2.2.1+dfsg/subprojects/groovy-ant/build.gradle
+--- groovy2-2.2.2+dfsg.orig/subprojects/groovy-ant/build.gradle
++++ groovy2-2.2.2+dfsg/subprojects/groovy-ant/build.gradle
 @@ -1,5 +1,5 @@
  dependencies {
 -    def antVersion = '1.9.2'
@@ -419,8 +564,8 @@ Last-Update: 2014-05-08
      compile project(':')
      groovy project(':')
      compile "org.apache.ant:ant:$antVersion"
---- groovy-2.2.1+dfsg.orig/subprojects/groovy-bsf/build.gradle
-+++ groovy-2.2.1+dfsg/subprojects/groovy-bsf/build.gradle
+--- groovy2-2.2.2+dfsg.orig/subprojects/groovy-bsf/build.gradle
++++ groovy2-2.2.2+dfsg/subprojects/groovy-bsf/build.gradle
 @@ -2,7 +2,7 @@ dependencies {
      compile('bsf:bsf:2.4.0') {
          exclude(group: 'commons-logging', module: 'commons-logging')
@@ -430,8 +575,19 @@ Last-Update: 2014-05-08
      compile project(':')
      testCompile project(':groovy-test')
  }
---- groovy-2.2.1+dfsg.orig/subprojects/groovy-docgenerator/build.gradle
-+++ groovy-2.2.1+dfsg/subprojects/groovy-docgenerator/build.gradle
+--- groovy2-2.2.2+dfsg.orig/subprojects/groovy-console/build.gradle
++++ groovy2-2.2.2+dfsg/subprojects/groovy-console/build.gradle
+@@ -8,8 +8,3 @@ dependencies {
+     testCompile project(':groovy-test')
+     testCompile project(':groovy-swing').sourceSets.test.runtimeClasspath
+ }
+-
+-task console(type: JavaExec, dependsOn:classes) {
+-    main = 'groovy.ui.Console'
+-    classpath = sourceSets.main.runtimeClasspath
+-}
+--- groovy2-2.2.2+dfsg.orig/subprojects/groovy-docgenerator/build.gradle
++++ groovy2-2.2.2+dfsg/subprojects/groovy-docgenerator/build.gradle
 @@ -3,5 +3,5 @@ dependencies {
      compile project(':groovy-templates')
      groovy project(':')
@@ -439,8 +595,8 @@ Last-Update: 2014-05-08
 -    compile 'com.thoughtworks.qdox:qdox:1.12.1'
 +    compile 'com.thoughtworks.qdox:qdox:debian'
  }
---- groovy-2.2.1+dfsg.orig/subprojects/groovy-groovysh/build.gradle
-+++ groovy-2.2.1+dfsg/subprojects/groovy-groovysh/build.gradle
+--- groovy2-2.2.2+dfsg.orig/subprojects/groovy-groovysh/build.gradle
++++ groovy2-2.2.2+dfsg/subprojects/groovy-groovysh/build.gradle
 @@ -1,5 +1,5 @@
  dependencies {
 -    def jlineVersion = '2.10'
@@ -448,8 +604,8 @@ Last-Update: 2014-05-08
      compile project(':')
      groovy project(':')
      compile project(':groovy-console')
---- groovy-2.2.1+dfsg.orig/subprojects/groovy-servlet/build.gradle
-+++ groovy-2.2.1+dfsg/subprojects/groovy-servlet/build.gradle
+--- groovy2-2.2.2+dfsg.orig/subprojects/groovy-servlet/build.gradle
++++ groovy2-2.2.2+dfsg/subprojects/groovy-servlet/build.gradle
 @@ -1,8 +1,8 @@
  dependencies {
 -    compile('javax.servlet:servlet-api:2.4') { dep ->

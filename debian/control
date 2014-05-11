@@ -8,7 +8,7 @@ Build-Depends-Indep: default-jdk, gradle (>= 1.4~), ant, ant-optional,
  maven-repo-helper, libasm4-java, libbsf-java, libcommons-cli-java,
  libcommons-logging-java, junit4, libservlet2.5-java, libxstream-java,
  libjline2-java, antlr, ivy, libqdox-java, libjansi-java, unzip,
- libjarjar-java (>= 1.4+svn142-3~), libcobertura-java, locales-all
+ libjarjar-java (>= 1.4+svn142-4~), libcobertura-java, locales-all
 Standards-Version: 3.9.5
 Homepage: http://groovy.codehaus.org/
 Vcs-Git: git://anonscm.debian.org/pkg-java/groovy2.git
