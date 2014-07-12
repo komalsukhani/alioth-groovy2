@@ -1,17 +1,17 @@
 Description: Add Maven POM files
 Author: Miguel Landaeta <nomadium@debian.org>
 Forwarded: no
-Last-Update: 2013-11-27
+Last-Update: 2014-07-12
 
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-all.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-all.pom
 @@ -0,0 +1,658 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-all</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -46,7 +46,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@44054e68</organization>
++      <organization>org.apache.maven.model.Organization@5ef70aec</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -57,7 +57,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@50a4e1e6</organization>
++      <organization>org.apache.maven.model.Organization@4cd0924a</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -66,7 +66,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@7465a8f</organization>
++      <organization>org.apache.maven.model.Organization@5751e07</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -74,7 +74,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@6e3e9ee9</organization>
++      <organization>org.apache.maven.model.Organization@36a0a0a9</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -82,7 +82,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@6e3abaab</organization>
++      <organization>org.apache.maven.model.Organization@36130ae2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -90,7 +90,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@5d064d42</organization>
++      <organization>org.apache.maven.model.Organization@786d54da</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -98,7 +98,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@41d82a29</organization>
++      <organization>org.apache.maven.model.Organization@42397e13</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -136,7 +136,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@c28a9ee</organization>
++      <organization>org.apache.maven.model.Organization@4938cc4f</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -153,7 +153,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@62f5e4be</organization>
++      <organization>org.apache.maven.model.Organization@1e36ee47</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -162,7 +162,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@327c022</organization>
++      <organization>org.apache.maven.model.Organization@705d660</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -171,7 +171,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@36c9d3ef</organization>
++      <organization>org.apache.maven.model.Organization@243d0c2a</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -180,7 +180,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@6f039725</organization>
++      <organization>org.apache.maven.model.Organization@421a3fcf</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -206,7 +206,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@53c02e2f</organization>
++      <organization>org.apache.maven.model.Organization@34f89046</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -224,7 +224,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@7fd00a54</organization>
++      <organization>org.apache.maven.model.Organization@71b1c270</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -233,7 +233,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@6838ad0a</organization>
++      <organization>org.apache.maven.model.Organization@66f9ed49</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -242,7 +242,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@48a0aeca</organization>
++      <organization>org.apache.maven.model.Organization@99c82a6</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -298,7 +298,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@1d927100</organization>
++      <organization>org.apache.maven.model.Organization@32e5d13d</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -665,14 +665,14 @@ Last-Update: 2013-11-27
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-ant.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-ant.pom
 @@ -0,0 +1,538 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-ant</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -707,7 +707,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@2dc141b3</organization>
++      <organization>org.apache.maven.model.Organization@f290193</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -718,7 +718,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@7d7823e4</organization>
++      <organization>org.apache.maven.model.Organization@12d6491f</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -727,7 +727,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@275474c3</organization>
++      <organization>org.apache.maven.model.Organization@5ab02c41</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -735,7 +735,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@79247b7a</organization>
++      <organization>org.apache.maven.model.Organization@64243105</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -743,7 +743,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@373d3210</organization>
++      <organization>org.apache.maven.model.Organization@50876874</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -751,7 +751,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@3e97db11</organization>
++      <organization>org.apache.maven.model.Organization@18b351ba</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -759,7 +759,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@d08d318</organization>
++      <organization>org.apache.maven.model.Organization@560fd57d</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -797,7 +797,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@4811fb9e</organization>
++      <organization>org.apache.maven.model.Organization@77f14e32</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -814,7 +814,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@b358ad</organization>
++      <organization>org.apache.maven.model.Organization@4c73f7fd</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -823,7 +823,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@3ba3441d</organization>
++      <organization>org.apache.maven.model.Organization@66e83b43</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -832,7 +832,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@6a37ea3c</organization>
++      <organization>org.apache.maven.model.Organization@45983b21</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -841,7 +841,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@45d5de28</organization>
++      <organization>org.apache.maven.model.Organization@872a604</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -867,7 +867,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@3dd00249</organization>
++      <organization>org.apache.maven.model.Organization@f4b52ce</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -885,7 +885,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@57beb073</organization>
++      <organization>org.apache.maven.model.Organization@f4c0910</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -894,7 +894,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@a2adb88</organization>
++      <organization>org.apache.maven.model.Organization@3605435c</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -903,7 +903,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@4d1bdace</organization>
++      <organization>org.apache.maven.model.Organization@223a53b4</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -959,7 +959,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@1ef30741</organization>
++      <organization>org.apache.maven.model.Organization@7210cfda</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -1163,8 +1163,8 @@ Last-Update: 2013-11-27
 +  <dependencies>
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy-groovydoc</artifactId>
-+      <version>2.2.1</version>
++      <artifactId>groovy</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
@@ -1177,6 +1177,12 @@ Last-Update: 2013-11-27
 +      <groupId>org.apache.ant</groupId>
 +      <artifactId>ant</artifactId>
 +      <version>1.9.2</version>
++      <scope>compile</scope>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.groovy</groupId>
++      <artifactId>groovy-groovydoc</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
@@ -1197,23 +1203,17 @@ Last-Update: 2013-11-27
 +        </exclusion>
 +      </exclusions>
 +    </dependency>
-+    <dependency>
-+      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
-+      <scope>compile</scope>
-+    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-bsf.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-bsf.pom
 @@ -0,0 +1,520 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-bsf</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -1248,7 +1248,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@4ad8d6ed</organization>
++      <organization>org.apache.maven.model.Organization@1f788581</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -1259,7 +1259,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@1aca66f9</organization>
++      <organization>org.apache.maven.model.Organization@1caea51e</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -1268,7 +1268,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@3b8b7e02</organization>
++      <organization>org.apache.maven.model.Organization@7cac1312</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -1276,7 +1276,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@265f2c44</organization>
++      <organization>org.apache.maven.model.Organization@7bc2336c</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1284,7 +1284,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@75843255</organization>
++      <organization>org.apache.maven.model.Organization@4e0848c4</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1292,7 +1292,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@75dd971</organization>
++      <organization>org.apache.maven.model.Organization@74648b64</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1300,7 +1300,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@80b5cdb</organization>
++      <organization>org.apache.maven.model.Organization@2f234042</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1338,7 +1338,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@18d7f3b0</organization>
++      <organization>org.apache.maven.model.Organization@1c20a3d7</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1355,7 +1355,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@6c5d6d3e</organization>
++      <organization>org.apache.maven.model.Organization@19b12cc6</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1364,7 +1364,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@6ec8ef1e</organization>
++      <organization>org.apache.maven.model.Organization@24d5280a</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1373,7 +1373,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@22fc7015</organization>
++      <organization>org.apache.maven.model.Organization@14f13fc0</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1382,7 +1382,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@273261ef</organization>
++      <organization>org.apache.maven.model.Organization@2ccfb8b3</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -1408,7 +1408,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@40d08a8e</organization>
++      <organization>org.apache.maven.model.Organization@4fd9330c</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -1426,7 +1426,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@a5843f5</organization>
++      <organization>org.apache.maven.model.Organization@5751cfcf</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1435,7 +1435,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@5ca7d478</organization>
++      <organization>org.apache.maven.model.Organization@6f9fe6d5</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -1444,7 +1444,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@68a242c8</organization>
++      <organization>org.apache.maven.model.Organization@2491601c</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -1500,7 +1500,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@394789c5</organization>
++      <organization>org.apache.maven.model.Organization@5e7d734b</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -1709,6 +1709,12 @@ Last-Update: 2013-11-27
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
++      <groupId>org.codehaus.groovy</groupId>
++      <artifactId>groovy</artifactId>
++      <version>2.2.2</version>
++      <scope>compile</scope>
++    </dependency>
++    <dependency>
 +      <groupId>bsf</groupId>
 +      <artifactId>bsf</artifactId>
 +      <version>2.4.0</version>
@@ -1720,23 +1726,17 @@ Last-Update: 2013-11-27
 +        </exclusion>
 +      </exclusions>
 +    </dependency>
-+    <dependency>
-+      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
-+      <scope>compile</scope>
-+    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-console.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-console.pom
 @@ -0,0 +1,514 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-console</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -1771,7 +1771,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@1adf6bb8</organization>
++      <organization>org.apache.maven.model.Organization@1f7b3051</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -1782,7 +1782,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@7a14ff96</organization>
++      <organization>org.apache.maven.model.Organization@7592f187</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -1791,7 +1791,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@471f8b7b</organization>
++      <organization>org.apache.maven.model.Organization@605f1c17</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -1799,7 +1799,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@6c7927b7</organization>
++      <organization>org.apache.maven.model.Organization@3dcdd68d</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1807,7 +1807,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@424c8abf</organization>
++      <organization>org.apache.maven.model.Organization@3621827</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1815,7 +1815,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@35e06ba6</organization>
++      <organization>org.apache.maven.model.Organization@9dd7f4b</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1823,7 +1823,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@74832cbd</organization>
++      <organization>org.apache.maven.model.Organization@125a0660</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1861,7 +1861,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@c84d4bd</organization>
++      <organization>org.apache.maven.model.Organization@2a0767fb</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1878,7 +1878,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@5817e692</organization>
++      <organization>org.apache.maven.model.Organization@2e52a517</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1887,7 +1887,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@425f90ca</organization>
++      <organization>org.apache.maven.model.Organization@4c867cca</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1896,7 +1896,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@545c1a99</organization>
++      <organization>org.apache.maven.model.Organization@7dce21d8</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1905,7 +1905,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@1fba6831</organization>
++      <organization>org.apache.maven.model.Organization@7dd51f21</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -1931,7 +1931,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@44a9bbdb</organization>
++      <organization>org.apache.maven.model.Organization@587834d8</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -1949,7 +1949,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@5b8634ea</organization>
++      <organization>org.apache.maven.model.Organization@4aa7060d</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -1958,7 +1958,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@78fac96c</organization>
++      <organization>org.apache.maven.model.Organization@74b769d</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -1967,7 +1967,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@65ebead7</organization>
++      <organization>org.apache.maven.model.Organization@6f1de026</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -2023,7 +2023,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@7cd87221</organization>
++      <organization>org.apache.maven.model.Organization@5df2a26d</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -2228,32 +2228,32 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy-templates</artifactId>
-+      <version>2.2.1</version>
-+      <scope>compile</scope>
-+    </dependency>
-+    <dependency>
-+      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy-swing</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
++      <scope>compile</scope>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.groovy</groupId>
++      <artifactId>groovy-swing</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-docgenerator.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-docgenerator.pom
 @@ -0,0 +1,514 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-docgenerator</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -2288,7 +2288,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@1813164a</organization>
++      <organization>org.apache.maven.model.Organization@51e5c11e</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -2299,7 +2299,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@420b6d72</organization>
++      <organization>org.apache.maven.model.Organization@e56337</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -2308,7 +2308,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@6989d384</organization>
++      <organization>org.apache.maven.model.Organization@30850919</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -2316,7 +2316,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@32e5e4bb</organization>
++      <organization>org.apache.maven.model.Organization@295106f</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2324,7 +2324,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@6b429e6c</organization>
++      <organization>org.apache.maven.model.Organization@612e92f4</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2332,7 +2332,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@4dff743e</organization>
++      <organization>org.apache.maven.model.Organization@2ee418b0</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2340,7 +2340,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@63e8f3e6</organization>
++      <organization>org.apache.maven.model.Organization@7b9e1bb6</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2378,7 +2378,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@62f4b6ba</organization>
++      <organization>org.apache.maven.model.Organization@6073d6f3</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2395,7 +2395,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@75ef6433</organization>
++      <organization>org.apache.maven.model.Organization@2732c10e</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2404,7 +2404,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@45363113</organization>
++      <organization>org.apache.maven.model.Organization@2d60dd37</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2413,7 +2413,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@2e1f1d7e</organization>
++      <organization>org.apache.maven.model.Organization@c40c545</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2422,7 +2422,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@55e6490</organization>
++      <organization>org.apache.maven.model.Organization@6ef5f28b</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -2448,7 +2448,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@a799d2e</organization>
++      <organization>org.apache.maven.model.Organization@68e3b309</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -2466,7 +2466,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@3a7d61e4</organization>
++      <organization>org.apache.maven.model.Organization@ffd1816</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2475,7 +2475,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@1480606f</organization>
++      <organization>org.apache.maven.model.Organization@69370e39</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -2484,7 +2484,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@72304a9e</organization>
++      <organization>org.apache.maven.model.Organization@78a47ef</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -2540,7 +2540,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@1f645c36</organization>
++      <organization>org.apache.maven.model.Organization@7fa42c71</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -2745,7 +2745,13 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy-templates</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
++      <scope>compile</scope>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.groovy</groupId>
++      <artifactId>groovy</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
@@ -2754,23 +2760,17 @@ Last-Update: 2013-11-27
 +      <version>1.12.1</version>
 +      <scope>compile</scope>
 +    </dependency>
-+    <dependency>
-+      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
-+      <scope>compile</scope>
-+    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-groovydoc.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-groovydoc.pom
 @@ -0,0 +1,508 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-groovydoc</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -2805,7 +2805,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@45bc844b</organization>
++      <organization>org.apache.maven.model.Organization@394f0d8f</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -2816,7 +2816,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@2c4fd06e</organization>
++      <organization>org.apache.maven.model.Organization@2991f5df</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -2825,7 +2825,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@6e244773</organization>
++      <organization>org.apache.maven.model.Organization@31feced6</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -2833,7 +2833,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@60f63190</organization>
++      <organization>org.apache.maven.model.Organization@1934ba58</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2841,7 +2841,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@a205703</organization>
++      <organization>org.apache.maven.model.Organization@75bc23e5</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2849,7 +2849,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@49ff956e</organization>
++      <organization>org.apache.maven.model.Organization@572a3dd4</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2857,7 +2857,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@6526649c</organization>
++      <organization>org.apache.maven.model.Organization@1b756711</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2895,7 +2895,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@39794292</organization>
++      <organization>org.apache.maven.model.Organization@39e62643</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2912,7 +2912,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@324ef0a9</organization>
++      <organization>org.apache.maven.model.Organization@5b7024b7</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2921,7 +2921,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@2baea53</organization>
++      <organization>org.apache.maven.model.Organization@29e51476</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2930,7 +2930,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@7ccb552e</organization>
++      <organization>org.apache.maven.model.Organization@5771bfed</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2939,7 +2939,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@3195e45d</organization>
++      <organization>org.apache.maven.model.Organization@632ff28b</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -2965,7 +2965,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@47cae167</organization>
++      <organization>org.apache.maven.model.Organization@2d0153ef</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -2983,7 +2983,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@214a725d</organization>
++      <organization>org.apache.maven.model.Organization@4c5f4d36</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -2992,7 +2992,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@231dc1a4</organization>
++      <organization>org.apache.maven.model.Organization@7265a7fc</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -3001,7 +3001,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@7098f183</organization>
++      <organization>org.apache.maven.model.Organization@757667dd</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -3057,7 +3057,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@70dc77a8</organization>
++      <organization>org.apache.maven.model.Organization@2b908f10</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -3262,26 +3262,26 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy-templates</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-groovysh.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-groovysh.pom
 @@ -0,0 +1,520 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-groovysh</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -3316,7 +3316,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@3d980b94</organization>
++      <organization>org.apache.maven.model.Organization@30ef1b05</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -3327,7 +3327,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@64948656</organization>
++      <organization>org.apache.maven.model.Organization@29d55b5f</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -3336,7 +3336,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@f60da62</organization>
++      <organization>org.apache.maven.model.Organization@f7939d3</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -3344,7 +3344,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@1b99a290</organization>
++      <organization>org.apache.maven.model.Organization@10a44aaa</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3352,7 +3352,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@32780f73</organization>
++      <organization>org.apache.maven.model.Organization@6fe131b5</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3360,7 +3360,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@574c1328</organization>
++      <organization>org.apache.maven.model.Organization@4448339f</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3368,7 +3368,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@79e0b66f</organization>
++      <organization>org.apache.maven.model.Organization@438fed4a</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3406,7 +3406,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@1832bb7a</organization>
++      <organization>org.apache.maven.model.Organization@f097ff2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3423,7 +3423,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@6f75a83a</organization>
++      <organization>org.apache.maven.model.Organization@625ebffa</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3432,7 +3432,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@6505c3a9</organization>
++      <organization>org.apache.maven.model.Organization@3a9dda0e</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3441,7 +3441,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@155148b6</organization>
++      <organization>org.apache.maven.model.Organization@216b4956</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3450,7 +3450,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@26f08623</organization>
++      <organization>org.apache.maven.model.Organization@76e6dde2</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -3476,7 +3476,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@5ab657</organization>
++      <organization>org.apache.maven.model.Organization@1f99c961</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -3494,7 +3494,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@37dc8eab</organization>
++      <organization>org.apache.maven.model.Organization@8e08ecc</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3503,7 +3503,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@9401d48</organization>
++      <organization>org.apache.maven.model.Organization@5b73936a</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -3512,7 +3512,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@37655fe4</organization>
++      <organization>org.apache.maven.model.Organization@2dd74c8e</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -3568,7 +3568,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@b836456</organization>
++      <organization>org.apache.maven.model.Organization@5b73a116</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -3784,27 +3784,27 @@ Last-Update: 2013-11-27
 +    </dependency>
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy-console</artifactId>
-+      <version>2.2.1</version>
++      <artifactId>groovy</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <artifactId>groovy-console</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-jmx.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-jmx.pom
 @@ -0,0 +1,502 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-jmx</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -3839,7 +3839,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@52138159</organization>
++      <organization>org.apache.maven.model.Organization@4f69db56</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -3850,7 +3850,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@6adcbd5b</organization>
++      <organization>org.apache.maven.model.Organization@51967d14</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -3859,7 +3859,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@24d55298</organization>
++      <organization>org.apache.maven.model.Organization@1d4a62db</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -3867,7 +3867,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@69e99c6</organization>
++      <organization>org.apache.maven.model.Organization@3597d811</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3875,7 +3875,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@168886d4</organization>
++      <organization>org.apache.maven.model.Organization@2081857</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3883,7 +3883,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@1d41bd10</organization>
++      <organization>org.apache.maven.model.Organization@4772cf3c</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3891,7 +3891,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@7ef1cb12</organization>
++      <organization>org.apache.maven.model.Organization@31fd8f36</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3929,7 +3929,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@6a0baacb</organization>
++      <organization>org.apache.maven.model.Organization@d280526</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3946,7 +3946,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@41e2160d</organization>
++      <organization>org.apache.maven.model.Organization@788c5a93</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3955,7 +3955,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@65e3b52</organization>
++      <organization>org.apache.maven.model.Organization@3f7a7e4d</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3964,7 +3964,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@f88dc16</organization>
++      <organization>org.apache.maven.model.Organization@717a69a8</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -3973,7 +3973,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@7e23482f</organization>
++      <organization>org.apache.maven.model.Organization@3d299e6a</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -3999,7 +3999,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@4241724c</organization>
++      <organization>org.apache.maven.model.Organization@710e3ef3</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -4017,7 +4017,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@8a91b2f</organization>
++      <organization>org.apache.maven.model.Organization@54ca6240</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4026,7 +4026,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@21c8df5b</organization>
++      <organization>org.apache.maven.model.Organization@2aa95abf</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -4035,7 +4035,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@3b3889fa</organization>
++      <organization>org.apache.maven.model.Organization@d97643c</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -4091,7 +4091,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@4fc8a486</organization>
++      <organization>org.apache.maven.model.Organization@261e733f</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -4296,20 +4296,20 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-json.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-json.pom
 @@ -0,0 +1,502 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-json</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -4344,7 +4344,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@93887a9</organization>
++      <organization>org.apache.maven.model.Organization@21afde64</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -4355,7 +4355,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@75707fcf</organization>
++      <organization>org.apache.maven.model.Organization@3af9617b</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -4364,7 +4364,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@6259d602</organization>
++      <organization>org.apache.maven.model.Organization@396e8311</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -4372,7 +4372,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@3aac21e</organization>
++      <organization>org.apache.maven.model.Organization@427f2c98</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4380,7 +4380,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@494b05ae</organization>
++      <organization>org.apache.maven.model.Organization@39a29be8</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4388,7 +4388,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@2801d0b1</organization>
++      <organization>org.apache.maven.model.Organization@74ec1f4b</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4396,7 +4396,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@1c36c02c</organization>
++      <organization>org.apache.maven.model.Organization@7973a81f</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4434,7 +4434,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@1a11734</organization>
++      <organization>org.apache.maven.model.Organization@4ed78c01</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4451,7 +4451,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@348ac2fd</organization>
++      <organization>org.apache.maven.model.Organization@5710247b</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4460,7 +4460,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@3d362abc</organization>
++      <organization>org.apache.maven.model.Organization@58bbf16e</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4469,7 +4469,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@66e20b12</organization>
++      <organization>org.apache.maven.model.Organization@5b4135cf</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4478,7 +4478,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@7fe2f29e</organization>
++      <organization>org.apache.maven.model.Organization@259f6fa4</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -4504,7 +4504,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@2ef8eeee</organization>
++      <organization>org.apache.maven.model.Organization@4d997685</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -4522,7 +4522,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@412a8a44</organization>
++      <organization>org.apache.maven.model.Organization@366c45d2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4531,7 +4531,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@59c9f46d</organization>
++      <organization>org.apache.maven.model.Organization@4873ed80</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -4540,7 +4540,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@776d5227</organization>
++      <organization>org.apache.maven.model.Organization@b79565e</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -4596,7 +4596,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@3e5107cc</organization>
++      <organization>org.apache.maven.model.Organization@44d0d45</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -4801,20 +4801,20 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-jsr223.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-jsr223.pom
 @@ -0,0 +1,502 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-jsr223</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -4849,7 +4849,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@64ce2f12</organization>
++      <organization>org.apache.maven.model.Organization@bb25be8</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -4860,7 +4860,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@2312e0f6</organization>
++      <organization>org.apache.maven.model.Organization@4134f479</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -4869,7 +4869,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@3dfe936b</organization>
++      <organization>org.apache.maven.model.Organization@57f75107</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -4877,7 +4877,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@7da89a52</organization>
++      <organization>org.apache.maven.model.Organization@f9b01b5</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4885,7 +4885,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@2fc33e3b</organization>
++      <organization>org.apache.maven.model.Organization@eab1bf2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4893,7 +4893,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@6e814bbc</organization>
++      <organization>org.apache.maven.model.Organization@11a41324</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4901,7 +4901,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@70920080</organization>
++      <organization>org.apache.maven.model.Organization@a3635b8</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4939,7 +4939,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@62235b5c</organization>
++      <organization>org.apache.maven.model.Organization@8a50f7f</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4956,7 +4956,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@a459894</organization>
++      <organization>org.apache.maven.model.Organization@74a4a9ee</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4965,7 +4965,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@3d280f7c</organization>
++      <organization>org.apache.maven.model.Organization@19cfb34e</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4974,7 +4974,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@5fec08ce</organization>
++      <organization>org.apache.maven.model.Organization@21c0a1fa</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -4983,7 +4983,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@100501d2</organization>
++      <organization>org.apache.maven.model.Organization@7677b232</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -5009,7 +5009,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@41bb11e1</organization>
++      <organization>org.apache.maven.model.Organization@13ad6177</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -5027,7 +5027,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@4116f358</organization>
++      <organization>org.apache.maven.model.Organization@662d76c</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5036,7 +5036,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@6ddcd49a</organization>
++      <organization>org.apache.maven.model.Organization@3cfa4fca</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -5045,7 +5045,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@5c3e8357</organization>
++      <organization>org.apache.maven.model.Organization@789a39b4</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -5101,7 +5101,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@2e166e9b</organization>
++      <organization>org.apache.maven.model.Organization@7cf000b2</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -5306,20 +5306,20 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-servlet.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-servlet.pom
 @@ -0,0 +1,526 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-servlet</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -5354,7 +5354,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@3f1265d6</organization>
++      <organization>org.apache.maven.model.Organization@1cea4bce</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -5365,7 +5365,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@149436fe</organization>
++      <organization>org.apache.maven.model.Organization@fbfb76f</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -5374,7 +5374,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@4f064943</organization>
++      <organization>org.apache.maven.model.Organization@be72834</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -5382,7 +5382,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@49eb3221</organization>
++      <organization>org.apache.maven.model.Organization@70c171ec</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5390,7 +5390,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@6114c896</organization>
++      <organization>org.apache.maven.model.Organization@4089cc0</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5398,7 +5398,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@342be5bc</organization>
++      <organization>org.apache.maven.model.Organization@48a6e499</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5406,7 +5406,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@6164ac1d</organization>
++      <organization>org.apache.maven.model.Organization@665c5316</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5444,7 +5444,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@1b38657e</organization>
++      <organization>org.apache.maven.model.Organization@7cf52a6</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5461,7 +5461,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@58a20b4f</organization>
++      <organization>org.apache.maven.model.Organization@44d549a6</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5470,7 +5470,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@16cf2484</organization>
++      <organization>org.apache.maven.model.Organization@194bcec4</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5479,7 +5479,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@309f59a6</organization>
++      <organization>org.apache.maven.model.Organization@1861dec0</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5488,7 +5488,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@377c4d48</organization>
++      <organization>org.apache.maven.model.Organization@584f3d72</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -5514,7 +5514,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@7b5edbdf</organization>
++      <organization>org.apache.maven.model.Organization@21fc3cfd</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -5532,7 +5532,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@78c36125</organization>
++      <organization>org.apache.maven.model.Organization@5a52a0b6</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5541,7 +5541,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@8c1603c</organization>
++      <organization>org.apache.maven.model.Organization@4380729</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -5550,7 +5550,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@412803d8</organization>
++      <organization>org.apache.maven.model.Organization@3732181b</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -5606,7 +5606,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@3a49e192</organization>
++      <organization>org.apache.maven.model.Organization@4e2c49ea</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -5811,7 +5811,13 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy-templates</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
++      <scope>compile</scope>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.groovy</groupId>
++      <artifactId>groovy</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
@@ -5821,34 +5827,28 @@ Last-Update: 2013-11-27
 +      <scope>provided</scope>
 +    </dependency>
 +    <dependency>
++      <groupId>org.codehaus.groovy</groupId>
++      <artifactId>groovy-xml</artifactId>
++      <version>2.2.2</version>
++      <scope>compile</scope>
++    </dependency>
++    <dependency>
 +      <groupId>javax.servlet</groupId>
 +      <artifactId>servlet-api</artifactId>
 +      <version>2.4</version>
 +      <scope>provided</scope>
 +    </dependency>
-+    <dependency>
-+      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy-xml</artifactId>
-+      <version>2.2.1</version>
-+      <scope>compile</scope>
-+    </dependency>
-+    <dependency>
-+      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
-+      <scope>compile</scope>
-+    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-sql.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-sql.pom
 @@ -0,0 +1,502 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-sql</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -5883,7 +5883,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@211fc71</organization>
++      <organization>org.apache.maven.model.Organization@54158353</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -5894,7 +5894,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@1cdbf6f5</organization>
++      <organization>org.apache.maven.model.Organization@a72da3d</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -5903,7 +5903,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@45a0ca8e</organization>
++      <organization>org.apache.maven.model.Organization@1bef1d89</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -5911,7 +5911,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@361f7de2</organization>
++      <organization>org.apache.maven.model.Organization@3cfe7c4c</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5919,7 +5919,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@78353b10</organization>
++      <organization>org.apache.maven.model.Organization@434a20a3</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5927,7 +5927,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@28ae11cb</organization>
++      <organization>org.apache.maven.model.Organization@25498a72</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5935,7 +5935,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@50f29615</organization>
++      <organization>org.apache.maven.model.Organization@23ccc2bf</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5973,7 +5973,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@338a88f7</organization>
++      <organization>org.apache.maven.model.Organization@521f809b</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5990,7 +5990,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@73f6e9c1</organization>
++      <organization>org.apache.maven.model.Organization@13f69fc7</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -5999,7 +5999,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@22febc1e</organization>
++      <organization>org.apache.maven.model.Organization@2e59bdd4</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6008,7 +6008,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@4e1c4dc1</organization>
++      <organization>org.apache.maven.model.Organization@6cce87af</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6017,7 +6017,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@bdf31b3</organization>
++      <organization>org.apache.maven.model.Organization@23c54e1a</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -6043,7 +6043,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@1ff378a0</organization>
++      <organization>org.apache.maven.model.Organization@4ad2080e</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -6061,7 +6061,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@7cf13353</organization>
++      <organization>org.apache.maven.model.Organization@43fd1f39</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6070,7 +6070,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@6c836257</organization>
++      <organization>org.apache.maven.model.Organization@cf4bd0f</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -6079,7 +6079,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@1ef753d2</organization>
++      <organization>org.apache.maven.model.Organization@2179a7e4</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -6135,7 +6135,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@7372194</organization>
++      <organization>org.apache.maven.model.Organization@5b493b48</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -6340,20 +6340,20 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-swing.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-swing.pom
 @@ -0,0 +1,502 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-swing</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -6388,7 +6388,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@1ab0f862</organization>
++      <organization>org.apache.maven.model.Organization@373305ba</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -6399,7 +6399,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@7e4ed377</organization>
++      <organization>org.apache.maven.model.Organization@77134b89</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -6408,7 +6408,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@a354969</organization>
++      <organization>org.apache.maven.model.Organization@3c76da81</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -6416,7 +6416,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@1de9a4d0</organization>
++      <organization>org.apache.maven.model.Organization@192efb4e</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6424,7 +6424,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@621a8ccf</organization>
++      <organization>org.apache.maven.model.Organization@50ae45fc</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6432,7 +6432,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@10d6f809</organization>
++      <organization>org.apache.maven.model.Organization@3b2fcb7f</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6440,7 +6440,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@784e98a1</organization>
++      <organization>org.apache.maven.model.Organization@200c6128</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6478,7 +6478,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@357dfa7c</organization>
++      <organization>org.apache.maven.model.Organization@425c63dc</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6495,7 +6495,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@3323e151</organization>
++      <organization>org.apache.maven.model.Organization@67d0fa14</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6504,7 +6504,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@36438af4</organization>
++      <organization>org.apache.maven.model.Organization@6ec3d546</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6513,7 +6513,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@522c5afb</organization>
++      <organization>org.apache.maven.model.Organization@5bc37ff8</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6522,7 +6522,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@30ff97a9</organization>
++      <organization>org.apache.maven.model.Organization@336bad92</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -6548,7 +6548,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@2000ec87</organization>
++      <organization>org.apache.maven.model.Organization@5f9cd7c0</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -6566,7 +6566,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@c62d05e</organization>
++      <organization>org.apache.maven.model.Organization@6f66b6e9</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6575,7 +6575,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@1c708972</organization>
++      <organization>org.apache.maven.model.Organization@2a90453c</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -6584,7 +6584,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@4e1ee2be</organization>
++      <organization>org.apache.maven.model.Organization@67420af0</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -6640,7 +6640,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@759c3036</organization>
++      <organization>org.apache.maven.model.Organization@74b26db0</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -6845,20 +6845,20 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-templates.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-templates.pom
 @@ -0,0 +1,508 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-templates</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -6893,7 +6893,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@6cd37fc8</organization>
++      <organization>org.apache.maven.model.Organization@22b8877c</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -6904,7 +6904,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@3d8f2ef7</organization>
++      <organization>org.apache.maven.model.Organization@4a2d12b</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -6913,7 +6913,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@1f021a21</organization>
++      <organization>org.apache.maven.model.Organization@4b38c3f8</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -6921,7 +6921,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@16903c20</organization>
++      <organization>org.apache.maven.model.Organization@80baa82</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6929,7 +6929,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@311fa52c</organization>
++      <organization>org.apache.maven.model.Organization@6157e4e7</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6937,7 +6937,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@4374a298</organization>
++      <organization>org.apache.maven.model.Organization@6382bbd9</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6945,7 +6945,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@6192fb7a</organization>
++      <organization>org.apache.maven.model.Organization@711ee528</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -6983,7 +6983,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@3733bbfd</organization>
++      <organization>org.apache.maven.model.Organization@6fbe82d</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7000,7 +7000,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@78b958f4</organization>
++      <organization>org.apache.maven.model.Organization@8f7fddb</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7009,7 +7009,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@507d3e4a</organization>
++      <organization>org.apache.maven.model.Organization@7399ba4</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7018,7 +7018,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@6276c5e7</organization>
++      <organization>org.apache.maven.model.Organization@3689f87c</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7027,7 +7027,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@6b4491e</organization>
++      <organization>org.apache.maven.model.Organization@19038b94</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -7053,7 +7053,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@e4a93a0</organization>
++      <organization>org.apache.maven.model.Organization@83cd2eb</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -7071,7 +7071,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@4a931343</organization>
++      <organization>org.apache.maven.model.Organization@457b1d78</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7080,7 +7080,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@5aa382b6</organization>
++      <organization>org.apache.maven.model.Organization@79079b7a</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -7089,7 +7089,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@f9b6cc8</organization>
++      <organization>org.apache.maven.model.Organization@514a85bc</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -7145,7 +7145,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@7c8950ce</organization>
++      <organization>org.apache.maven.model.Organization@46ffd40e</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -7349,27 +7349,27 @@ Last-Update: 2013-11-27
 +  <dependencies>
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy-xml</artifactId>
-+      <version>2.2.1</version>
++      <artifactId>groovy</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <artifactId>groovy-xml</artifactId>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-test.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-test.pom
 @@ -0,0 +1,508 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-test</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -7404,7 +7404,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@241eb350</organization>
++      <organization>org.apache.maven.model.Organization@3499d1a5</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -7415,7 +7415,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@5f2738af</organization>
++      <organization>org.apache.maven.model.Organization@752701ec</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -7424,7 +7424,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@55922b38</organization>
++      <organization>org.apache.maven.model.Organization@ad93a93</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -7432,7 +7432,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@5876dce6</organization>
++      <organization>org.apache.maven.model.Organization@1614c1e2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7440,7 +7440,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@49d8fb98</organization>
++      <organization>org.apache.maven.model.Organization@334b46dd</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7448,7 +7448,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@90c0251</organization>
++      <organization>org.apache.maven.model.Organization@6b690a61</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7456,7 +7456,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@3dbb2cc9</organization>
++      <organization>org.apache.maven.model.Organization@3573a5b0</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7494,7 +7494,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@3498671d</organization>
++      <organization>org.apache.maven.model.Organization@6b457a86</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7511,7 +7511,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@37efa9d4</organization>
++      <organization>org.apache.maven.model.Organization@430eedab</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7520,7 +7520,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@33ac7c40</organization>
++      <organization>org.apache.maven.model.Organization@68aa9586</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7529,7 +7529,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@1dd383f3</organization>
++      <organization>org.apache.maven.model.Organization@1a3f9f3b</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7538,7 +7538,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@112a19e</organization>
++      <organization>org.apache.maven.model.Organization@6ebe26e6</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -7564,7 +7564,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@1dd5e19a</organization>
++      <organization>org.apache.maven.model.Organization@646df6c5</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -7582,7 +7582,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@1980ecd0</organization>
++      <organization>org.apache.maven.model.Organization@15b81ee6</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7591,7 +7591,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@3140dcb4</organization>
++      <organization>org.apache.maven.model.Organization@60749036</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -7600,7 +7600,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@55031829</organization>
++      <organization>org.apache.maven.model.Organization@303c0028</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -7656,7 +7656,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@114e9c16</organization>
++      <organization>org.apache.maven.model.Organization@2c102ee7</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -7858,29 +7858,29 @@ Last-Update: 2013-11-27
 +    <url>git@github.com:groovy/groovy-core.git</url>
 +  </scm>
 +  <dependencies>
++    <dependency>
++      <groupId>org.codehaus.groovy</groupId>
++      <artifactId>groovy</artifactId>
++      <version>2.2.2</version>
++      <scope>compile</scope>
++    </dependency>
 +    <dependency>
 +      <groupId>junit</groupId>
 +      <artifactId>junit</artifactId>
 +      <version>4.11</version>
 +      <scope>compile</scope>
 +    </dependency>
-+    <dependency>
-+      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
-+      <scope>compile</scope>
-+    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-testng.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-testng.pom
 @@ -0,0 +1,526 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-testng</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -7915,7 +7915,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@17bc9c03</organization>
++      <organization>org.apache.maven.model.Organization@22b456c5</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -7926,7 +7926,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@3188da96</organization>
++      <organization>org.apache.maven.model.Organization@64acf1c9</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -7935,7 +7935,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@4343c625</organization>
++      <organization>org.apache.maven.model.Organization@30db45f2</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -7943,7 +7943,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@2978f7e2</organization>
++      <organization>org.apache.maven.model.Organization@4afedaa8</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7951,7 +7951,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@4f6b1815</organization>
++      <organization>org.apache.maven.model.Organization@29c3481b</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7959,7 +7959,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@346bc66</organization>
++      <organization>org.apache.maven.model.Organization@b3d4e26</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -7967,7 +7967,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@79f8cb57</organization>
++      <organization>org.apache.maven.model.Organization@2da9a736</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8005,7 +8005,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@a45e697</organization>
++      <organization>org.apache.maven.model.Organization@2322cc4</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8022,7 +8022,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@29e214bf</organization>
++      <organization>org.apache.maven.model.Organization@14606a6a</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8031,7 +8031,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@73b529aa</organization>
++      <organization>org.apache.maven.model.Organization@1e2a59ab</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8040,7 +8040,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@7c510a68</organization>
++      <organization>org.apache.maven.model.Organization@2718efe2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8049,7 +8049,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@27f08df1</organization>
++      <organization>org.apache.maven.model.Organization@20e39570</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -8075,7 +8075,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@5bd513cf</organization>
++      <organization>org.apache.maven.model.Organization@279d6908</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -8093,7 +8093,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@f4973f7</organization>
++      <organization>org.apache.maven.model.Organization@9a64f19</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8102,7 +8102,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@6ae8e5dd</organization>
++      <organization>org.apache.maven.model.Organization@73a710e9</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -8111,7 +8111,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@6e228263</organization>
++      <organization>org.apache.maven.model.Organization@7c182807</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -8167,7 +8167,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@2c261b2b</organization>
++      <organization>org.apache.maven.model.Organization@75e13dbe</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -8369,6 +8369,12 @@ Last-Update: 2013-11-27
 +    <url>git@github.com:groovy/groovy-core.git</url>
 +  </scm>
 +  <dependencies>
++    <dependency>
++      <groupId>org.codehaus.groovy</groupId>
++      <artifactId>groovy</artifactId>
++      <version>2.2.2</version>
++      <scope>compile</scope>
++    </dependency>
 +    <dependency>
 +      <groupId>org.testng</groupId>
 +      <artifactId>testng</artifactId>
@@ -8393,23 +8399,17 @@ Last-Update: 2013-11-27
 +        </exclusion>
 +      </exclusions>
 +    </dependency>
-+    <dependency>
-+      <groupId>org.codehaus.groovy</groupId>
-+      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
-+      <scope>compile</scope>
-+    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy-xml.pom
++++ groovy2-2.2.2+dfsg/maven/groovy-xml.pom
 @@ -0,0 +1,502 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy-xml</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -8444,7 +8444,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@5c170c7f</organization>
++      <organization>org.apache.maven.model.Organization@4532db4</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -8455,7 +8455,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@58ce8c0f</organization>
++      <organization>org.apache.maven.model.Organization@5fb27138</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -8464,7 +8464,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@7665b3d7</organization>
++      <organization>org.apache.maven.model.Organization@3609be45</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -8472,7 +8472,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@55c9e26f</organization>
++      <organization>org.apache.maven.model.Organization@791169e9</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8480,7 +8480,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@446e21d4</organization>
++      <organization>org.apache.maven.model.Organization@14164c73</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8488,7 +8488,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@6f902c71</organization>
++      <organization>org.apache.maven.model.Organization@11166e59</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8496,7 +8496,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@75ee2e58</organization>
++      <organization>org.apache.maven.model.Organization@7bc372f2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8534,7 +8534,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@456d8f9f</organization>
++      <organization>org.apache.maven.model.Organization@655942e8</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8551,7 +8551,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@757c5de2</organization>
++      <organization>org.apache.maven.model.Organization@209f750</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8560,7 +8560,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@71b9c384</organization>
++      <organization>org.apache.maven.model.Organization@6a8e9ad3</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8569,7 +8569,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@657a86a5</organization>
++      <organization>org.apache.maven.model.Organization@49b9b979</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8578,7 +8578,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@36214bbd</organization>
++      <organization>org.apache.maven.model.Organization@20b5a08d</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -8604,7 +8604,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@6877ef8d</organization>
++      <organization>org.apache.maven.model.Organization@660483d2</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -8622,7 +8622,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@f57a6ba</organization>
++      <organization>org.apache.maven.model.Organization@4a989c17</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8631,7 +8631,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@4ecabb8c</organization>
++      <organization>org.apache.maven.model.Organization@421214a8</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -8640,7 +8640,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@2cbd7d77</organization>
++      <organization>org.apache.maven.model.Organization@18d45964</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -8696,7 +8696,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@613e09de</organization>
++      <organization>org.apache.maven.model.Organization@39244f1f</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -8901,20 +8901,20 @@ Last-Update: 2013-11-27
 +    <dependency>
 +      <groupId>org.codehaus.groovy</groupId>
 +      <artifactId>groovy</artifactId>
-+      <version>2.2.1</version>
++      <version>2.2.2</version>
 +      <scope>compile</scope>
 +    </dependency>
 +  </dependencies>
 +</project>
 --- /dev/null
-+++ groovy-2.2.1+dfsg/maven/groovy.pom
++++ groovy2-2.2.2+dfsg/maven/groovy.pom
 @@ -0,0 +1,581 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 +  <modelVersion>4.0.0</modelVersion>
 +  <groupId>org.codehaus.groovy</groupId>
 +  <artifactId>groovy</artifactId>
-+  <version>2.2.1</version>
++  <version>2.2.2</version>
 +  <packaging>jar</packaging>
 +  <name>Groovy</name>
 +  <description>Groovy: A powerful, dynamic language for the JVM</description>
@@ -8949,7 +8949,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>glaforge</id>
 +      <name>Guillaume Laforge</name>
-+      <organization>org.apache.maven.model.Organization@6a6096d9</organization>
++      <organization>org.apache.maven.model.Organization@6524cd02</organization>
 +      <roles>
 +        <role>Project Manager</role>
 +        <role>Despot</role>
@@ -8960,7 +8960,7 @@ Last-Update: 2013-11-27
 +      <id>bob</id>
 +      <name>bob mcwhirter</name>
 +      <email>bob@werken.com</email>
-+      <organization>org.apache.maven.model.Organization@3e7f499c</organization>
++      <organization>org.apache.maven.model.Organization@1b11549c</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -8969,7 +8969,7 @@ Last-Update: 2013-11-27
 +      <id>jstrachan</id>
 +      <name>James Strachan</name>
 +      <email>james@coredevelopers.com</email>
-+      <organization>org.apache.maven.model.Organization@7d2226a5</organization>
++      <organization>org.apache.maven.model.Organization@667376df</organization>
 +      <roles>
 +        <role>Founder</role>
 +      </roles>
@@ -8977,7 +8977,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>joe</id>
 +      <name>Joe Walnes</name>
-+      <organization>org.apache.maven.model.Organization@384b76e1</organization>
++      <organization>org.apache.maven.model.Organization@77855502</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8985,7 +8985,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>skizz</id>
 +      <name>Chris Stevenson</name>
-+      <organization>org.apache.maven.model.Organization@f778ac4</organization>
++      <organization>org.apache.maven.model.Organization@792c2f75</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -8993,7 +8993,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>jamiemc</id>
 +      <name>Jamie McCrindle</name>
-+      <organization>org.apache.maven.model.Organization@66daded7</organization>
++      <organization>org.apache.maven.model.Organization@211782bf</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -9001,7 +9001,7 @@ Last-Update: 2013-11-27
 +    <developer>
 +      <id>mattf</id>
 +      <name>Matt Foemmel</name>
-+      <organization>org.apache.maven.model.Organization@2fc9ff8b</organization>
++      <organization>org.apache.maven.model.Organization@3ac5aeb2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -9039,7 +9039,7 @@ Last-Update: 2013-11-27
 +      <id>jwilson</id>
 +      <name>John Wilson</name>
 +      <email>tug@wilson.co.uk</email>
-+      <organization>org.apache.maven.model.Organization@1524c1a5</organization>
++      <organization>org.apache.maven.model.Organization@5e3e72ff</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -9056,7 +9056,7 @@ Last-Update: 2013-11-27
 +      <id>ckl</id>
 +      <name>Christiaan ten Klooster</name>
 +      <email>ckl@dacelo.nl</email>
-+      <organization>org.apache.maven.model.Organization@7b2fe932</organization>
++      <organization>org.apache.maven.model.Organization@73b1e0f2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -9065,7 +9065,7 @@ Last-Update: 2013-11-27
 +      <id>goetze</id>
 +      <name>Steve Goetze</name>
 +      <email>goetze@dovetail.com</email>
-+      <organization>org.apache.maven.model.Organization@72f0060b</organization>
++      <organization>org.apache.maven.model.Organization@70ef769a</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -9074,7 +9074,7 @@ Last-Update: 2013-11-27
 +      <id>bran</id>
 +      <name>Bing Ran</name>
 +      <email>b55r@sina.com</email>
-+      <organization>org.apache.maven.model.Organization@61a48d53</organization>
++      <organization>org.apache.maven.model.Organization@65e47e28</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -9083,7 +9083,7 @@ Last-Update: 2013-11-27
 +      <id>jez</id>
 +      <name>Jeremy Rayner</name>
 +      <email>jeremy.rayner@gmail.com</email>
-+      <organization>org.apache.maven.model.Organization@1427d6e0</organization>
++      <organization>org.apache.maven.model.Organization@3386ec5b</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -9109,7 +9109,7 @@ Last-Update: 2013-11-27
 +      <id>russel</id>
 +      <name>Russel Winder</name>
 +      <email>russel@russel.org.uk</email>
-+      <organization>org.apache.maven.model.Organization@623a505d</organization>
++      <organization>org.apache.maven.model.Organization@19300fb7</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Founder of Gant</role>
@@ -9127,7 +9127,7 @@ Last-Update: 2013-11-27
 +      <id>cstein</id>
 +      <name>Christian Stein</name>
 +      <email>sormuras@gmx.de</email>
-+      <organization>org.apache.maven.model.Organization@e204b1f</organization>
++      <organization>org.apache.maven.model.Organization@132576a2</organization>
 +      <roles>
 +        <role>Developer Emeritus</role>
 +      </roles>
@@ -9136,7 +9136,7 @@ Last-Update: 2013-11-27
 +      <id>mittie</id>
 +      <name>Dierk Koenig</name>
 +      <email>dierk.koenig@canoo.com</email>
-+      <organization>org.apache.maven.model.Organization@5b316c11</organization>
++      <organization>org.apache.maven.model.Organization@51161cc9</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
@@ -9145,7 +9145,7 @@ Last-Update: 2013-11-27
 +      <id>paulk</id>
 +      <name>Paul King</name>
 +      <email>paulk@asert.com.au</email>
-+      <organization>org.apache.maven.model.Organization@7e376421</organization>
++      <organization>org.apache.maven.model.Organization@3071d21</organization>
 +      <roles>
 +        <role>Developer</role>
 +        <role>Despot</role>
@@ -9201,7 +9201,7 @@ Last-Update: 2013-11-27
 +      <id>jimwhite</id>
 +      <name>Jim White</name>
 +      <email>jim@pagesmiths.com</email>
-+      <organization>org.apache.maven.model.Organization@2aae91f8</organization>
++      <organization>org.apache.maven.model.Organization@67a84246</organization>
 +      <roles>
 +        <role>Developer</role>
 +      </roles>
