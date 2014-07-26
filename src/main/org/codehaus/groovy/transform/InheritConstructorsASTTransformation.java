@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,29 @@
 package org.codehaus.groovy.transform;
 
 import groovy.transform.InheritConstructors;
-import org.codehaus.groovy.GroovyBugError;
-import org.codehaus.groovy.ast.*;
-import org.codehaus.groovy.ast.expr.ArgumentListExpression;
-import org.codehaus.groovy.ast.expr.ConstructorCallExpression;
+import org.codehaus.groovy.ast.ASTNode;
+import org.codehaus.groovy.ast.AnnotatedNode;
+import org.codehaus.groovy.ast.AnnotationNode;
+import org.codehaus.groovy.ast.ClassNode;
+import org.codehaus.groovy.ast.ConstructorNode;
+import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.expr.Expression;
-import org.codehaus.groovy.ast.expr.VariableExpression;
-import org.codehaus.groovy.ast.stmt.BlockStatement;
-import org.codehaus.groovy.ast.stmt.ExpressionStatement;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
-import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
-import org.codehaus.groovy.syntax.SyntaxException;
-import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
+import static org.codehaus.groovy.ast.ClassHelper.make;
+import static org.codehaus.groovy.ast.tools.GeneralUtils.args;
+import static org.codehaus.groovy.ast.tools.GeneralUtils.block;
+import static org.codehaus.groovy.ast.tools.GeneralUtils.ctorSuperS;
+import static org.codehaus.groovy.ast.tools.GeneralUtils.param;
+import static org.codehaus.groovy.ast.tools.GeneralUtils.varX;
+import static org.codehaus.groovy.ast.tools.GenericsUtils.correctToGenericsSpecRecurse;
+import static org.codehaus.groovy.ast.tools.GenericsUtils.createGenericsSpec;
+import static org.codehaus.groovy.ast.tools.GenericsUtils.extractSuperClassGenerics;
 
 /**
  * Handles generation of code for the {@code @}InheritConstructors annotation.
@@ -40,30 +46,27 @@ import java.util.List;
  * @author Paul King
  */
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
-public class InheritConstructorsASTTransformation implements ASTTransformation, Opcodes {
+public class InheritConstructorsASTTransformation extends AbstractASTTransformation {
 
     private static final Class MY_CLASS = InheritConstructors.class;
-    private static final ClassNode MY_TYPE = ClassHelper.make(MY_CLASS);
+    private static final ClassNode MY_TYPE = make(MY_CLASS);
     private static final String MY_TYPE_NAME = "@" + MY_TYPE.getNameWithoutPackage();
 
     public void visit(ASTNode[] nodes, SourceUnit source) {
-        if (nodes.length != 2 || !(nodes[0] instanceof AnnotationNode) || !(nodes[1] instanceof AnnotatedNode)) {
-            throw new GroovyBugError("Internal error: expecting [AnnotationNode, AnnotatedNode] but got: " + Arrays.asList(nodes));
-        }
-
+        init(nodes, source);
         AnnotatedNode parent = (AnnotatedNode) nodes[1];
         AnnotationNode node = (AnnotationNode) nodes[0];
         if (!MY_TYPE.equals(node.getClassNode())) return;
 
         if (parent instanceof ClassNode) {
-            processClass((ClassNode) parent, source);
+            processClass((ClassNode) parent);
         }
     }
 
-    private void processClass(ClassNode cNode, SourceUnit source) {
+    private void processClass(ClassNode cNode) {
         if (cNode.isInterface()) {
             addError("Error processing interface '" + cNode.getName() +
-                    "'. " + MY_TYPE_NAME + " only allowed for classes.", cNode, source);
+                    "'. " + MY_TYPE_NAME + " only allowed for classes.", cNode);
             return;
         }
         ClassNode sNode = cNode.getSuperClass();
@@ -73,7 +76,7 @@ public class InheritConstructorsASTTransformation implements ASTTransformation, 
             // so force that order here. The transformation is benign on an already
             // processed node so processing twice in any order won't matter bar
             // a very small time penalty.
-            processClass(sNode, source);
+            processClass(sNode);
         }
         for (ConstructorNode cn : sNode.getDeclaredConstructors()) {
             addConstructorUnlessAlreadyExisting(cNode, cn);
@@ -84,19 +87,17 @@ public class InheritConstructorsASTTransformation implements ASTTransformation, 
         Parameter[] origParams = consNode.getParameters();
         if (consNode.isPrivate()) return;
         Parameter[] params = new Parameter[origParams.length];
-        List<Expression> args = new ArrayList<Expression>();
+        List<Expression> theArgs = new ArrayList<Expression>();
+        Map<String, ClassNode> genericsSpec = createGenericsSpec(classNode);
+        extractSuperClassGenerics(classNode, classNode.getSuperClass(), genericsSpec);
         for (int i = 0; i < origParams.length; i++) {
             Parameter p = origParams[i];
-            params[i] = p.hasInitialExpression() ?
-                    new Parameter(p.getType(), p.getName(), p.getInitialExpression()) :
-                    new Parameter(p.getType(), p.getName());
-            args.add(new VariableExpression(p.getName(), p.getType()));
+            ClassNode newType = correctToGenericsSpecRecurse(genericsSpec, p.getType());
+            params[i] = p.hasInitialExpression() ? param(newType, p.getName(), p.getInitialExpression()) : param(newType, p.getName());
+            theArgs.add(varX(p.getName(), newType));
         }
         if (isExisting(classNode, params)) return;
-        BlockStatement body = new BlockStatement();
-        body.addStatement(new ExpressionStatement(
-                new ConstructorCallExpression(ClassNode.SUPER, new ArgumentListExpression(args))));
-        classNode.addConstructor(consNode.getModifiers(), params, consNode.getExceptions(), body);
+        classNode.addConstructor(consNode.getModifiers(), params, consNode.getExceptions(), block(ctorSuperS(args(theArgs))));
     }
 
     private boolean isExisting(ClassNode classNode, Parameter[] params) {
@@ -117,12 +118,4 @@ public class InheritConstructorsASTTransformation implements ASTTransformation, 
         }
         return true;
     }
-
-    private void addError(String msg, ASTNode expr, SourceUnit source) {
-        source.getErrorCollector().addErrorAndContinue(
-                new SyntaxErrorMessage(new SyntaxException(msg + '\n', expr.getLineNumber(), expr.getColumnNumber(),
-                        expr.getLastLineNumber(), expr.getLastColumnNumber()), source)
-        );
-    }
-
 }

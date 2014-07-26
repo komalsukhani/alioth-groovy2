@@ -16,7 +16,6 @@
 
 package org.codehaus.groovy.tools.shell.commands
 
-import jline.console.history.FileHistory
 import jline.console.history.History
 import org.codehaus.groovy.tools.shell.ComplexCommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
@@ -31,8 +30,11 @@ import org.codehaus.groovy.tools.shell.util.SimpleCompletor
 class HistoryCommand
     extends ComplexCommandSupport
 {
+
+    public static final String COMMAND_NAME = ':history'
+
     HistoryCommand(final Groovysh shell) {
-        super(shell, 'history', '\\H', [ 'show', 'clear', 'flush', 'recall' ], 'show')
+        super(shell, COMMAND_NAME, ':H', [ 'show', 'clear', 'flush', 'recall' ], 'show')
     }
 
     protected List createCompleters() {

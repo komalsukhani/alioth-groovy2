@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import groovy.lang.GroovyRuntimeException;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.groovy.runtime.typehandling.DefaultTypeTransformation;
@@ -44,6 +45,7 @@ public class NodeChild extends GPathResult {
     public NodeChild(final Node node, final GPathResult parent, final String namespacePrefix, final Map<String, String> namespaceTagHints) {
         super(parent, node.name(), namespacePrefix, namespaceTagHints);
         this.node = node;
+        ((NamespaceAwareHashMap)this.node.attributes()).setNamespaceTagHints(namespaceTagHints);
     }
 
     /**
@@ -68,6 +70,16 @@ public class NodeChild extends GPathResult {
 
     public String text() {
         return this.node.text();
+    }
+
+    /**
+     * Returns the list of any direct String nodes of this NodeChild.
+     *
+     * @return the list of String values from this node
+     * @since 2.3.0
+     */
+    public List<String> localText() {
+        return this.node.localText();
     }
 
     /**

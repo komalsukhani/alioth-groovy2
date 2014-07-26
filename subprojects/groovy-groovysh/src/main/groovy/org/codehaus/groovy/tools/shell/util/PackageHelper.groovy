@@ -14,15 +14,15 @@ import java.util.zip.ZipException
  */
 class PackageHelper implements PreferenceChangeListener {
 
-    public final static String IMPORT_COMPLETION_PREFERENCE_KEY = "disable-import-completion"
+    public static final String IMPORT_COMPLETION_PREFERENCE_KEY = "disable-import-completion"
     // Pattern for regular Classnames
-    public final static Pattern NAME_PATTERN = java.util.regex.Pattern.compile("^[A-Z][^.\$_]+\$")
+    public static final Pattern NAME_PATTERN = java.util.regex.Pattern.compile("^[A-Z][^.\$_]+\$")
 
     private static final String CLASS_SUFFIX = ".class"
 
     Map<String, CachedPackage> rootPackages = null
     ClassLoader groovyClassLoader
-    protected static final Logger log = Logger.create(PackageHelper.class)
+    protected static final Logger log = Logger.create(PackageHelper)
 
     PackageHelper(ClassLoader groovyClassLoader) {
         this.groovyClassLoader = groovyClassLoader
@@ -58,7 +58,7 @@ class PackageHelper implements PreferenceChangeListener {
         }
 
         // System classes
-        Class[] systemClasses = [String.class, javax.swing.JFrame.class, GroovyObject.class] as Class[]
+        Class[] systemClasses = [String, javax.swing.JFrame, GroovyObject] as Class[]
         systemClasses.each { Class systemClass ->
             // normal slash even in Windows
             String classfileName = systemClass.name.replace('.', '/') + ".class"

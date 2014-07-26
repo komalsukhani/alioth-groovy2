@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007 the original author or authors.
+ * Copyright 2003-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,20 @@ package org.codehaus.groovy.tools.shell
 
 import jline.console.completer.Completer
 import jline.console.history.FileHistory
+import org.codehaus.groovy.tools.shell.commands.DocCommand
+import org.codehaus.groovy.tools.shell.commands.EditCommand
+import org.codehaus.groovy.tools.shell.commands.ExitCommand
+import org.codehaus.groovy.tools.shell.commands.HelpCommand
+import org.codehaus.groovy.tools.shell.commands.InspectCommand
+import org.codehaus.groovy.tools.shell.commands.PurgeCommand
+import org.codehaus.groovy.tools.shell.commands.SetCommand
+import org.codehaus.groovy.tools.shell.commands.ShowCommand
 
 
 /**
  * Test the combination of multiple completers via JLine ConsoleReader
  */
-class AllCompletersTest
-extends GroovyTestCase {
+class AllCompletorsTest extends GroovyTestCase {
 
     IO testio
     BufferedOutputStream mockOut
@@ -95,33 +102,33 @@ extends GroovyTestCase {
 
     void testEmpty() {
         def result = complete("", 0)
-        assertTrue('help' in result[0])
-        assertTrue('exit' in result[0])
+        assertTrue(HelpCommand.COMMAND_NAME in result[0])
+        assertTrue(ExitCommand.COMMAND_NAME in result[0])
         assertTrue('import' in result[0])
-        assertTrue('show' in result[0])
-        assertTrue('set' in result[0])
-        assertTrue('inspect' in result[0])
-        assertTrue('doc' in result[0])
-        assertEquals(0, result[1])
+        assertTrue(ShowCommand.COMMAND_NAME in result[0])
+        assertTrue(SetCommand.COMMAND_NAME in result[0])
+        assertTrue(InspectCommand.COMMAND_NAME in result[0])
+        assertTrue(DocCommand.COMMAND_NAME in result[0])
+        assert 0 == result[1]
     }
 
     void testExitEdit() {
-        assertEquals([["exit ", "edit "], 0], complete("e", 0))
+        assert [["${ExitCommand.COMMAND_NAME} ", ":e", EditCommand.COMMAND_NAME], 0] == complete(":e", 0)
     }
 
     void testShow() {
-        String prompt = "show "
-        assertEquals([["all", "classes", "imports", "preferences", "variables"], prompt.length()], complete(prompt, prompt.length()))
+        String prompt = ":show "
+        assert [["all", "classes", "imports", "preferences", "variables"], prompt.length()] == complete(prompt, prompt.length())
     }
 
     void testShowV() {
-        String prompt = "show v"
-        assertEquals([["variables "], prompt.length() - 1], complete(prompt, prompt.length()))
+        String prompt = ShowCommand.COMMAND_NAME + " v"
+        assert [["variables "], prompt.length() - 1] == complete(prompt, prompt.length())
     }
 
     void testShowVariables() {
-        String prompt = "show variables "
-        assertEquals(null, complete(prompt, prompt.length()))
+        String prompt = ShowCommand.COMMAND_NAME + " variables "
+        assertNull(complete(prompt, prompt.length()))
     }
 
     void testImportJava() {
@@ -135,24 +142,24 @@ extends GroovyTestCase {
 
     void testShowVariablesJava() {
         // tests against interaction with ReflectionCompleter
-        String prompt = "show variables java"
-        assertEquals(null, complete(prompt, prompt.length()))
+        String prompt = ShowCommand.COMMAND_NAME + " variables java"
+        assertNull(complete(prompt, prompt.length()))
     }
 
     void testKeyword() {
         // tests against interaction with ReflectionCompleter
         String prompt = "pub"
-        assertEquals([["public "], 0], complete(prompt, prompt.length()))
+        assert [["public "], 0] == complete(prompt, prompt.length())
     }
 
     void testCommandAndKeyword() {
         // tests against interaction with ReflectionCompleter
-        String prompt = "pu" // purge, public
-        assertEquals([["purge "], 0], complete(prompt, prompt.length()))
+        String prompt = ":pu" // purge, public
+        assert [["${PurgeCommand.COMMAND_NAME} "], 0] == complete(prompt, prompt.length())
     }
 
     void testDoc() {
-        String prompt = "doc j"
+        String prompt = DocCommand.COMMAND_NAME + " j"
         def result = complete(prompt, prompt.length())
         assert result
         assert prompt.length() - 1 == result[1]

@@ -42,7 +42,7 @@ class Parser
 {
     static final String NEWLINE = System.getProperty('line.separator')
 
-    private static final Logger log = Logger.create(Parser.class)
+    private static final Logger log = Logger.create(Parser)
 
     private final Parsing delegate
 
@@ -184,11 +184,8 @@ final class RigidParser implements Parsing
 
             return new ParseStatus(error)
         }
-        else {
-            log.debug('Parse incomplete')
-
-            return new ParseStatus(ParseCode.INCOMPLETE)
-        }
+        log.debug('Parse incomplete')
+        return new ParseStatus(ParseCode.INCOMPLETE)
     }
     
     private boolean ignoreSyntaxErrorForLineEnding(String line) {
@@ -244,3 +241,4 @@ final class ParseStatus
         this(ParseCode.ERROR, cause)
     }
 }
+

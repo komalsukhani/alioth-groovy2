@@ -43,12 +43,16 @@ import org.codehaus.groovy.ast.stmt.Statement;
 import org.codehaus.groovy.control.CompilationUnit;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
+import org.codehaus.groovy.control.io.StringReaderSource;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.tools.GrapeUtil;
 import org.codehaus.groovy.transform.ASTTransformation;
 import org.codehaus.groovy.transform.ASTTransformationVisitor;
 import org.codehaus.groovy.transform.GroovyASTTransformation;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -250,6 +254,34 @@ public class GrabAnnotationTransformation extends ClassCodeVisitorSupport implem
                             grabResolverMap.put(s, ((ConstantExpression) member).getValue());
                         }
                     }
+
+                    // If no scheme is specified for the repository root,
+                    // then turn it into a URI relative to that of the source file.
+                    String root = (String) grabResolverMap.get("root");
+                    if (root != null && !root.contains(":")) {
+                        URI sourceURI = null;
+                        // Since we use the data: scheme for StringReaderSources (which are fairly common)
+                        // and those are not hierarchical we can't use them for making an absolute URI.
+                        if (!(getSourceUnit().getSource() instanceof StringReaderSource)) {
+                            // Otherwise let's trust the source to know where it is from.
+                            // And actually InputStreamReaderSource doesn't know what to do and so returns null.
+                            sourceURI = getSourceUnit().getSource().getURI();
+                        }
+                        // If source doesn't know how to get a reference to itself,
+                        // then let's use the current working directory, since the repo can be relative to that.
+                        if (sourceURI == null) {
+                            sourceURI = new File(".").toURI();
+                        }
+                        try {
+                            URI rootURI = sourceURI.resolve(new URI(root));
+                            grabResolverMap.put("root", rootURI.toString());
+                        } catch (URISyntaxException e) {
+                            // We'll be silent here.
+                            // If the URI scheme is unknown or not hierarchical, then we just can't help them and shouldn't cause any trouble either.
+                            // addError("Attribute \"root\" has value '" + root + "' which can't be turned into a valid URI relative to it's source '" + getSourceUnit().getName() + "' @" + node.getClassNode().getNameWithoutPackage() + " annotations", node);
+                        }
+                    }
+
                     Grape.addResolver(grabResolverMap);
                     addGrabResolverAsStaticInitIfNeeded(grapeClassNode, node, grabResolverInitializers, grabResolverMap);
                 }
@@ -364,6 +396,7 @@ public class GrabAnnotationTransformation extends ClassCodeVisitorSupport implem
 
         List<Expression> argList = new ArrayList<Expression>();
         argList.add(basicArgs);
+        if (grabMapsInit.size() == 0) return;
         for (Map<String, Object> grabMap : grabMapsInit) {
             // add Grape.grab(excludeArgs, [group:group, module:module, version:version, classifier:classifier])
             // or Grape.grab([group:group, module:module, version:version, classifier:classifier])

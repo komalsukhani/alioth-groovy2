@@ -106,10 +106,13 @@ public class ClassNode extends AnnotatedNode implements Opcodes {
             if (map.containsKey(key)) {
                 get(key).add(value);
             } else {
-                ArrayList<MethodNode> list = new ArrayList<MethodNode>(2);
+                List<MethodNode> list = new ArrayList<MethodNode>(2);
                 list.add(value);
                 map.put(key, list);
             }
+        }
+        public void remove(Object key, MethodNode value) {
+            get(key).remove(value);
         }
     }
 
@@ -586,6 +589,11 @@ public class ClassNode extends AnnotatedNode implements Opcodes {
         node.setDeclaringClass(this);
         redirect().methodsList.add(node);
         redirect().methods.put(node.getName(), node);
+    }
+
+    public void removeMethod(MethodNode node) {
+        redirect().methodsList.remove(node);
+        redirect().methods.remove(node.getName(), node);
     }
 
     /**
@@ -1377,7 +1385,9 @@ public class ClassNode extends AnnotatedNode implements Opcodes {
         ClassNode n = new ClassNode(name, modifiers, superClass,null,null);
         n.isPrimaryNode = false;
         n.setRedirect(redirect());
-        n.componentType = redirect().getComponentType();
+        if (isArray()) {
+            n.componentType = redirect().getComponentType();
+        } 
         return n;
     }
 

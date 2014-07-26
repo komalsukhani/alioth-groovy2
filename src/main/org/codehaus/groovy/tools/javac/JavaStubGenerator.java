@@ -308,15 +308,16 @@ public class JavaStubGenerator {
     }
 
     private void printEnumFields(PrintWriter out, List<FieldNode> fields) {
-        if (fields.size() == 0) return;
-        boolean first = true;
-        for (FieldNode field : fields) {
-            if (!first) {
-                out.print(", ");
-            } else {
-                first = false;
+        if (fields.size() != 0) {
+            boolean first = true;
+            for (FieldNode field : fields) {
+                if (!first) {
+                    out.print(", ");
+                } else {
+                    first = false;
+                }
+                out.print(field.getName());
             }
-            out.print(field.getName());
         }
         out.println(";");
     }
@@ -599,6 +600,10 @@ public class JavaStubGenerator {
 
     private void printValue(PrintWriter out, Expression re, boolean assumeClass) {
         if (assumeClass) {
+            if (re.getType().getName().equals("groovy.lang.Closure")) {
+                out.print("groovy.lang.Closure.class");
+                return;
+            }
             String className = re.getText();
             out.print(className);
             if (!className.endsWith(".class")) {
@@ -731,6 +736,7 @@ public class JavaStubGenerator {
             int lastIndex = parameters.length - 1;
             boolean vararg = parameters[lastIndex].getType().isArray();
             for (int i = 0; i != parameters.length; ++i) {
+                printAnnotations(out, parameters[i]);
                 if (i == lastIndex && vararg) {
                     printType(out, parameters[i].getType().getComponentType());
                     out.print("...");

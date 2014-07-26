@@ -18,7 +18,6 @@ package org.codehaus.groovy.tools.shell.commands
 
 import org.codehaus.groovy.tools.shell.ComplexCommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
-import org.codehaus.groovy.tools.shell.Shell
 import org.codehaus.groovy.tools.shell.util.Preferences
 
 /**
@@ -30,8 +29,10 @@ import org.codehaus.groovy.tools.shell.util.Preferences
 class PurgeCommand
     extends ComplexCommandSupport
 {
+    public static final String COMMAND_NAME = ':purge'
+
     PurgeCommand(final Groovysh shell) {
-        super(shell, 'purge', '\\p', [ 'variables', 'classes', 'imports', 'preferences', 'all' ])
+        super(shell, COMMAND_NAME, ':p', [ 'variables', 'classes', 'imports', 'preferences', 'all' ])
     }
     
     def do_variables = {

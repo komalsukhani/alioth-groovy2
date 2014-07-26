@@ -21,7 +21,6 @@ import org.codehaus.groovy.runtime.MethodClosure
 
 import org.codehaus.groovy.tools.shell.ComplexCommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
-import org.codehaus.groovy.tools.shell.Shell
 import org.codehaus.groovy.tools.shell.util.Preferences
 
 /**
@@ -33,8 +32,10 @@ import org.codehaus.groovy.tools.shell.util.Preferences
 class ShowCommand
     extends ComplexCommandSupport
 {
+    public static final String COMMAND_NAME = ':show'
+
     ShowCommand(final Groovysh shell) {
-        super(shell, 'show', '\\S', [ 'variables', 'classes', 'imports', 'preferences', 'all' ])
+        super(shell, COMMAND_NAME, ':S', [ 'variables', 'classes', 'imports', 'preferences', 'all' ])
     }
     
     def do_variables = {
@@ -93,13 +94,11 @@ class ShowCommand
             io.out.println('No preferences are set')
             return
         }
-        else {
-            io.out.println('Preferences:')
 
-            keys.each { String key ->
-                def value = Preferences.get(key, null)
-                println("    $key=$value")
-            }
+        io.out.println('Preferences:')
+        keys.each { String key ->
+            def value = Preferences.get(key, null)
+            println("    $key=$value")
         }
         return
     }

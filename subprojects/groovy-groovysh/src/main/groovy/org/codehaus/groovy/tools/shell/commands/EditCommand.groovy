@@ -18,7 +18,6 @@ package org.codehaus.groovy.tools.shell.commands
 
 import org.codehaus.groovy.tools.shell.CommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
-import org.codehaus.groovy.tools.shell.Shell
 import org.codehaus.groovy.tools.shell.util.Preferences
 
 /**
@@ -30,8 +29,10 @@ import org.codehaus.groovy.tools.shell.util.Preferences
 class EditCommand
     extends CommandSupport
 {
+    public static final String COMMAND_NAME = ':edit'
+
     EditCommand(final Groovysh shell) {
-        super(shell, 'edit', '\\e')
+        super(shell, COMMAND_NAME, ':e')
     }
 
     ProcessBuilder getEditorProcessBuilder(String editCommand, String tempFilename) {

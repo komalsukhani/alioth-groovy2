@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,12 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an arbitrary tree node which can be used for structured metadata or any arbitrary XML-like tree.
@@ -329,13 +334,21 @@ public class Node implements Serializable, Cloneable {
         if (value instanceof String) {
             return (String) value;
         }
+        if (value instanceof NodeList) {
+            return ((NodeList) value).text();
+        }
         if (value instanceof Collection) {
             Collection coll = (Collection) value;
             String previousText = null;
             StringBuilder sb = null;
             for (Object child : coll) {
+                String childText = null;
                 if (child instanceof String) {
-                    String childText = (String) child;
+                    childText = (String) child;
+                } else if (child instanceof Node) {
+                    childText = ((Node) child).text();
+                }
+                if (childText != null) {
                     if (previousText == null) {
                         previousText = childText;
                     } else {
@@ -574,6 +587,23 @@ public class Node implements Serializable, Cloneable {
                     List children = childNode.getDirectChildren();
                     if (children.size() > 1 || (children.size() == 1 && !(children.get(0) instanceof String))) nextLevelChildren.addAll(children);
                 }
+            }
+        }
+        return answer;
+    }
+
+    /**
+     * Returns the list of any direct String nodes of this node.
+     *
+     * @return the list of String values from this node
+     * @since 2.3.0
+     */
+    public List<String> localText() {
+        List<String> answer = new ArrayList<String>();
+        for (Iterator iter = InvokerHelper.asIterator(value); iter.hasNext(); ) {
+            Object child = iter.next();
+            if (!(child instanceof Node)) {
+                answer.add(child.toString());
             }
         }
         return answer;

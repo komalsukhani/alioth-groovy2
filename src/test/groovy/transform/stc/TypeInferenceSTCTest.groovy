@@ -13,7 +13,6 @@
  */
 package groovy.transform.stc
 
-import groovy.transform.NotYetImplemented
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.control.customizers.CompilationCustomizer
 import org.codehaus.groovy.control.CompilePhase
@@ -341,7 +340,7 @@ class TypeInferenceSTCTest extends StaticTypeCheckingTestCase {
             a.with { String it ->
                 it.x = 2 // should be recognized as a.x at compile time
             }
-        ''', 'Expected parameter type: A but was: java.lang.String'
+        ''', 'Expected parameter of type A but got java.lang.String'
     }
 
     void testShouldNotFailWithInheritanceAndWith() {
@@ -732,8 +731,6 @@ Thing.run()
         '''
     }
 
-    // disabled for 2.2.x, fixed in 2.3.0
-    @NotYetImplemented
     void testInferenceWithImplicitClosureCoercionAndGenericTypeAsParameter() {
         assertScript '''
             interface Action<T> { void execute(T t) }

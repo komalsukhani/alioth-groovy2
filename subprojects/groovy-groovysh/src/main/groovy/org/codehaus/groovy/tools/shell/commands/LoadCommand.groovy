@@ -29,10 +29,12 @@ import org.codehaus.groovy.tools.shell.Groovysh
 class LoadCommand
     extends CommandSupport
 {
-    LoadCommand(final Groovysh shell) {
-        super(shell, 'load', '\\l')
+    public static final String COMMAND_NAME = ':load'
 
-        alias('.', '\\.')
+    LoadCommand(final Groovysh shell) {
+        super(shell, COMMAND_NAME, ':l')
+
+        alias('.', ':.')
     }
 
     protected List createCompleters() {
@@ -43,7 +45,7 @@ class LoadCommand
         assert args != null
         
         if (args.size() == 0) {
-            fail("Command 'load' requires at least one argument") // TODO: i18n
+            fail("Command '$COMMAND_NAME' requires at least one argument") // TODO: i18n
         }
 
         for (source in args) {

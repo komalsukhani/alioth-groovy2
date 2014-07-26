@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,44 @@ import java.util.Map;
  * @author paulk
  */
 public class DOMCategory {
+    private static boolean trimWhitespace = false;
+    private static boolean keepIgnorableWhitespace = false;
 
-    private static boolean trimWhitespace = true;
+    /**
+     * @return true if text elements are trimmed before returning; default false
+     */
+    public static synchronized boolean isGlobalTrimWhitespace() {
+        return trimWhitespace;
+    }
+
+    /**
+     * Whether text content is trimmed (removing leading and trailing whitespace); default false.
+     * WARNING: this is a global setting. Altering it will affect all DOMCategory usage within the current Java process.
+     * It is not recommended that this is altered; instead call the trim() method on the returned text, but the
+     * flag is available to support legacy Groovy behavior.
+     *
+     * @param trimWhitespace the new value
+     */
+    public static synchronized void setGlobalTrimWhitespace(boolean trimWhitespace) {
+        DOMCategory.trimWhitespace = trimWhitespace;
+    }
+
+    /**
+     * @return true if ignorable whitespace (e.g. whitespace between elements) is kept; default false
+     */
+    public static synchronized boolean isGlobalKeepIgnorableWhitespace() {
+        return keepIgnorableWhitespace;
+    }
+
+    /**
+     * Whether ignorable whitespace (e.g. whitespace between elements) is kept (default false).
+     * WARNING: this is a global setting. Altering it will affect all DOMCategory usage within the current Java process.
+     *
+     * @param keepIgnorableWhitespace the new value
+     */
+    public static synchronized void setGlobalKeepIgnorableWhitespace(boolean keepIgnorableWhitespace) {
+        DOMCategory.keepIgnorableWhitespace = keepIgnorableWhitespace;
+    }
 
     public static Object get(Element element, String elementName) {
         return xgetAt(element, elementName);
@@ -348,6 +384,28 @@ public class DOMCategory {
         }
     }
 
+    /**
+     * Returns the list of any direct String nodes of this node.
+     *
+     * @return the list of String values from this node
+     * @since 2.3.0
+     */
+    public static List<String> localText(Element self) {
+        List<String> result = new ArrayList<String>();
+        if (self.getNodeType() == Node.TEXT_NODE || self.getNodeType() == Node.CDATA_SECTION_NODE) {
+            result.add(self.getNodeValue());
+        } else if (self.hasChildNodes()) {
+            NodeList nodeList = self.getChildNodes();
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node item = nodeList.item(i);
+                if (item.getNodeType() == Node.TEXT_NODE || item.getNodeType() == Node.CDATA_SECTION_NODE) {
+                    result.add(item.getNodeValue());
+                }
+            }
+        }
+        return result;
+    }
+
     public static void plus(NodeList self, Closure c) {
         for (int i = 0; i < self.getLength(); i++) {
             plus((Element) self.item(i), c);
@@ -401,7 +459,7 @@ public class DOMCategory {
                 }
             } else if (node.getNodeType() == Node.TEXT_NODE) {
                 String value = node.getNodeValue();
-                if (trimWhitespace) {
+                if ((!isGlobalKeepIgnorableWhitespace() && value.trim().length() == 0) || isGlobalTrimWhitespace()) {
                     value = value.trim();
                 }
                 if ("*".equals(elementName) && value.length() > 0) {

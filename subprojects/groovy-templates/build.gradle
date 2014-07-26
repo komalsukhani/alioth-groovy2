@@ -1,6 +1,12 @@
 dependencies {
-    compile project(':')
+    compile rootProject
     compile project(':groovy-xml')
-    groovy project(':')
     testCompile project(':groovy-test')
+}
+
+task backportJar(type:Jar) {
+    appendix = 'markup-backport'
+    dependsOn classes
+    from sourceSets.main.output
+    include 'groovy/text/markup/**'
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ public class VariableScopeVisitor extends ClassCodeVisitorSupport {
     private SourceUnit source;
     private boolean isSpecialConstructorCall = false;
     private boolean inConstructor = false;
+    private final boolean recurseInnerClasses;
 
     private LinkedList stateStack = new LinkedList();
 
@@ -61,9 +62,15 @@ public class VariableScopeVisitor extends ClassCodeVisitorSupport {
         }
     }
 
-    public VariableScopeVisitor(SourceUnit source) {
+    public VariableScopeVisitor(SourceUnit source, boolean recurseInnerClasses) {
         this.source = source;
         currentScope = headScope;
+        this.recurseInnerClasses = recurseInnerClasses;
+    }
+
+
+    public VariableScopeVisitor(SourceUnit source) {
+        this(source, false);
     }
 
     // ------------------------------
@@ -201,8 +208,11 @@ public class VariableScopeVisitor extends ClassCodeVisitorSupport {
 
         VariableScope scope = currentScope;
         Variable var = new DynamicVariable(name, currentScope.isInStaticContext());
+        Variable orig = var;
         // try to find a declaration of a variable
+        boolean crossingStaticContext = false;
         while (true) {
+            crossingStaticContext = crossingStaticContext || scope.isInStaticContext();
             Variable var1;
             var1 = scope.getDeclaredVariable(var.getName());
 
@@ -227,7 +237,7 @@ public class VariableScopeVisitor extends ClassCodeVisitorSupport {
             if (classScope != null) {
                 Variable member = findClassMember(classScope, var.getName());
                 if (member != null) {
-                    boolean staticScope = currentScope.isInStaticContext() || isSpecialConstructorCall;
+                    boolean staticScope = crossingStaticContext || isSpecialConstructorCall;
                     boolean staticMember = member.isInStaticContext();
                     // We don't allow a static context (e.g. a static method) to access
                     // a non-static variable (e.g. a non-static field).
@@ -237,6 +247,9 @@ public class VariableScopeVisitor extends ClassCodeVisitorSupport {
                 break;
             }
             scope = scope.getParent();
+        }
+        if (var == orig && crossingStaticContext) {
+            var = new DynamicVariable(var.getName(), true);
         }
 
         VariableScope end = scope;
@@ -319,7 +332,7 @@ public class VariableScopeVisitor extends ClassCodeVisitorSupport {
         ifElse.getElseBlock().visit(this);
         popState();
     }
-    
+
     public void visitDeclarationExpression(DeclarationExpression expression) {
         // visit right side first to avoid the usage of a
         // variable before its declaration
@@ -462,6 +475,12 @@ public class VariableScopeVisitor extends ClassCodeVisitorSupport {
         prepareVisit(node);
 
         super.visitClass(node);
+        if (recurseInnerClasses) {
+            Iterator<InnerClassNode> innerClasses = node.getInnerClasses();
+            while (innerClasses.hasNext()) {
+                visitClass(innerClasses.next());
+            }
+        }
         popState();
     }
 
@@ -539,9 +558,19 @@ public class VariableScopeVisitor extends ClassCodeVisitorSupport {
 
         for (FieldNode field : innerClass.getFields()) {
             final Expression expression = field.getInitialExpression();
+            pushState(field.isStatic());
             if (expression != null) {
+                if (expression instanceof VariableExpression) {
+                    VariableExpression vexp = (VariableExpression) expression;
+                    if (vexp.getAccessedVariable() instanceof Parameter) {
+                        // workaround for GROOVY-6834: accessing a parameter which is not yet seen in scope
+                        popState();
+                        continue;
+                    }
+                }
                 expression.visit(this);
             }
+            popState();
         }
 
         for (Statement statement : innerClass.getObjectInitializerStatements()) {

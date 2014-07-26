@@ -53,7 +53,8 @@ public class IndyInterface {
             /**Method invocation type*/         METHOD("invoke"), 
             /**Constructor invocation type*/    INIT("init"), 
             /**Get property invocation type*/   GET("getProperty"), 
-            /**Set property invocation type*/   SET("setProperty");
+            /**Set property invocation type*/   SET("setProperty"),
+            /**Cast invocation type*/           CAST("cast");
             /**The name of the call site type*/
             private final String name;
             private CALL_TYPES(String callSiteName) {
@@ -64,9 +65,9 @@ public class IndyInterface {
         }
 
         /** Logger */
-        protected final static Logger LOG;
+        protected static final Logger LOG;
         /** boolean to indicate if logging for indy is enabled */
-        protected final static boolean LOG_ENABLED;
+        protected static final boolean LOG_ENABLED;
         static {
             LOG = Logger.getLogger(IndyInterface.class.getName());
             if (System.getProperty("groovy.indy.logging")!=null) {
@@ -138,7 +139,9 @@ public class IndyInterface {
                 callID = CALL_TYPES.GET.ordinal();
             } else if (callType.equals(CALL_TYPES.SET.getCallSiteName())) {
                 callID = CALL_TYPES.SET.ordinal();
-            } else {
+            } else if (callType.equals(CALL_TYPES.CAST.getCallSiteName())) {
+                callID = CALL_TYPES.CAST.ordinal();
+            }else {
                 throw new GroovyBugError("Unknown call type: "+callType);
             }
             return realBootstrap(caller, name, callID, type, safe, thisCall, spreadCall);

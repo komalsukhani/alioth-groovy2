@@ -18,7 +18,6 @@ package org.codehaus.groovy.tools.shell.commands
 
 import org.codehaus.groovy.tools.shell.CommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
-import org.codehaus.groovy.tools.shell.Shell
 
 /**
  * The 'display' command.
@@ -29,8 +28,10 @@ import org.codehaus.groovy.tools.shell.Shell
 class DisplayCommand
     extends CommandSupport
 {
+    public static final String COMMAND_NAME = ':display'
+
     DisplayCommand(final Groovysh shell) {
-        super(shell, 'display', '\\d')
+        super(shell, COMMAND_NAME, ':d')
     }
 
     Object execute(final List<String> args) {

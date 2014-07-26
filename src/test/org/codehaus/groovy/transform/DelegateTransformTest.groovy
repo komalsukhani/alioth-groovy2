@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class DelegateTransformTest extends CompilableTestSupport {
         """
     }
 
-    /** test for GROOVY-GROOVY-5974 */
+    /** test for GROOVY-5974 */
     void testDelegateExcludes() {
         assertScript """
           class MapSet {
@@ -69,6 +69,26 @@ class DelegateTransformTest extends CompilableTestSupport {
           assert ms.toString() == '[a:1] [2, 4]'
           ms.clear()
           assert ms.toString() == '[a:1] []'
+        """
+    }
+
+    void testDelegateCompileStatic() {
+        assertScript """
+          @groovy.transform.CompileStatic
+          class MapSet {
+            @Delegate(interfaces=false, excludes=['remove','clear']) Map m = [a: 1]
+            @Delegate Set s = new LinkedHashSet([2, 3, 4] as Set)
+            String toString() { m.toString() + ' ' + s }
+          }
+
+          def ms = new MapSet()
+          assert ms.size() == 1
+          assert ms.toString() == '{a=1} [2, 3, 4]'
+          ms.remove(3)
+          assert ms.size() == 1
+          assert ms.toString() == '{a=1} [2, 4]'
+          ms.clear()
+          assert ms.toString() == '{a=1} []'
         """
     }
 
@@ -467,6 +487,47 @@ class DelegateTransformTest extends CompilableTestSupport {
         """
     }
 
+    // GROOVY-6329
+    void testIncludeAndExcludeByType() {
+        assertScript """
+            interface OddInclusionsTU<T, U> {
+                boolean addAll(Collection<? extends T> t)
+                boolean add(U u)
+                T remove(int index)
+            }
+
+            interface OddInclusionsU<U> extends OddInclusionsTU<Integer, U> { }
+
+            interface OddInclusions extends OddInclusionsU<Integer> { }
+
+            interface OtherInclusions {
+                void clear()
+            }
+
+            interface EvenExclusions extends OddInclusions, OtherInclusions { }
+
+            class MixedNumbers {
+                // collection variant of addAll and remove will work on odd list
+                @Delegate(includeTypes=OddInclusions) List<Integer> odds = [1, 3]
+                // clear will work on other list
+                @Delegate(includeTypes=OtherInclusions) List<Integer> others = [0]
+                // all other methods will work on even list
+                @Delegate(excludeTypes=EvenExclusions) List<Integer> evens = [2, 4, 6]
+                def getAll() { evens + odds + others }
+            }
+
+            def list = new MixedNumbers()
+            assert list.all == [2, 4, 6, 1, 3, 0]
+            list.add(5)
+            list.addAll([7, 9])
+            list.addAll(1, [8])
+            list.remove(0)
+            assert list.indexOf(8) == 1
+            list.clear()
+            assert list.all == [2, 8, 4, 6, 3, 5, 7, 9]
+        """
+    }
+
     // GROOVY-5211
     void testAvoidFieldNameClashWithParameterName() {
         assertScript """
@@ -525,6 +586,17 @@ class DelegateTransformTest extends CompilableTestSupport {
             // ok
         }
     }
+
+    //
+    void testShouldNotReuseRawClassNode() {
+        assertScript '''import org.codehaus.groovy.transform.DelegateMap
+class Foo {
+    DelegateMap dm = new DelegateMap()
+}
+def foo = new Foo()
+assert foo.dm.x == '123'
+'''
+    }
 }
 
 interface DelegateFoo {
@@ -578,4 +650,10 @@ interface SomeOtherInterface4619 extends SomeInterface4619 {}
 class SomeClass4619 {
     @Delegate
     SomeOtherInterface4619 delegate
+}
+
+// DO NOT MOVE INSIDE THE TEST SCRIPT OR IT WILL NOT TEST
+// WHAT IT IS SUPPOSED TO TEST ANYMORE !
+class DelegateMap {
+    protected final @Delegate Map props = [x:'123']
 }

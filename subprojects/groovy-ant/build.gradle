@@ -1,7 +1,5 @@
 dependencies {
-    def antVersion = '1.9.2'
-    compile project(':')
-    groovy project(':')
+    compile rootProject
     compile "org.apache.ant:ant:$antVersion"
     runtime("org.apache.ant:ant-junit:$antVersion") {
         exclude(group: 'junit', module: 'junit')

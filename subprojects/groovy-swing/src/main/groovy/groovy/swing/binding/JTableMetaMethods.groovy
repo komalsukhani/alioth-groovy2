@@ -21,14 +21,6 @@ import javax.swing.table.TableColumnModel
 import javax.swing.table.TableModel
 import org.codehaus.groovy.runtime.InvokerHelper
 
-
-/**
- * Created by IntelliJ IDEA.
- * User: Danno.Ferrin
- * Date: Jun 19, 2008
- * Time: 12:46:29 PM
- * To change this template use File | Settings | File Templates.
- */
 class JTableMetaMethods {
 
     public static void enhanceMetaClass(table) {
@@ -47,7 +39,7 @@ class JTableMetaMethods {
             },
             getSelectedElements:{->
                 def myTable = delegate
-                return myTable.getSelectedRows().collect() { getElement(myTable, it) }
+                return myTable.getSelectedRows().collect { getElement(myTable, it) }
             }
         ]);
     }
@@ -71,11 +63,9 @@ class JTableMetaMethods {
             Object rowValue = model.getRowsModel().value
             if (rowValue == null) {
                 return null;
-            } else {
-                return InvokerHelper.asList(rowValue)[row]
             }
+            return InvokerHelper.asList(rowValue)[row]
         }
     }
-
 
 }

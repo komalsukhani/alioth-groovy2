@@ -1,8 +1,7 @@
 evaluationDependsOn(':groovy-swing')
 
 dependencies {
-    compile project(':')
-    groovy project(':')
+    compile rootProject
     compile project(':groovy-swing')
     compile project(':groovy-templates')
     testCompile project(':groovy-test')

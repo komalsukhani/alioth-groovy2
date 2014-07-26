@@ -490,7 +490,7 @@ class BugsSTCTest extends StaticTypeCheckingTestCase {
 
     void testListToSet() {
         assertScript '''
-            Set foo(List set) {
+            Set foo(List<Map.Entry> set) {
                 set.collect { Map.Entry entry -> entry.key }.toSet()
             }
         '''
@@ -510,4 +510,126 @@ assert p.name == 'Bob'
 '''
     }
 
+    void testOuterDotThisNotation() {
+        assertScript '''
+class Outer {
+    int x
+    class Inner {
+        int foo() { 2*Outer.this.x }
+    }
+    int bar() {
+        new Inner().foo()
+    }
+}
+def o = new Outer(x:123)
+assert o.bar() == 2*o.x
+'''
+    }
+
+    // GROOVY-6965
+    void testShouldNotFailWithClassCastExceptionDuringCompilation() {
+        assertScript '''
+interface Job {
+  Runnable getRunnable()
+}
+
+
+class Printer implements Job{
+
+  protected void execute() {
+    println "Printing"
+  }
+
+  public void acceptsRunnable(Runnable r){
+    r.run()
+  }
+
+  public Runnable getRunnable(){
+     acceptsRunnable(this.&execute) // OK
+     return this.&execute           // compile error
+  }
+}
+
+Printer
+'''
+    }
+
+    // GROOVY-6970
+    void testShouldBeAbleToChooseBetweenTwoEquivalentInterfaceMethods() {
+        assertScript '''
+            interface A { void m() }
+            interface B { void m() }
+            interface C extends A, B {}
+
+            class D {
+             D(C c) {
+               c.m()
+             }
+            }
+            class CImpl implements C {
+                void m() { }
+            }
+
+            new D(new CImpl())
+        '''
+    }
+    void testShouldBeAbleToChooseBetweenTwoEquivalentInterfaceMethodsVariant() {
+        assertScript '''
+            interface A { void m() }
+            interface B { void m() }
+            class C implements A,B {
+                void m() {}
+            }
+            class D {
+             D(C c) {
+               c.m()
+             }
+            }
+
+            new D(new C())
+        '''
+    }
+
+    void testShouldBeAbleToChooseBetweenTwoEquivalentInterfaceMethodsVariant2() {
+        assertScript '''
+            interface A { void m() }
+            interface B { void m() }
+            interface C extends A,B {}
+            class CImpl implements C, A,B {
+                void m() {}
+            }
+            class D {
+             D(C c) {
+               c.m()
+             }
+            }
+
+            new D(new CImpl())
+        '''
+    }
+
+    void testAmbiguousMethodResolutionGroovy6849() {
+        assertScript '''
+            interface ObservableList<E> extends List<E> {
+                public boolean addAll(E... elements)
+            }
+            public <E> ObservableList<E> wrap(List<E> list) { list as ObservableList }
+            ObservableList<String> tags = wrap(['groovy','programming'])
+            tags.addAll('bug')
+        '''
+    }
+
+    // GROOVY-6911
+    void testShouldNotThrowArrayIndexOfOutBoundsException() {
+        assertScript '''
+            class MyMap<T> extends LinkedHashMap<String, Object> { }
+
+            class C {
+                MyMap bar() { new MyMap() }
+            }
+
+            Map<String, Object> m = new C().bar()
+            List tmp = (List) m.get("some_key_here")     // <---  actually groovy crashes here!!
+        '''
+    }
 }

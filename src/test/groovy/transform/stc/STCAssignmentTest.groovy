@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -310,7 +310,7 @@ class STCAssignmentTest extends StaticTypeCheckingTestCase {
         ''', 'Cannot assign value of type java.lang.String to variable of type java.util.Collection'
     }
 
-    void testTernaryOperatorAssignementShouldFailBecauseOfIncompatibleGenericTypes() {
+    void testTernaryOperatorAssignmentShouldFailBecauseOfIncompatibleGenericTypes() {
         shouldFailWithMessages '''
             List<Integer> foo = true?new LinkedList<String>():new LinkedList<Integer>();
         ''', 'Incompatible generic argument types. Cannot assign java.util.LinkedList <? extends java.io.Serializable <? extends java.io.Serializable>> to: java.util.List <Integer>'
@@ -335,9 +335,19 @@ class STCAssignmentTest extends StaticTypeCheckingTestCase {
     }
 
     void testCastNullToBoolean() {
-        shouldFailWithMessages '''
+        // GROOVY-6577
+        assertScript '''
             boolean c = null
-        ''', 'Cannot assign value of type java.lang.Object to variable of type boolean'
+            assert c == false
+        '''
+    }
+
+    void testCastNullToBooleanWithExplicitCast() {
+        // GROOVY-6577
+        assertScript '''
+            boolean c = (boolean) null
+            assert c == false
+        '''
     }
 
     void testCastStringToCharacter() {
@@ -790,7 +800,7 @@ class STCAssignmentTest extends StaticTypeCheckingTestCase {
     }
 
     // GROOVY-6575
-    void testAssignementOfObjectToArrayShouldFail() {
+    void testAssignmentOfObjectToArrayShouldFail() {
         shouldFailWithMessages '''
             Object o
             int[] array = o

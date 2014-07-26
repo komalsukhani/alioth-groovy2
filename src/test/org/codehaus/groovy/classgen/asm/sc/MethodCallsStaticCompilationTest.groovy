@@ -18,13 +18,7 @@ package org.codehaus.groovy.classgen.asm.sc;
 import groovy.transform.stc.MethodCallsSTCTest
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
-@Mixin(StaticCompilationTestSupport)
-public class MethodCallsStaticCompilationTest extends MethodCallsSTCTest {
-    @Override
-    protected void setUp() {
-        super.setUp()
-        extraSetup()
-    }
+public class MethodCallsStaticCompilationTest extends MethodCallsSTCTest implements StaticCompilationTestSupport {
 
     void testCallToSuper() {
         assertScript '''
@@ -168,6 +162,19 @@ import groovy.transform.TypeCheckingMode//import org.codehaus.groovy.classgen.as
         DefaultParamTestSupport(String name, String val, List arg=null, Set set = null, Date suffix = new Date()) {
             "$name$val$suffix"
         }
+    }
+
+    // GROOVY-6647
+    void testInaccessibleConstructor() {
+        shouldFailWithMessages '''
+            class Foo {
+                private Foo(){}
+            }
+
+            class Bar {
+                def foo() {new Foo()}
+            }
+        ''', 'Cannot call private constructor'
     }
 
 }

@@ -14,15 +14,11 @@ import jline.console.completer.Completer
 
 import jline.internal.Configuration;
 
-import java.io.File;
-import java.util.List;
-
 import static jline.internal.Preconditions.checkNotNull;
 
 /**
- * PATCHED copy from jline2.10, included
- * https://github.com/jline/jline2/pull/88
- * https://github.com/jline/jline2/issues/90
+ * PATCHED copy from jline 2.12, with
+ * https://github.com/jline/jline2/issues/90 (no trailing blank)
  *
  * A file name completer takes the buffer and issues a list of
  * potential completions.

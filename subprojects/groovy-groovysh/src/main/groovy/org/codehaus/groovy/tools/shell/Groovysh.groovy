@@ -21,33 +21,21 @@ import jline.Terminal
 import jline.TerminalFactory
 import jline.console.history.FileHistory
 import org.codehaus.groovy.runtime.InvokerHelper
-import org.codehaus.groovy.tools.shell.util.PackageHelper
 import org.codehaus.groovy.runtime.StackTraceUtils
-import org.codehaus.groovy.tools.shell.util.CurlyCountingGroovyLexer
-import org.codehaus.groovy.tools.shell.util.MessageSource
-import org.codehaus.groovy.tools.shell.util.Preferences
-import org.codehaus.groovy.tools.shell.util.XmlCommandRegistrar
-import org.fusesource.jansi.Ansi
-import org.fusesource.jansi.AnsiConsole
+import org.codehaus.groovy.tools.shell.commands.LoadCommand
+import org.codehaus.groovy.tools.shell.commands.RecordCommand
+import org.codehaus.groovy.tools.shell.util.*
 import org.fusesource.jansi.AnsiRenderer
 
 /**
  * An interactive shell for evaluating Groovy code from the command-line (aka. groovysh).
  *
- * @version $Id$
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  */
 class Groovysh extends Shell {
 
-    static {
-        // Install the system adapters
-        AnsiConsole.systemInstall()
 
-        // Register jline ansi detector
-        Ansi.setDetector(new AnsiDetector())
-    }
-
-    private static final MessageSource messages = new MessageSource(Groovysh.class)
+    private static final MessageSource messages = new MessageSource(Groovysh)
 
     final BufferManager buffers = new BufferManager()
 
@@ -58,6 +46,8 @@ class Groovysh extends Shell {
     final List<String> imports = []
 
     public static final String AUTOINDENT_PREFERENCE_KEY = "autoindent"
+    // after how many prefix characters we start displaying all metaclass methods
+    public static final String METACLASS_COMPLETION_PREFIX_LENGTH_PREFERENCE_KEY = "meta-completion-prefix-length"
     int indentSize = 2
     
     InteractiveShellRunner runner
@@ -76,19 +66,24 @@ class Groovysh extends Shell {
         assert registrar
 
         parser = new Parser()
-        
+
         interp = new Interpreter(classLoader, binding)
 
         registrar.call(this)
 
         this.packageHelper = new PackageHelper(classLoader)
-
     }
 
     private static Closure createDefaultRegistrar(final ClassLoader classLoader) {
-        return {Shell shell ->
-            def r = new XmlCommandRegistrar(shell, classLoader)
-            r.register(getClass().getResource('commands.xml'))
+
+        return {Groovysh shell ->
+            URL xmlCommandResource = getClass().getResource('commands.xml')
+            if (xmlCommandResource != null) {
+                def r = new XmlCommandRegistrar(shell, classLoader)
+                r.register(xmlCommandResource)
+            } else {
+                new DefaultCommandsRegistrar(shell).register()
+            }
         }
     }
 
@@ -145,8 +140,10 @@ class Groovysh extends Shell {
         // Append the line to the current buffer
         current << line
 
+        String importsSpec = this.getImportStatements()
+
         // Attempt to parse the current buffer
-        def status = parser.parse(imports + current)
+        def status = parser.parse([importsSpec] + current)
 
         switch (status.code) {
             case ParseCode.COMPLETE:
@@ -157,7 +154,7 @@ class Groovysh extends Shell {
                 }
 
                 // Evaluate the current buffer w/imports and dummy statement
-                List buff = imports + [ 'true' ] + current
+                List buff = [importsSpec] + [ 'true' ] + current
 
                 setLastResult(result = interp.evaluate(buff))
                 buffers.clearSelected()
@@ -196,11 +193,15 @@ class Groovysh extends Shell {
         }
     }
 
+    String getImportStatements() {
+        return this.imports.collect({String it -> "import $it;"}).join('')
+    }
+
     //
     // Prompt
     //
 
-    private AnsiRenderer prompt = new AnsiRenderer()
+    private final AnsiRenderer prompt = new AnsiRenderer()
 
     /*
         Builds the command prompt name in 1 of 3 ways:
@@ -214,13 +215,13 @@ class Groovysh extends Shell {
     private String buildPrompt() {
         def lineNum = formatLineNumber(buffers.current().size())
 
-        def GROOVYSHELL_PROPERTY = System.getProperty("groovysh.prompt")
-        if (GROOVYSHELL_PROPERTY) {
-            return  "@|bold ${GROOVYSHELL_PROPERTY}:|@${lineNum}@|bold >|@ "
+        def groovyshellProperty = System.getProperty("groovysh.prompt")
+        if (groovyshellProperty) {
+            return  "@|bold ${groovyshellProperty}:|@${lineNum}@|bold >|@ "
         }
-        def GROOVYSHELL_ENV = System.getenv("GROOVYSH_PROMPT")
-        if (GROOVYSHELL_ENV) {
-            return  "@|bold ${GROOVYSHELL_ENV}:|@${lineNum}@|bold >|@ "
+        def groovyshellEnv = System.getenv("GROOVYSH_PROMPT")
+        if (groovyshellEnv) {
+            return  "@|bold ${groovyshellEnv}:|@${lineNum}@|bold >|@ "
         }
         return "@|bold groovy:|@${lineNum}@|bold >|@ "
 
@@ -280,13 +281,17 @@ class Groovysh extends Shell {
         return dir.canonicalFile
     }
 
-    private void loadUserScript(final String filename) {
+    /**
+     * Loads file from within user groovy state directory
+     * @param filename
+     */
+    protected void loadUserScript(final String filename) {
         assert filename
         
-        def file = new File(userStateDirectory, filename)
+        File file = new File(getUserStateDirectory(), filename)
         
         if (file.exists()) {
-            Command command = registry['load'] as Command
+            Command command = registry[LoadCommand.COMMAND_NAME] as Command
 
             if (command) {
                 log.debug("Loading user-script: $file")
@@ -302,9 +307,8 @@ class Groovysh extends Shell {
                     // Restore the result hook
                     resultHook = previousHook
                 }
-            }
-            else {
-                log.error("Unable to load user-script, missing 'load' command")
+            } else {
+                log.error("Unable to load user-script, missing '$LoadCommand.COMMAND_NAME' command")
             }
         }
     }
@@ -314,7 +318,7 @@ class Groovysh extends Shell {
     //
 
     private void maybeRecordInput(final String line) {
-        def record = registry['record']
+        def record = registry[RecordCommand.COMMAND_NAME]
 
         if (record != null) {
             record.recordInput(line)
@@ -322,7 +326,7 @@ class Groovysh extends Shell {
     }
 
     private void maybeRecordResult(final Object result) {
-        def record = registry['record']
+        def record = registry[RecordCommand.COMMAND_NAME]
 
         if (record != null) {
             record.recordResult(result)
@@ -330,7 +334,7 @@ class Groovysh extends Shell {
     }
 
     private void maybeRecordError(Throwable cause) {
-        def record = registry['record']
+        def record = registry[RecordCommand.COMMAND_NAME]
 
         if (record != null) {
             boolean sanitize = Preferences.sanitizeStackTrace
@@ -368,10 +372,6 @@ class Groovysh extends Shell {
         interp.context['_'] = result
 
         maybeRecordResult(result)
-    }
-
-    private Object getLastResult() {
-        return interp.context['_']
     }
 
     final Closure defaultErrorHook = { Throwable cause ->
@@ -488,7 +488,10 @@ class Groovysh extends Shell {
                 loadUserScript('groovysh.rc')
 
                 // Setup the interactive runner
-                runner = new InteractiveShellRunner(this, this.&renderPrompt as Closure)
+                runner = new InteractiveShellRunner(
+                        this,
+                        this.&renderPrompt as Closure,
+                        Integer.valueOf(Preferences.get(METACLASS_COMPLETION_PREFIX_LENGTH_PREFERENCE_KEY, '3')))
 
                 // Setup the history
                 File histFile = new File(userStateDirectory, 'groovysh.history')

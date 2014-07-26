@@ -21,6 +21,7 @@ import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.codehaus.groovy.reflection.CachedClass;
 import org.codehaus.groovy.reflection.ClassInfo;
 import org.codehaus.groovy.reflection.ReflectionCache;
 import org.codehaus.groovy.runtime.ConvertedClosure;
+import org.codehaus.groovy.transform.trait.Traits;
 
 public class CachedSAMClass extends CachedClass {
 
@@ -62,6 +64,13 @@ public class CachedSAMClass extends CachedClass {
             return argument;
         }
         if (isInterface) {
+            if (Traits.isTrait(clazz)) {
+                Map<String,Closure> impl = Collections.singletonMap(
+                        method.getName(),
+                        argument
+                );
+                return ProxyGenerator.INSTANCE.instantiateAggregate(impl,Collections.singletonList(clazz));
+            }
             return Proxy.newProxyInstance(
                     clazz.getClassLoader(),
                     new Class[]{clazz},
@@ -85,13 +94,17 @@ public class CachedSAMClass extends CachedClass {
     }
 
     private static Method[] getDeclaredMethods(final Class c) {
-        Method[] methods = AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
-            public Method[] run() {
-                return c.getDeclaredMethods();
-            }
-        });
-        if (methods==null) return new Method[0];
-        return methods;
+        try {
+            Method[] methods = AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
+                public Method[] run() {
+                    return c.getDeclaredMethods();
+                }
+            });
+            if (methods!=null) return methods;
+        } catch (java.security.AccessControlException ace) {
+            // swallow and do as if no method is available
+        }
+        return new Method[0];
     }
 
     private static void getAbstractMethods(Class c, List<Method> current) {
@@ -150,6 +163,8 @@ public class CachedSAMClass extends CachedClass {
             for (Method mi : methods) {
                 // ignore methods, that are not abstract and from Object
                 if (!Modifier.isAbstract(mi.getModifiers())) continue;
+                // ignore trait methods which have a default implementation
+                if (mi.getAnnotation(Traits.Implemented.class)!=null) continue;
                 try {
                     Object.class.getMethod(mi.getName(), mi.getParameterTypes());
                     continue;

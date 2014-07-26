@@ -70,6 +70,7 @@ class XmlNodePrinterTest extends GroovyTestCase {
         pw = new PrintWriter(writer)
         printer = new XmlNodePrinter(pw, "  ")
         parser = new XmlParser()
+        parser.setTrimWhitespace(true)
     }
 
     private void setUpNoindentingPrinter() {
@@ -83,12 +84,14 @@ class XmlNodePrinterTest extends GroovyTestCase {
 
     void testNamespacesPreserving() {
         parser.trimWhitespace = false
+        parser.keepIgnorableWhitespace = true
         setUpNoindentingPrinter()
         checkRoundtrip namespaceInput, namespaceInput.trim()
     }
 
     void testNamespacesDisabledOnParsing() {
         parser = new XmlParser(false, false)
+        parser.trimWhitespace = true
         checkRoundtrip namespaceInput, namespaceInput
     }
 
@@ -103,6 +106,7 @@ class XmlNodePrinterTest extends GroovyTestCase {
 
     void testWithoutNamespacesVerbosePreserving() {
         parser.trimWhitespace = false
+        parser.keepIgnorableWhitespace = true
         setUpNoindentingPrinter()
         checkRoundtrip noNamespaceInputVerbose, noNamespaceInputVerbose.trim()
     }

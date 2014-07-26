@@ -31,6 +31,7 @@ import org.codehaus.groovy.classgen.asm.*;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.syntax.SyntaxException;
 import org.codehaus.groovy.syntax.Token;
+import org.codehaus.groovy.transform.sc.StaticCompilationMetadataKeys;
 import org.codehaus.groovy.transform.sc.StaticCompilationVisitor;
 import org.codehaus.groovy.transform.stc.ExtensionMethodNode;
 import org.codehaus.groovy.transform.stc.StaticTypeCheckingSupport;
@@ -103,6 +104,14 @@ public class StaticInvocationWriter extends InvocationWriter {
             cn = new ConstructorNode(mn.getModifiers(), mn.getParameters(), mn.getExceptions(), mn.getCode());
             cn.setDeclaringClass(mn.getDeclaringClass());
         }
+        if (cn.isPrivate()) {
+            ClassNode classNode = controller.getClassNode();
+            ClassNode declaringClass = cn.getDeclaringClass();
+            if (declaringClass != classNode) {
+                controller.getSourceUnit().addError(new SyntaxException("Cannot call private constructor for " + declaringClass.toString(false) +
+                            " from class " + classNode.toString(false), call.getLineNumber(), call.getColumnNumber(), mn.getLastLineNumber(), call.getLastColumnNumber()));
+            }
+        }
 
         String ownerDescriptor = prepareConstructorCall(cn);
         TupleExpression args = makeArgumentList(call.getArguments());
@@ -119,6 +128,7 @@ public class StaticInvocationWriter extends InvocationWriter {
             super.writeSpecialConstructorCall(call);
             return;
         }
+        controller.getCompileStack().pushInSpecialConstructorCall();
         ConstructorNode cn;
         if (mn instanceof ConstructorNode) {
             cn = (ConstructorNode) mn;
@@ -135,6 +145,7 @@ public class StaticInvocationWriter extends InvocationWriter {
         finnishConstructorCall(cn, ownerDescriptor, controller.getOperandStack().getStackLength() - before);
         // on a special call, there's no object on stack
         controller.getOperandStack().remove(1);
+        controller.getCompileStack().pop();
     }
 
     /**
@@ -144,11 +155,20 @@ public class StaticInvocationWriter extends InvocationWriter {
         Map<MethodNode, MethodNode> bridges = target.getDeclaringClass().redirect().getNodeMetaData(PRIVATE_BRIDGE_METHODS);
         MethodNode bridge = bridges==null?null:bridges.get(target);
         if (bridge != null) {
-            ArgumentListExpression newArgs = new ArgumentListExpression(target.isStatic()?new ConstantExpression(null):receiver);
+            Expression fixedReceiver = receiver;
+            ClassNode classNode = implicitThis?controller.getClassNode():null;
+            ClassNode declaringClass = bridge.getDeclaringClass();
+            if (implicitThis && !controller.isInClosure()
+                    && !classNode.isDerivedFrom(declaringClass)
+                    && !classNode.implementsInterface(declaringClass)
+                    && classNode instanceof InnerClassNode) {
+                fixedReceiver = new PropertyExpression(new ClassExpression(classNode.getOuterClass()), "this");
+            }
+            ArgumentListExpression newArgs = new ArgumentListExpression(target.isStatic()?new ConstantExpression(null):fixedReceiver);
             for (Expression expression : args.getExpressions()) {
                 newArgs.addExpression(expression);
             }
-            return writeDirectMethodCall(bridge, implicitThis, receiver, newArgs);
+            return writeDirectMethodCall(bridge, implicitThis, fixedReceiver, newArgs);
         }
         return false;
     }
@@ -178,7 +198,7 @@ public class StaticInvocationWriter extends InvocationWriter {
 
             String owner = BytecodeHelper.getClassInternalName(node.getDeclaringClass());
             String desc = BytecodeHelper.getMethodDescriptor(target.getReturnType(), parameters);
-            mv.visitMethodInsn(INVOKESTATIC, owner, methodName, desc);
+            mv.visitMethodInsn(INVOKESTATIC, owner, methodName, desc, false);
             ClassNode ret = target.getReturnType().redirect();
             if (ret == ClassHelper.VOID_TYPE) {
                 ret = ClassHelper.OBJECT_TYPE;
@@ -371,19 +391,7 @@ public class StaticInvocationWriter extends InvocationWriter {
                     makeCall(origin, receiver, message, arguments, adapter, safe, spreadSafe, implicitThis);
             return;
         }
-        Object implicitReceiver = origin.getNodeMetaData(StaticTypesMarker.IMPLICIT_RECEIVER);
-        if (implicitReceiver !=null && implicitThis) {
-            String[] propertyPath = ((String) implicitReceiver).split("\\.");
-            // GROOVY-6021
-            PropertyExpression pexp = new PropertyExpression(new VariableExpression("this", CLOSURE_TYPE), propertyPath[0]);
-            pexp.setImplicitThis(true);
-            for (int i=1; i<propertyPath.length;i++) {
-                pexp.putNodeMetaData(StaticTypesMarker.INFERRED_TYPE, CLOSURE_TYPE);
-                pexp = new PropertyExpression(pexp, propertyPath[i]);
-            }
-            pexp.putNodeMetaData(StaticTypesMarker.IMPLICIT_RECEIVER, implicitReceiver);
-            origin.removeNodeMetaData(StaticTypesMarker.IMPLICIT_RECEIVER);
-            makeCall(origin, pexp, message, arguments, adapter, safe, spreadSafe, false);
+        if (tryImplicitReceiver(origin, message, arguments, adapter, safe, spreadSafe, implicitThis)) {
             return;
         }
         // if call is spread safe, replace it with a for in loop
@@ -500,6 +508,44 @@ public class StaticInvocationWriter extends InvocationWriter {
         }
     }
 
+    boolean tryImplicitReceiver(final Expression origin, final Expression message, final Expression arguments, final MethodCallerMultiAdapter adapter, final boolean safe, final boolean spreadSafe, final boolean implicitThis) {
+        Object implicitReceiver = origin.getNodeMetaData(StaticTypesMarker.IMPLICIT_RECEIVER);
+        ClassNode propertyOwnerType = origin.getNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER);
+        if (implicitThis && implicitReceiver==null && origin instanceof MethodCallExpression) {
+            implicitReceiver = ((MethodCallExpression) origin).getObjectExpression().getNodeMetaData(StaticTypesMarker.IMPLICIT_RECEIVER);
+        }
+        if (implicitReceiver !=null && implicitThis) {
+            String[] propertyPath = ((String) implicitReceiver).split("\\.");
+            // GROOVY-6021
+            PropertyExpression pexp = new PropertyExpression(new VariableExpression("this", CLOSURE_TYPE), propertyPath[0]);
+            pexp.setImplicitThis(true);
+            for (int i=1; i<propertyPath.length;i++) {
+                pexp.putNodeMetaData(StaticTypesMarker.INFERRED_TYPE, CLOSURE_TYPE);
+                pexp = new PropertyExpression(pexp, propertyPath[i]);
+            }
+            pexp.putNodeMetaData(StaticTypesMarker.IMPLICIT_RECEIVER, implicitReceiver);
+            if (propertyOwnerType!=null) {
+                pexp.putNodeMetaData(StaticTypesMarker.INFERRED_TYPE, propertyOwnerType);
+            }
+            origin.removeNodeMetaData(StaticTypesMarker.IMPLICIT_RECEIVER);
+            if (origin instanceof PropertyExpression) {
+                PropertyExpression rewritten = new PropertyExpression(
+                        pexp,
+                        ((PropertyExpression) origin).getProperty(),
+                        ((PropertyExpression) origin).isSafe()
+                );
+                rewritten.setSpreadSafe(((PropertyExpression) origin).isSpreadSafe());
+                rewritten.setImplicitThis(false);
+                rewritten.visit(controller.getAcg());
+                rewritten.putNodeMetaData(StaticTypesMarker.INFERRED_TYPE, origin.getNodeMetaData(StaticTypesMarker.INFERRED_TYPE));
+                return true;
+            }
+            makeCall(origin, pexp, message, arguments, adapter, safe, spreadSafe, false);
+            return true;
+        }
+        return false;
+    }
+
     private static void pushZero(final MethodVisitor mv, final ClassNode type) {
         boolean isInt = ClassHelper.int_TYPE.equals(type);
         boolean isShort = ClassHelper.short_TYPE.equals(type);
@@ -560,6 +606,11 @@ public class StaticInvocationWriter extends InvocationWriter {
                         BytecodeHelper.getClassInternalName(type.getName()));
                 controller.getOperandStack().replace(type);
             }
+        }
+
+        @Override
+        public ClassNode getType() {
+            return controller.getTypeChooser().resolveType(receiver, controller.getClassNode());
         }
     }
 

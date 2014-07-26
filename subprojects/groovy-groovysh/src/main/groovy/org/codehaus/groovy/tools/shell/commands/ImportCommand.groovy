@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,13 @@ import org.codehaus.groovy.tools.shell.util.PackageHelper
 /**
  * The 'import' command.
  *
- * @version $Id$
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  */
 class ImportCommand
     extends CommandSupport
 {
     ImportCommand(final Groovysh shell) {
-        super(shell, 'import', '\\i')
+        super(shell, 'import', ':i')
     }
 
     @Override
@@ -72,6 +71,23 @@ class ImportCommand
             fail("Command 'import' requires one or more arguments") // TODO: i18n
         }
 
+        def importSpec = args.join(' ')
+
+        // technically java conventions don't allow numerics at the start of package/class names so the regex below
+        // is a bit lacking.  this approach works reasonably well ->
+        // "(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.)+((\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart})|\\*)+;?$"
+        // but there's something preventing it from working when class names end in a "d" or "D" like
+        // "java.awt.TextField" so it is not implemented as such here.  Perhaps this could be made to be more
+        // intelligent if someone could figure out why that is happening or could write a nicer batch of regex to
+        // solve the problem
+        if (! (importSpec ==~ '[\\da-zA-Z_. *]+;?$')) {
+            def msg = "Invalid import definition: '${importSpec}'" // TODO: i18n
+            log.debug(msg)
+            fail(msg)
+        }
+        // remove last semicolon
+        importSpec = importSpec.replaceAll(';', '')
+
         def buff = [ 'import ' + args.join(' ') ]
         buff << 'def dummp = false'
         
@@ -82,16 +98,17 @@ class ImportCommand
             // No need to keep duplicates, but order may be important so remove the previous def, since
             // the last defined import will win anyways
             
-            if (imports.remove(buff[0])) {
+            if (imports.remove(importSpec)) {
                 log.debug("Removed duplicate import from list")
             }
             
-            log.debug("Adding import: ${buff[0]}")
+            log.debug("Adding import: $importSpec")
             
-            imports << buff[0]
+            imports.add(importSpec)
+            return imports.join(', ')
         }
         catch (CompilationFailedException e) {
-            def msg = "Invalid import definition: '${buff[0]}'; reason: $e.message" // TODO: i18n
+            def msg = "Invalid import definition: '${importSpec}'; reason: $e.message" // TODO: i18n
             log.debug(msg, e)
             fail(msg)
         }
@@ -106,20 +123,20 @@ class ImportCompleter implements Completer {
 
     PackageHelper packageHelper
     Groovysh shell
-    protected final Logger log = Logger.create(ImportCompleter.class)
+    protected final Logger log = Logger.create(ImportCompleter)
     /*
      * The following rules do not need to work for all thinkable situations,just for all reasonable situations.
      * In particular the underscore and dollar signs in Class or method names usually indicate something internal,
      * which we intentionally want to hide in tab completion
      */
     // matches fully qualified Classnames with dot at the end
-    public final static String QUALIFIED_CLASS_DOT_PATTERN = /^[a-z_]{1}[a-z0-9_]*(\.[a-z0-9_]*)*\.[A-Z][^.]*\.$/
+    public static final String QUALIFIED_CLASS_DOT_PATTERN = /^[a-z_]{1}[a-z0-9_]*(\.[a-z0-9_]*)*\.[A-Z][^.]*\.$/
     // matches empty, packagenames or fully qualified classNames
-    public final static String PACK_OR_CLASSNAME_PATTERN = /^([a-z_]{1}[a-z0-9_]*(\.[a-z0-9_]*)*(\.[A-Z][^.]*)?)?$/
+    public static final String PACK_OR_CLASSNAME_PATTERN = /^([a-z_]{1}[a-z0-9_]*(\.[a-z0-9_]*)*(\.[A-Z][^.]*)?)?$/
     // matches empty, packagenames or fully qualified classNames without special symbols
-    public final static String PACK_OR_SIMPLE_CLASSNAME_PATTERN = '^([a-z_]{1}[a-z0-9_]*(\\.[a-z0-9_]*)*(\\.[A-Z][^.\$_]*)?)?\$'
+    public static final String PACK_OR_SIMPLE_CLASSNAME_PATTERN = '^([a-z_]{1}[a-z0-9_]*(\\.[a-z0-9_]*)*(\\.[A-Z][^.\$_]*)?)?\$'
     // matches empty, packagenames or fully qualified classNames or fully qualified method names
-    public final static String PACK_OR_CLASS_OR_METHODNAME_PATTERN = '^([a-z_]{1}[a-z0-9.]*(\\.[a-z0-9_]*)*(\\.[A-Z][^.\$_]*(\\.[a-zA-Z0-9_]*)?)?)?\$'
+    public static final String PACK_OR_CLASS_OR_METHODNAME_PATTERN = '^([a-z_]{1}[a-z0-9.]*(\\.[a-z0-9_]*)*(\\.[A-Z][^.\$_]*(\\.[a-zA-Z0-9_]*)?)?)?\$'
 
 
     boolean staticImport

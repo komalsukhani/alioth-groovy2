@@ -24,6 +24,7 @@ import org.codehaus.groovy.ast.stmt.Statement;
 import org.codehaus.groovy.control.ClassNodeResolver.LookupResult;
 import org.codehaus.groovy.syntax.Types;
 import org.codehaus.groovy.GroovyBugError;
+import org.codehaus.groovy.transform.trait.Traits;
 import org.objectweb.asm.Opcodes;
 
 import java.lang.annotation.Retention;
@@ -792,18 +793,34 @@ public class ResolveVisitor extends ClassCodeExpressionTransformer {
         return ret;
     }
 
+    private boolean directlyImplementsTrait(ClassNode trait) {
+        ClassNode[] interfaces = currentClass.getInterfaces();
+        if (interfaces==null) {
+            return currentClass.getSuperClass().equals(trait);
+        }
+        for (ClassNode node : interfaces) {
+            if (node.equals(trait)) {
+                return true;
+            }
+        }
+        return currentClass.getSuperClass().equals(trait);
+    }
+
     private void checkThisAndSuperAsPropertyAccess(PropertyExpression expression) {
         if (expression.isImplicitThis()) return;
         String prop = expression.getPropertyAsString();
         if (prop == null) return;
         if (!prop.equals("this") && !prop.equals("super")) return;
 
+        ClassNode type = expression.getObjectExpression().getType();
         if (expression.getObjectExpression() instanceof ClassExpression) {
-            if (!(currentClass instanceof InnerClassNode)) {
+            if (!(currentClass instanceof InnerClassNode) && !Traits.isTrait(type)) {
                 addError("The usage of 'Class.this' and 'Class.super' is only allowed in nested/inner classes.", expression);
                 return;
             }
-            ClassNode type = expression.getObjectExpression().getType();
+            if (!currentScope.isInStaticContext() && Traits.isTrait(type) && "super".equals(prop) && directlyImplementsTrait(type)) {
+                return;
+            }
             ClassNode iterType = currentClass;
             while (iterType != null) {
                 if (iterType.equals(type)) break;
@@ -864,6 +881,8 @@ public class ResolveVisitor extends ClassCodeExpressionTransformer {
             }
         }
         resolveOrFail(ve.getType(), ve);
+        ClassNode origin = ve.getOriginType();
+        if (origin!=ve.getType()) resolveOrFail(origin, ve);
         return ve;
     }
 
@@ -1245,12 +1264,15 @@ public class ResolveVisitor extends ClassCodeExpressionTransformer {
         return source;
     }
 
-    private void resolveGenericsTypes(GenericsType[] types) {
-        if (types == null) return;
+    private boolean resolveGenericsTypes(GenericsType[] types) {
+        if (types == null) return true;
         currentClass.setUsingGenerics(true);
+        boolean resolved = true;
         for (GenericsType type : types) {
-            resolveGenericsType(type);
+            // attempt resolution on all types, so don't short-circuit and stop if we've previously failed
+            resolved = resolveGenericsType(type) && resolved;
         }
+        return resolved;
     }
 
     private void resolveGenericsHeader(GenericsType[] types) {
@@ -1279,8 +1301,8 @@ public class ResolveVisitor extends ClassCodeExpressionTransformer {
         }
     }
 
-    private void resolveGenericsType(GenericsType genericsType) {
-        if (genericsType.isResolved()) return;
+    private boolean resolveGenericsType(GenericsType genericsType) {
+        if (genericsType.isResolved()) return true;
         currentClass.setUsingGenerics(true);
         ClassNode type = genericsType.getType();
         // save name before redirect
@@ -1307,8 +1329,12 @@ public class ResolveVisitor extends ClassCodeExpressionTransformer {
         if (genericsType.getLowerBound() != null) {
             resolveOrFail(genericsType.getLowerBound(), genericsType);
         }
-        resolveGenericsTypes(type.getGenericsTypes());
-        genericsType.setResolved(genericsType.getType().isResolved());
+
+        if (resolveGenericsTypes(type.getGenericsTypes())) {
+            genericsType.setResolved(genericsType.getType().isResolved());
+        }
+        return genericsType.isResolved();
+
     }
 
     public void setClassNodeResolver(ClassNodeResolver classNodeResolver) {
