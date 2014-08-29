@@ -1,3 +1,10 @@
+groovy2 (2.2.2+dfsg-3) unstable; urgency=medium
+
+  * Relicense patches under Apache-2.0 license to make them compatible
+    with upstream and to address FTPmasters concerns. 
+
+ -- Miguel Landaeta <nomadium@debian.org>  Thu, 28 Aug 2014 21:18:18 -0700
+
 groovy2 (2.2.2+dfsg-2) unstable; urgency=low
 
   * Fix typo in Maven artifacts versioning.
