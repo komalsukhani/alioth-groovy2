@@ -1,3 +1,10 @@
+groovy2 (2.2.2+dfsg-5) UNRELEASED; urgency=medium
+
+  * Team upload.
+  * Depend on java6-runtime-headless instead of java6-runtime
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Thu, 11 Jun 2015 12:40:46 +0200
+
 groovy2 (2.2.2+dfsg-4) unstable; urgency=medium
 
   * Team upload.

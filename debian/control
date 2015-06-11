@@ -33,7 +33,7 @@ Homepage: http://www.groovy-lang.org
 Package: groovy2
 Architecture: all
 Depends: antlr,
-         default-jre-headless | java6-runtime,
+         default-jre-headless | java6-runtime-headless,
          ivy,
          junit4,
          libasm4-java,
