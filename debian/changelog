@@ -1,13 +1,14 @@
-groovy2 (2.2.2+dfsg-4) UNRELEASED; urgency=medium
+groovy2 (2.2.2+dfsg-4) unstable; urgency=medium
 
   * Team upload.
   * Use junit 4.x instead of 4.11 to fix a build failure
   * Updated the watch file
-  * Standards-Version updated to 3.9.6 (no changes)
-  * Updated the Homepage field
+  * debian/control:
+    - Standards-Version updated to 3.9.6 (no changes)
+    - Updated the Homepage field
   * Use XZ compression for the upstream tarball
 
- -- Emmanuel Bourg <ebourg@apache.org>  Thu, 11 Jun 2015 09:06:12 +0200
+ -- Emmanuel Bourg <ebourg@apache.org>  Thu, 11 Jun 2015 10:11:01 +0200
 
 groovy2 (2.2.2+dfsg-3) unstable; urgency=medium
 
