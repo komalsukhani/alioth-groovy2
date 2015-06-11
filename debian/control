@@ -26,9 +26,9 @@ Build-Depends: ant,
                maven-repo-helper,
                unzip
 Standards-Version: 3.9.6
-Homepage: http://groovy.codehaus.org/
 Vcs-Git: git://anonscm.debian.org/pkg-java/groovy2.git
 Vcs-Browser: http://anonscm.debian.org/cgit/pkg-java/groovy2.git
+Homepage: http://www.groovy-lang.org
 
 Package: groovy2
 Architecture: all
