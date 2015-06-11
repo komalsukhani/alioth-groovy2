@@ -1,6 +1,7 @@
 groovy2 (2.2.2+dfsg-4) UNRELEASED; urgency=medium
 
   * Team upload.
+  * Use junit 4.x instead of 4.11 to fix a build failure
   * Updated the watch file
   * Standards-Version updated to 3.9.6 (no changes)
   * Updated the Homepage field
