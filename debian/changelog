@@ -4,6 +4,7 @@ groovy2 (2.2.2+dfsg-4) UNRELEASED; urgency=medium
   * Updated the watch file
   * Standards-Version updated to 3.9.6 (no changes)
   * Updated the Homepage field
+  * Use XZ compression for the upstream tarball
 
  -- Emmanuel Bourg <ebourg@apache.org>  Thu, 11 Jun 2015 09:06:12 +0200
 
