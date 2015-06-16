@@ -108,7 +108,11 @@ public abstract class BaseJsonParser implements JsonParser {
     }
 
     public Object parse(byte[] bytes, String charset) {
-        return parse(bytes, charset);
+        try {
+            return parse(new String(bytes, charset));
+        } catch (UnsupportedEncodingException e) {
+            return Exceptions.handle(Object.class, e);
+        }
     }
 
     public Object parse(CharSequence charSequence) {
@@ -116,10 +120,8 @@ public abstract class BaseJsonParser implements JsonParser {
     }
 
     public Object parse(Reader reader) {
-
         fileInputBuf = IO.read(reader, fileInputBuf, bufSize);
         return parse(fileInputBuf.readForRecycle());
-
     }
 
     public Object parse(InputStream input) {
@@ -137,7 +139,6 @@ public abstract class BaseJsonParser implements JsonParser {
     private final CharBuf builder = CharBuf.create(20);
 
     public Object parse(File file, String charset) {
-
         Reader reader = null;
         try {
             if (charset == null || charset.length() == 0) {
@@ -153,7 +154,6 @@ public abstract class BaseJsonParser implements JsonParser {
                 DefaultGroovyMethodsSupport.closeWithWarning(reader);
             }
         }
-
     }
 
     protected static boolean isDecimalChar(int currentChar) {
@@ -166,11 +166,9 @@ public abstract class BaseJsonParser implements JsonParser {
                 return true;
         }
         return false;
-
     }
 
     protected static boolean isDelimiter(int c) {
-
         return c == COMMA || c == CLOSED_CURLY || c == CLOSED_BRACKET;
     }
 
@@ -197,7 +195,6 @@ public abstract class BaseJsonParser implements JsonParser {
                 indexHolder[0] = index;
                 return true;
             }
-
         }
 
         indexHolder[0] = index;
@@ -229,5 +226,4 @@ public abstract class BaseJsonParser implements JsonParser {
         }
         return index;
     }
-
 }

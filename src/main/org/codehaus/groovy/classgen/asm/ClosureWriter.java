@@ -167,7 +167,7 @@ public class ClosureWriter {
         ClassNode classNode = controller.getClassNode();
         ClassNode outerClass = controller.getOutermostClass();
         MethodNode methodNode = controller.getMethodNode();
-        String name = outerClass.getName() + "$"
+        String name = classNode.getName() + "$"
                 + controller.getContext().getNextClosureInnerName(outerClass, classNode, methodNode); // add a more informative name
         boolean staticMethodOrInStaticClass = controller.isStaticMethod() || classNode.isStaticClass();
 
@@ -211,7 +211,9 @@ public class ClosureWriter {
         if (parameters.length > 1
                 || (parameters.length == 1
                 && parameters[0].getType() != null
-                && parameters[0].getType() != ClassHelper.OBJECT_TYPE)) {
+                && parameters[0].getType() != ClassHelper.OBJECT_TYPE
+                && !ClassHelper.OBJECT_TYPE.equals(parameters[0].getType().getComponentType())))
+        {
 
             // let's add a typesafe call method
             MethodNode call = answer.addMethod(

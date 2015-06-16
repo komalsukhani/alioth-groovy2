@@ -1,5 +1,19 @@
+/*
+ * Copyright 2003-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package groovy.json
-
 
 /**
  * Created by Richard on 2/2/14.
@@ -11,27 +25,26 @@ class JsonSlurperLaxTest extends JsonSlurperTest {
     }
 
     void testNullEmptyMalformedPayloads() {
-        shouldFail(IllegalArgumentException) { parser.parseText(null)   }
-        shouldFail(IllegalArgumentException) { parser.parseText("")     }
+        shouldFail(IllegalArgumentException) { parser.parseText(null) }
+        shouldFail(IllegalArgumentException) { parser.parseText("") }
 
-        shouldFail(JsonException) { parser.parseText("[")           }
-        shouldFail(JsonException) { parser.parseText('{"')          }
-        shouldFail(JsonException) { parser.parseText("[a")           }
-        shouldFail(JsonException) { parser.parseText('{a"')          }
-        shouldFail(JsonException) { parser.parseText("[\"a\"")           }
-        shouldFail(JsonException) { parser.parseText('{"a"')          }
-
+        shouldFail(JsonException) { parser.parseText("[") }
+        shouldFail(JsonException) { parser.parseText('{"') }
+        shouldFail(JsonException) { parser.parseText("[a") }
+        shouldFail(JsonException) { parser.parseText('{a"') }
+        shouldFail(JsonException) { parser.parseText("[\"a\"") }
+        shouldFail(JsonException) { parser.parseText('{"a"') }
     }
 
     void testObjectWithSimpleValues() {
         assert parser.parseText('{"a": 1, "b" : true , "c":false, "d": null}') == [a: 1, b: true, c: false, d: null]
 
-         parser.parseText('{true}')
-         shouldFail { parser.parseText('{"a"}') }
-         parser.parseText('{"a":true')
-         parser.parseText('{"a":}')
-         shouldFail {parser.parseText('{"a":"b":"c"}') }
-         parser.parseText('{:true}')
+        parser.parseText('{true}')
+        shouldFail { parser.parseText('{"a"}') }
+        parser.parseText('{"a":true')
+        parser.parseText('{"a":}')
+        shouldFail {parser.parseText('{"a":"b":"c"}') }
+        parser.parseText('{:true}')
     }
 
     void testArrayOfArrayWithSimpleValues() {
@@ -69,9 +82,7 @@ class JsonSlurperLaxTest extends JsonSlurperTest {
     }
 
     void testLaxCommentsAndKeys() {
-
         String jsonString = """
-
             {
             foo:bar,    //look mom no quotes
             'foo1': 'bar1',  //I can do single quotes if I want to
@@ -84,11 +95,18 @@ class JsonSlurperLaxTest extends JsonSlurperTest {
             flag2 : false,
             strings : [we, are, string, here, us, roar],
             he said : '"fire all your guns at once baby, and explode into the night"',
+            "going deeper" : [
+                "nestedArrays", // needs comments
+                "anotherThing" // commented
+                // only one comment
+                ,
+                "a last thing" // explain that too
+            ],
             the : end
             }
         """
 
-        Map <String, Object> map = parser.parseText(jsonString)
+        Map<String, Object> map = parser.parseText(jsonString)
         assert map.foo == "bar"
         assert map.foo1 == "bar1"
         assert map.foo2 == "bar2"

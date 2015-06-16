@@ -57,7 +57,6 @@ public class JsonFastParser extends JsonParserCharArray {
     }
 
     protected final Value decodeJsonObjectLazyFinalParse() {
-
         char[] array = charArray;
 
         if (__currentChar == '{')
@@ -102,7 +101,6 @@ public class JsonFastParser extends JsonParserCharArray {
 
                     complain(
                             "expecting '}' or ',' but got current char " + charDescription(__currentChar));
-
             }
         }
         return value;
@@ -113,11 +111,9 @@ public class JsonFastParser extends JsonParserCharArray {
     }
 
     private Value decodeValueOverlay() {
-
         skipWhiteSpace();
 
         switch (__currentChar) {
-
             case '"':
                 return decodeStringOverlay();
 
@@ -159,13 +155,13 @@ public class JsonFastParser extends JsonParserCharArray {
     }
 
     private final Value decodeNumberOverlay(final boolean minus) {
-
         char[] array = charArray;
 
         final int startIndex = __index;
         int index = __index;
         char currentChar;
         boolean doubleFloat = false;
+        boolean foundDot = false;
 
         if (minus && index + 1 < array.length) {
             index++;
@@ -179,6 +175,12 @@ public class JsonFastParser extends JsonParserCharArray {
                 break;
             } else if (isDelimiter(currentChar)) {
                 break;
+            } else if (currentChar == '.') {
+                if (foundDot) {
+                    complain("unexpected character " + currentChar);
+                }
+                foundDot = true;
+                doubleFloat = true;
             } else if (isDecimalChar(currentChar)) {
                 doubleFloat = true;
             }
@@ -197,7 +199,6 @@ public class JsonFastParser extends JsonParserCharArray {
     }
 
     private Value decodeStringOverlay() {
-
         char[] array = charArray;
         int index = __index;
         char currentChar = charArray[index];
@@ -226,7 +227,6 @@ public class JsonFastParser extends JsonParserCharArray {
     }
 
     private Value decodeJsonArrayOverlay() {
-
         char[] array = charArray;
         if (__currentChar == '[') {
             __index++;

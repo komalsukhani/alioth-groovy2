@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,11 @@
 package groovy.beans
 
 import org.codehaus.groovy.control.CompilationFailedException
+
+import java.beans.PropertyChangeListener
+
+import static java.lang.reflect.Modifier.isPublic
+import static java.lang.reflect.Modifier.isSynthetic
 
 /**
  * @author Danno Ferrin (shemnon)
@@ -344,6 +349,13 @@ class BindableTest extends GroovyTestCase {
             assert sb.getPropertyChangeListeners("foo") == [listener]
             assert sb.propertyChangeListeners.size() == 1
         """
+    }
+
+    void testPropertyChangeMethodsNotSynthetic() {
+        def clazz = new GroovyClassLoader().parseClass('class MyBean { @groovy.beans.Bindable String dummy }', 'dummyName')
+        def modifiers = clazz.getMethod('addPropertyChangeListener', PropertyChangeListener).modifiers
+        assert isPublic(modifiers)
+        assert !isSynthetic(modifiers)
     }
 
     void testPropertyChangeMethodWithCompileStatic() {

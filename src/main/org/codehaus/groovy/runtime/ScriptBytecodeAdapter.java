@@ -45,14 +45,16 @@ public class ScriptBytecodeAdapter {
     //                   exception handling
     //  --------------------------------------------------------
     public static Throwable unwrap(GroovyRuntimeException gre) {
-        if (gre instanceof MissingPropertyExceptionNoStack) {
-            MissingPropertyExceptionNoStack noStack = (MissingPropertyExceptionNoStack) gre;
-            return new MissingPropertyException(noStack.getProperty(), noStack.getType());
-        }
+        if (gre.getCause()==null) {
+            if (gre instanceof MissingPropertyExceptionNoStack) {
+                MissingPropertyExceptionNoStack noStack = (MissingPropertyExceptionNoStack) gre;
+                return new MissingPropertyException(noStack.getProperty(), noStack.getType());
+            }
 
-        if (gre instanceof MissingMethodExceptionNoStack) {
-            MissingMethodExceptionNoStack noStack = (MissingMethodExceptionNoStack) gre;
-            return new MissingMethodException(noStack.getMethod(), noStack.getType(), noStack.getArguments(), noStack.isStatic());
+            if (gre instanceof MissingMethodExceptionNoStack) {
+                MissingMethodExceptionNoStack noStack = (MissingMethodExceptionNoStack) gre;
+                return new MissingMethodException(noStack.getMethod(), noStack.getType(), noStack.getArguments(), noStack.isStatic());
+            }
         }
 
         Throwable th = gre;
@@ -665,6 +667,18 @@ public class ScriptBytecodeAdapter {
     }
 
     public static boolean compareEqual(Object left, Object right) {
+        if (left==right) return true;
+        Class<?> leftClass = left==null?null:left.getClass();
+        Class<?> rightClass = right==null?null:right.getClass();
+        if (leftClass ==Integer.class && rightClass==Integer.class) {
+            return left.equals(right);
+        }
+        if (leftClass ==Double.class && rightClass==Double.class) {
+            return left.equals(right);
+        }
+        if (leftClass ==Long.class && rightClass==Long.class) {
+            return left.equals(right);
+        }
         return DefaultTypeTransformation.compareEqual(left, right);
     }
 
@@ -682,18 +696,62 @@ public class ScriptBytecodeAdapter {
     }
 
     public static boolean compareLessThan(Object left, Object right) {
+        Class<?> leftClass = left==null?null:left.getClass();
+        Class<?> rightClass = right==null?null:right.getClass();
+        if (leftClass ==Integer.class && rightClass==Integer.class) {
+            return (Integer) left < (Integer) right;
+        }
+        if (leftClass ==Double.class && rightClass==Double.class) {
+            return (Double) left < (Double) right;
+        }
+        if (leftClass ==Long.class && rightClass==Long.class) {
+            return (Long) left < (Long) right;
+        }
         return compareTo(left, right).intValue() < 0;
     }
 
     public static boolean compareLessThanEqual(Object left, Object right) {
+        Class<?> leftClass = left==null?null:left.getClass();
+        Class<?> rightClass = right==null?null:right.getClass();
+        if (leftClass ==Integer.class && rightClass==Integer.class) {
+            return (Integer) left <= (Integer) right;
+        }
+        if (leftClass ==Double.class && rightClass==Double.class) {
+            return (Double) left <= (Double) right;
+        }
+        if (leftClass ==Long.class && rightClass==Long.class) {
+            return (Long) left <= (Long) right;
+        }
         return compareTo(left, right).intValue() <= 0;
     }
 
     public static boolean compareGreaterThan(Object left, Object right) {
+        Class<?> leftClass = left==null?null:left.getClass();
+        Class<?> rightClass = right==null?null:right.getClass();
+        if (leftClass ==Integer.class && rightClass==Integer.class) {
+            return (Integer) left > (Integer) right;
+        }
+        if (leftClass ==Double.class && rightClass==Double.class) {
+            return (Double) left > (Double) right;
+        }
+        if (leftClass ==Long.class && rightClass==Long.class) {
+            return (Long) left > (Long) right;
+        }
         return compareTo(left, right).intValue() > 0;
     }
 
     public static boolean compareGreaterThanEqual(Object left, Object right) {
+        Class<?> leftClass = left==null?null:left.getClass();
+        Class<?> rightClass = right==null?null:right.getClass();
+        if (leftClass ==Integer.class && rightClass==Integer.class) {
+            return (Integer) left >= (Integer) right;
+        }
+        if (leftClass ==Double.class && rightClass==Double.class) {
+            return (Double) left >= (Double) right;
+        }
+        if (leftClass ==Long.class && rightClass==Long.class) {
+            return (Long) left >= (Long) right;
+        }
         return compareTo(left, right).intValue() >= 0;
     }
 

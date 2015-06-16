@@ -1,3 +1,6 @@
+import groovy.text.markup.MarkupTemplateEngine
+import groovy.text.markup.TemplateConfiguration
+
 /*
  * Copyright 2003-2014 the original author or authors.
  *
@@ -15,31 +18,98 @@
  */
 
 allprojects {
-    apply plugin: 'cobertura'
+    //apply plugin: "com.github.hierynomus.license"
     apply plugin: 'checkstyle'
     apply plugin: 'codenarc'
-    cobertura {
-        coverageFormats = ['xml', 'html']
-        coverageReportDir = file("$buildDir/reports/cobertura")
-    }
+
+//    license {
+//        header rootProject.file('gradle/LICENSE.txt')
+//        include "**/*.groovy"
+//        include "**/*.java"
+//        include "**/*.properties"
+//        include "**/*.js"
+//        include "**/*.css"
+//        include "**/*.html"
+//        exclude "org/codehaus/groovy/antlr/**"
+//        exclude 'reloading/**' // test resources for documentation of reloading
+//        exclude 'includes/**'
+//        dryRun = true
+//        ignoreFailures = true
+//        skipExistingHeaders = true
+//        ext.year = Calendar.instance.get(Calendar.YEAR)
+//    }
 
     // don't fail build on CodeNarc tasks
     tasks.withType(CodeNarc) {
         ignoreFailures = true
         configFile = file("$rootProject.projectDir/config/codenarc/codenarc.groovy")
+        codenarcClasspath = rootProject.sourceSets.main.output +
+                project(':groovy-templates').sourceSets.main.output +
+                project(':groovy-xml').sourceSets.main.output +
+                configurations.compile +
+                files(configurations.codenarc.findAll { !(it.name =~ /groovy|junit/)})
     }
+
     tasks.withType(Checkstyle) {
+        showViolations = false
         ignoreFailures = true
         configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
         configProperties = ['rootProject.projectDir': rootProject.projectDir]
+        def reportFile = file("${buildDir}/reports/checkstyle/${name}.xml")
+        reports {
+            include ( '**/*.java')
+            xml {
+                destination reportFile
+            }
+        }
+        task("${name}Report") {
+            def configDir = file("$rootProject.projectDir/config/checkstyle")
+            def templateFile = 'checkstyle-report.groovy'
+            def htmlReportFile = file("${buildDir}/reports/checkstyle/${name}.html")
+            inputs.file file("$configDir/$templateFile")
+            inputs.file reportFile
+            outputs.file htmlReportFile
+
+            doLast {
+                if (reportFile.exists()) {
+                    def templateConfiguration = new TemplateConfiguration()
+                    templateConfiguration.with {
+                        autoIndent = true
+                        autoNewLine = true
+                    }
+                    def engine = new MarkupTemplateEngine(this.class.classLoader, configDir, templateConfiguration)
+                    def xml = new XmlSlurper().parse(reportFile.newReader('utf-8'))
+                    def files = []
+                    xml.file.each { f ->
+                        if (f.error.size()) {
+                            files << [
+                                    name: f.@name.toString(),
+                                    errors: f.error.collect { e ->
+                                        def rule = e.@source.toString()
+                                        rule = rule.substring(rule.lastIndexOf('.')+1)
+                                        [line: e.@line.toString(),
+                                         column: e.@column.toString(),
+                                         message: e.@message.toString(),
+                                         source: rule,
+                                         severity: e.@severity.toString()]
+                                    }]
+                        }
+                    }
+                    def model = [
+                            project: project,
+                            files: files
+                    ]
+                    htmlReportFile.withWriter('utf-8') { wrt ->
+                        engine.createTemplateByPath('checkstyle-report.groovy').make(model).writeTo(wrt)
+                    }
+                }
+            }
+        }
+        finalizedBy "${name}Report"
     }
 
 }
 
-// suppress CheckStyle/CodeNarc
-task checkstyleExamples(overwrite: true) << {}
-task checkstyleMain(overwrite: true) << {}
-task checkstyleTest(overwrite: true) << {}
-task checkstyleTools(overwrite: true) << {}
-task codenarcExamples(overwrite: true) << {}
-
+apply from: 'gradle/jacoco/jacoco.gradle'
+// Temporarily disabled because of conflict
+//apply from: 'gradle/binarycompatibility.gradle'

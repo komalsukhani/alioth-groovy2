@@ -52,6 +52,7 @@ import org.codehaus.groovy.ast.stmt.SynchronizedStatement;
 import org.codehaus.groovy.ast.stmt.ThrowStatement;
 import org.codehaus.groovy.ast.stmt.TryCatchStatement;
 import org.codehaus.groovy.ast.stmt.WhileStatement;
+import org.codehaus.groovy.ast.tools.WideningCategories;
 import org.codehaus.groovy.classgen.asm.BytecodeHelper;
 import org.codehaus.groovy.classgen.asm.BytecodeVariable;
 import org.codehaus.groovy.classgen.asm.MethodCaller;
@@ -229,7 +230,11 @@ public class AsmClassGenerator extends ClassGenerator {
                 createInterfaceSyntheticStaticFields();
             } else {
                 super.visitClass(classNode);
-                MopWriter mopWriter = new MopWriter(controller);
+                MopWriter.Factory mopWriterFactory = classNode.getNodeMetaData(MopWriter.Factory.class);
+                if (mopWriterFactory==null) {
+                    mopWriterFactory = MopWriter.FACTORY;
+                }
+                MopWriter mopWriter = mopWriterFactory.create(controller);
                 mopWriter.createMopMethods();
                 controller.getCallSiteWriter().generateCallSiteArray();
                 createSyntheticStaticFields();
@@ -272,6 +277,10 @@ public class AsmClassGenerator extends ClassGenerator {
         int mods = adjustedClassModifiersForInnerClassTable(cn);
 
 
+        if (Modifier.isPrivate(mods)) {
+            mods = mods ^ Modifier.PRIVATE;
+            innerClass.setModifiers(mods);
+        }
         cv.visitInnerClass(
                 innerClassInternalName,
                 outerClassName,
@@ -654,7 +663,7 @@ public class AsmClassGenerator extends ClassGenerator {
         if (isInnerClass()) {
             visitFieldExpression(new FieldExpression(controller.getClassNode().getDeclaredField("owner")));
         } else {
-            loadThis();
+            loadThis(null);
         }
     }
 
@@ -715,13 +724,20 @@ public class AsmClassGenerator extends ClassGenerator {
         ClassNode type = castExpression.getType();
         Expression subExpression = castExpression.getExpression();
         subExpression.visit(this);
+        if (ClassHelper.OBJECT_TYPE.equals(type)) return;
         if (castExpression.isCoerce()) {
             controller.getOperandStack().doAsType(type);
         } else {
             if (isNullConstant(subExpression) && !ClassHelper.isPrimitiveType(type)) {
                 controller.getOperandStack().replace(type);
             } else {
-                controller.getOperandStack().doGroovyCast(type);
+                ClassNode subExprType = controller.getTypeChooser().resolveType(subExpression, controller.getClassNode());
+                if (!ClassHelper.isPrimitiveType(type) && WideningCategories.implementsInterfaceOrSubclassOf(subExprType, type)) {
+                    BytecodeHelper.doCast(controller.getMethodVisitor(), type);
+                    controller.getOperandStack().replace(type);
+                } else {
+                    controller.getOperandStack().doGroovyCast(type);
+                }
             }
         }
     }
@@ -891,7 +907,7 @@ public class AsmClassGenerator extends ClassGenerator {
             if (isSuperExpression(objectExpression)) {
                 String prefix;
                 if (controller.getCompileStack().isLHS()) {
-                    prefix = "set";
+                    throw new GroovyBugError("Unexpected super property set for:"+expression.getText());
                 } else {
                     prefix = "get";
                 }
@@ -1162,7 +1178,7 @@ public class AsmClassGenerator extends ClassGenerator {
                 if (controller.isInClosure()) classNode = controller.getOutermostClass();
                 visitClassExpression(new ClassExpression(classNode));
             } else {
-                loadThis();
+                loadThis(expression);
             }
             return;
         }
@@ -1172,7 +1188,7 @@ public class AsmClassGenerator extends ClassGenerator {
             if (controller.isStaticMethod()) {
                 visitClassExpression(new ClassExpression(classNode.getSuperClass()));
             } else {
-                loadThis();
+                loadThis(expression);
             }
             return;
         }
@@ -1186,13 +1202,18 @@ public class AsmClassGenerator extends ClassGenerator {
         if (!controller.getCompileStack().isLHS()) controller.getAssertionWriter().record(expression);
     }
 
-    private void loadThis() {
+    private void loadThis(VariableExpression thisExpression) {
         MethodVisitor mv = controller.getMethodVisitor();
         mv.visitVarInsn(ALOAD, 0);
         if (controller.isInClosure() && !controller.getCompileStack().isImplicitThis()) {
             mv.visitMethodInsn(INVOKEVIRTUAL, "groovy/lang/Closure", "getThisObject", "()Ljava/lang/Object;", false);
-            controller.getOperandStack().push(ClassHelper.OBJECT_TYPE);
-//            controller.getOperandStack().push(controller.getClassNode().getOuterClass());
+            ClassNode expectedType = thisExpression!=null?controller.getTypeChooser().resolveType(thisExpression, controller.getOutermostClass()):null;
+            if (!ClassHelper.OBJECT_TYPE.equals(expectedType) && !ClassHelper.isPrimitiveType(expectedType)) {
+                BytecodeHelper.doCast(mv, expectedType);
+                controller.getOperandStack().push(expectedType);
+            } else {
+                controller.getOperandStack().push(ClassHelper.OBJECT_TYPE);
+            }
         } else {
             controller.getOperandStack().push(controller.getClassNode());
         }
@@ -1211,7 +1232,7 @@ public class AsmClassGenerator extends ClassGenerator {
 
             mv.visitMethodInsn(INVOKESPECIAL, "org/codehaus/groovy/runtime/ScriptReference", "<init>", "(Lgroovy/lang/Script;Ljava/lang/String;)V", false);
         } else {
-            PropertyExpression pexp = new PropertyExpression(VariableExpression.THIS_EXPRESSION, name);
+            PropertyExpression pexp = new PropertyExpression(new VariableExpression("this"), name);
             pexp.setImplicitThis(true);
             visitPropertyExpression(pexp);
         }
@@ -1239,6 +1260,9 @@ public class AsmClassGenerator extends ClassGenerator {
     }
 
     protected void createSyntheticStaticFields() {
+        if (referencedClasses.isEmpty()) {
+            return;
+        }
         MethodVisitor mv;
         for (String staticFieldName : referencedClasses.keySet()) {
             // generate a field node
@@ -1721,10 +1745,8 @@ public class AsmClassGenerator extends ClassGenerator {
                 List<String> methods = new ArrayList();
                 MethodVisitor oldMv = mv;
                 int index = 0;
-                int methodIndex = 0;
                 while (index<size) {
-                    methodIndex++;
-                    String methodName = "$createListEntry_" + methodIndex;
+                    String methodName = "$createListEntry_" + controller.getNextHelperMethodIndex();
                     methods.add(methodName);
                     mv = controller.getClassVisitor().visitMethod(
                             ACC_PRIVATE+ACC_STATIC+ACC_SYNTHETIC,

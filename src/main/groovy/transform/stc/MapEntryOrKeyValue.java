@@ -47,7 +47,7 @@ import java.util.Map;
  *     <li><i>index=true or false</i>, by default false. If true, then an additional "int" parameter is added,
  *     for "withIndex" variants</li>
  * </ul>
- * <code>void doSomething(String str, Map&lt;K,&gt;V map, @ClosureParams(value=MapEntryOrKeyValue.class,options="1") Closure c) { ... }</code>
+ * <code>void doSomething(String str, Map&lt;K,&gt;V map, @ClosureParams(value=MapEntryOrKeyValue.class,options="argNum=1") Closure c) { ... }</code>
  */
 public class MapEntryOrKeyValue extends ClosureSignatureHint {
     private static final ClassNode MAPENTRY_TYPE = ClassHelper.make(Map.Entry.class);
@@ -101,7 +101,7 @@ public class MapEntryOrKeyValue extends ClosureSignatureHint {
                     String key = keyValue[0];
                     String value = keyValue[1];
                     if ("argNum".equals(key)) {
-                        pIndex = Integer.valueOf(value);
+                        pIndex = Integer.parseInt(value);
                     } else if ("index".equals(key)) {
                         generateIndex = Boolean.valueOf(value);
                     } else {

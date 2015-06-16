@@ -1,5 +1,7 @@
 dependencies {
     compile rootProject
-    compile 'junit:junit:4.11'
+    compile 'junit:junit:4.12'
     testRuntime project(':groovy-ant')
 }
+
+apply from: "${rootProject.projectDir}/gradle/jacoco/jacocofix.gradle"

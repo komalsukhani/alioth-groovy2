@@ -32,6 +32,7 @@ import org.codehaus.groovy.runtime.m12n.ExtensionModuleScanner;
 import org.codehaus.groovy.runtime.m12n.MetaInfExtensionModule;
 import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl;
 import org.codehaus.groovy.tools.GroovyClass;
+import org.codehaus.groovy.transform.trait.Traits;
 import org.objectweb.asm.Opcodes;
 
 import java.lang.ref.WeakReference;
@@ -379,7 +380,7 @@ public abstract class StaticTypeCheckingSupport {
         return false;
     }
 
-    static boolean isCompareToBoolean(int op) {
+    public static boolean isCompareToBoolean(int op) {
         return op == COMPARE_GREATER_THAN ||
                 op == COMPARE_GREATER_THAN_EQUAL ||
                 op == COMPARE_LESS_THAN ||
@@ -558,7 +559,7 @@ public abstract class StaticTypeCheckingSupport {
         if (leftRedirect==rightRedirect) return true;
 
         if (leftRedirect.isArray() && rightRedirect.isArray()) {
-            return checkCompatibleAssignmentTypes(leftRedirect.getComponentType(), rightRedirect.getComponentType(), rightExpression, allowConstructorCoercion);
+            return checkCompatibleAssignmentTypes(leftRedirect.getComponentType(), rightRedirect.getComponentType(), rightExpression, false);
         }
 
         if (right==VOID_TYPE||right==void_WRAPPER_TYPE) {
@@ -608,11 +609,7 @@ public abstract class StaticTypeCheckingSupport {
 
         // if right is array, map or collection we try invoking the
         // constructor
-        if (allowConstructorCoercion && (rightRedirect.implementsInterface(MAP_TYPE) ||
-                rightRedirect.implementsInterface(Collection_TYPE) ||
-                rightRedirect.equals(MAP_TYPE) ||
-                rightRedirect.equals(Collection_TYPE) ||
-                rightRedirect.isArray())) {
+        if (allowConstructorCoercion && isGroovyConstructorCompatible(rightExpression)) {
             //TODO: in case of the array we could maybe make a partial check
             if (leftRedirect.isArray() && rightRedirect.isArray()) {
                 return checkCompatibleAssignmentTypes(leftRedirect.getComponentType(), rightRedirect.getComponentType());
@@ -638,7 +635,24 @@ public abstract class StaticTypeCheckingSupport {
             return true;
         }
 
-        return false;
+        if (left.isGenericsPlaceHolder()) {
+            // GROOVY-7307
+            GenericsType[] genericsTypes = left.getGenericsTypes();
+            if (genericsTypes!=null && genericsTypes.length==1) {
+                // should always be the case, but safe guard is better
+                return genericsTypes[0].isCompatibleWith(right);
+            }
+        }
+
+        // GROOVY-7316 : it is an apparently legal thing to allow this. It's not type safe,
+        // but it is allowed...
+        return right.isGenericsPlaceHolder();
+    }
+
+    private static boolean isGroovyConstructorCompatible(final Expression rightExpression) {
+        return rightExpression instanceof ListExpression
+                || rightExpression instanceof MapExpression
+                || rightExpression instanceof ArrayExpression;
     }
 
     /**
@@ -727,7 +741,7 @@ public abstract class StaticTypeCheckingSupport {
                     return false; // no possible loose here
             }
         }
-        return true; // possible loose of precision
+        return true; // possible loss of precision
     }
 
     static String toMethodParametersString(String methodName, ClassNode... parameters) {
@@ -1465,7 +1479,11 @@ public abstract class StaticTypeCheckingSupport {
             compareNode = getCombinedBoundType(resolved);
             compareNode = compareNode.redirect().getPlainNodeReference();
         } else {
-            compareNode = resolved.getType().getPlainNodeReference();
+            if (!resolved.isPlaceholder()) {
+                compareNode = resolved.getType().getPlainNodeReference();
+            } else {
+                return true;
+            }
         }
         return gt.isCompatibleWith(compareNode);
     }
@@ -1881,9 +1899,15 @@ public abstract class StaticTypeCheckingSupport {
             Collections.addAll(instanceExtClasses, DefaultGroovyMethods.additionals);
             staticExtClasses.add(DefaultGroovyStaticMethods.class);
             instanceExtClasses.add(ObjectArrayStaticTypesHelper.class);
-            List<Class> allClasses = new ArrayList<Class>(instanceExtClasses.size()+staticExtClasses.size());
-            allClasses.addAll(instanceExtClasses);
-            allClasses.addAll(staticExtClasses);
+
+            scanClassesForDGMMethods(methods, staticExtClasses, true);
+            scanClassesForDGMMethods(methods, instanceExtClasses, false);
+            
+            return methods;
+        }
+
+        private static void scanClassesForDGMMethods(Map<String, List<MethodNode>> accumulator,
+                                                    Iterable<Class> allClasses, boolean isStatic) {
             for (Class dgmLikeClass : allClasses) {
                 ClassNode cn = ClassHelper.makeWithoutCaching(dgmLikeClass, true);
                 for (MethodNode metaMethod : cn.getMethods()) {
@@ -1899,22 +1923,21 @@ public abstract class StaticTypeCheckingSupport {
                                 metaMethod.getReturnType(),
                                 parameters,
                                 ClassNode.EMPTY_ARRAY, null,
-                                staticExtClasses.contains(dgmLikeClass));
+                                isStatic);
                         node.setGenericsTypes(metaMethod.getGenericsTypes());
                         ClassNode declaringClass = types[0].getType();
                         String declaringClassName = declaringClass.getName();
                         node.setDeclaringClass(declaringClass);
 
-                        List<MethodNode> nodes = methods.get(declaringClassName);
+                        List<MethodNode> nodes = accumulator.get(declaringClassName);
                         if (nodes == null) {
                             nodes = new LinkedList<MethodNode>();
-                            methods.put(declaringClassName, nodes);
+                            accumulator.put(declaringClassName, nodes);
                         }
                         nodes.add(node);
                     }
                 }
             }
-            return methods;
         }
 
     }
@@ -2048,5 +2071,39 @@ public abstract class StaticTypeCheckingSupport {
                 && genericsTypes!=null
                 && !genericsTypes[0].isPlaceholder()
                 && !genericsTypes[0].isWildcard();
+    }
+
+    public static List<MethodNode> findSetters(ClassNode cn, String setterName, boolean voidOnly) {
+        List<MethodNode> result = null;
+        for (MethodNode method : cn.getDeclaredMethods(setterName)) {
+            if (setterName.equals(method.getName())
+                    && (!voidOnly || ClassHelper.VOID_TYPE==method.getReturnType())
+                    && method.getParameters().length == 1) {
+                if (result==null) {
+                    result = new LinkedList<MethodNode>();
+                }
+                result.add(method);
+            }
+        }
+        if (result==null) {
+            ClassNode parent = cn.getSuperClass();
+            if (parent != null) {
+                return findSetters(parent, setterName, voidOnly);
+            }
+            return Collections.emptyList();
+        }
+        return result;
+    }
+
+    public static ClassNode isTraitSelf(VariableExpression vexp) {
+        if (Traits.THIS_OBJECT.equals(vexp.getName())) {
+            Variable accessedVariable = vexp.getAccessedVariable();
+            ClassNode type = accessedVariable!=null?accessedVariable.getType():null;
+            if (accessedVariable instanceof Parameter
+                    && Traits.isTrait(type)) {
+                return type;
+            }
+        }
+        return null;
     }
 }

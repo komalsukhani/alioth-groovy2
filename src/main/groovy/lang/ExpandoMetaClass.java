@@ -52,6 +52,7 @@ import org.codehaus.groovy.runtime.metaclass.MixinInstanceMetaMethod;
 import org.codehaus.groovy.runtime.metaclass.OwnedMetaClass;
 import org.codehaus.groovy.runtime.metaclass.ThreadManagedMetaBeanProperty;
 import org.codehaus.groovy.util.FastArray;
+import org.objectweb.asm.Opcodes;
 
 /**
  * ExpandoMetaClass is a MetaClass that behaves like an Expando, allowing the addition or replacement
@@ -253,6 +254,7 @@ import org.codehaus.groovy.util.FastArray;
  */
 public class ExpandoMetaClass extends MetaClassImpl implements GroovyObject {
 
+    private static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
     private static final String META_CLASS = "metaClass";
     private static final String CLASS = "class";
     private static final String META_METHODS = "metaMethods";
@@ -280,16 +282,16 @@ public class ExpandoMetaClass extends MetaClassImpl implements GroovyObject {
     public boolean inRegistry;
     
     private final Set<MetaMethod> inheritedMetaMethods = new HashSet<MetaMethod>();
-    private final Map<String, MetaProperty> beanPropertyCache = new ConcurrentHashMap<String, MetaProperty>();
-    private final Map<String, MetaProperty> staticBeanPropertyCache = new ConcurrentHashMap<String, MetaProperty>();
-    private final Map<MethodKey, MetaMethod> expandoMethods = new ConcurrentHashMap<MethodKey, MetaMethod>();
+    private final Map<String, MetaProperty> beanPropertyCache = new ConcurrentHashMap<String, MetaProperty>(16, 0.75f, 1);
+    private final Map<String, MetaProperty> staticBeanPropertyCache = new ConcurrentHashMap<String, MetaProperty>(16, 0.75f, 1);
+    private final Map<MethodKey, MetaMethod> expandoMethods = new ConcurrentHashMap<MethodKey, MetaMethod>(16, 0.75f, 1);
 
     public Collection getExpandoSubclassMethods() {
         return expandoSubclassMethods.values();
     }
 
-    private final ConcurrentHashMap expandoSubclassMethods = new ConcurrentHashMap();
-    private final Map<String, MetaProperty> expandoProperties = new ConcurrentHashMap<String, MetaProperty>();
+    private final ConcurrentHashMap expandoSubclassMethods = new ConcurrentHashMap(16, 0.75f, 1);
+    private final Map<String, MetaProperty> expandoProperties = new ConcurrentHashMap<String, MetaProperty>(16, 0.75f, 1);
     private ClosureStaticMetaMethod invokeStaticMethodMethod;
     private final Set<MixinInMetaClass> mixinClasses = new LinkedHashSet<MixinInMetaClass>();
 
@@ -365,11 +367,11 @@ public class ExpandoMetaClass extends MetaClassImpl implements GroovyObject {
                 MetaMethod method = new MixinInstanceMetaMethod(metaMethod, mixin);
 
                 if (method.getParameterTypes().length == 1 && !method.getParameterTypes()[0].isPrimitive) {
-                    MetaMethod noParam = pickMethod(methodName, new Class[0]);
+                    MetaMethod noParam = pickMethod(methodName, EMPTY_CLASS_ARRAY);
                     // if the current call itself is with empty arg class array, no need to recurse with 'new Class[0]'
                     if (noParam == null && arguments.length != 0) {
                         try {
-                            findMixinMethod(methodName, new Class[0]);
+                            findMixinMethod(methodName, EMPTY_CLASS_ARRAY);
                         } catch (MethodSelectionException msex) {
                             /*
                              * Here we just additionally tried to find another no-arg mixin method of the same name and register that as well, if found.
@@ -950,6 +952,15 @@ public class ExpandoMetaClass extends MetaClassImpl implements GroovyObject {
     private void registerBeanPropertyForMethod(MetaMethod metaMethod, String propertyName, boolean getter, boolean isStatic) {
         Map<String, MetaProperty> propertyCache = isStatic ? staticBeanPropertyCache : beanPropertyCache;
         MetaBeanProperty beanProperty = (MetaBeanProperty) propertyCache.get(propertyName);
+        if (beanProperty==null) {
+            MetaProperty metaProperty = super.getMetaProperty(propertyName);
+            if (metaProperty instanceof MetaBeanProperty) {
+                boolean staticProp = Modifier.isStatic(metaProperty.getModifiers());
+                if (isStatic==staticProp) {
+                    beanProperty = (MetaBeanProperty) metaProperty;
+                }
+            }
+        }
         if (beanProperty == null) {
             if (getter)
                 beanProperty = new MetaBeanProperty(propertyName, Object.class, metaMethod, null);

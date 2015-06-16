@@ -177,4 +177,52 @@ import groovy.transform.TypeCheckingMode//import org.codehaus.groovy.classgen.as
         ''', 'Cannot call private constructor'
     }
 
+    // GROOVY-7063
+    void testCallToProtectedMethodFromClosureInSubclassAndDifferentPackage() {
+        assertScript ''' import org.codehaus.groovy.classgen.asm.sc.MethodCallsStaticCompilationTest.Base
+
+        class Ext extends Base {
+
+            int doSomething() {
+                def c = {
+                    foo()
+                }
+                c.call()
+            }
+        }
+        def ext = new Ext()
+        assert ext.doSomething() == 123
+        '''
+    }
+
+    // GROOVY-7264
+    void testCallProtectedMethodWithGenericTypes() {
+        assertScript '''
+            import org.codehaus.groovy.classgen.asm.sc.MethodCallsStaticCompilationTest.BaseGeneric
+
+            class Ext extends BaseGeneric<Integer> {
+
+                int doSomething() {
+                    def c = {
+                        foo(123)
+                    }
+                    c.call()?1:0
+                }
+            }
+            def ext = new Ext()
+            assert ext.doSomething() == 1
+        '''
+    }
+
+    public static class Base {
+        protected int foo() {
+            123
+        }
+    }
+
+    public static class BaseGeneric<T> {
+        protected boolean foo(T t) {
+            true
+        }
+    }
 }

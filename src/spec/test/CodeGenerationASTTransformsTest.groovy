@@ -128,6 +128,27 @@ assert p.toString() == 'Person(Jack, Nicholson, Id(1))'
         assertScript '''
 import groovy.transform.ToString
 
+// tag::tostring_example_includeSuperProperties[]
+
+class Person {
+    String name
+}
+
+@ToString(includeSuperProperties = true, includeNames = true)
+class BandMember extends Person {
+    String bandName
+}
+
+def bono = new BandMember(name:'Bono', bandName: 'U2').toString()
+
+assert bono.toString() == 'BandMember(bandName:U2, name:Bono)'
+// end::tostring_example_includeSuperProperties[]
+
+'''
+
+        assertScript '''
+import groovy.transform.ToString
+
 // tag::tostring_example_ignoreNulls[]
 @ToString(ignoreNulls=true)
 class Person {
@@ -445,7 +466,7 @@ assert p2.toString() == 'Jack Nicholson: Actor'
 '''
 
         assertScript '''
-// tag::tupleconstructor_example_includeSuperProperties[]
+// tag::tupleconstructor_example_callSuper[]
 import groovy.transform.TupleConstructor
 
 class Base {
@@ -473,7 +494,7 @@ assert p1.firstName == p2.firstName
 assert p1.lastName == p2.lastName
 assert p1.toString() == 'Jack Nicholson: null'
 assert p2.toString() == 'Jack Nicholson: actor'
-// end::tupleconstructor_example_includeSuperProperties[]
+// end::tupleconstructor_example_callSuper[]
 '''
     }
 
@@ -556,6 +577,42 @@ new CustomException(new RuntimeException())
 // Java 7 only
 // new CustomException("A custom message", new RuntimeException(), false, true)
 // end::inheritconstructors_simple[]
+'''
+        assertScript '''
+import groovy.transform.InheritConstructors
+import java.lang.annotation.*
+// tag::inheritconstructors_constructor_annotations[]
+@Retention(RetentionPolicy.RUNTIME)
+@Target([ElementType.CONSTRUCTOR])
+public @interface ConsAnno {}
+
+class Base {
+  @ConsAnno Base() {}
+}
+
+@InheritConstructors(constructorAnnotations=true)
+class Child extends Base {}
+
+assert Child.constructors[0].annotations[0].annotationType().name == 'ConsAnno'
+// end::inheritconstructors_constructor_annotations[]
+'''
+        assertScript '''
+import groovy.transform.InheritConstructors
+import java.lang.annotation.*
+// tag::inheritconstructors_parameter_annotations[]
+@Retention(RetentionPolicy.RUNTIME)
+@Target([ElementType.PARAMETER])
+public @interface ParamAnno {}
+
+class Base {
+  Base(@ParamAnno String name) {}
+}
+
+@InheritConstructors(parameterAnnotations=true)
+class Child extends Base {}
+
+assert Child.constructors[0].parameterAnnotations[0][0].annotationType().name == 'ParamAnno'
+// end::inheritconstructors_parameter_annotations[]
 '''
     }
 

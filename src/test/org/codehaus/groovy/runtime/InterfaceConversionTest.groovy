@@ -22,8 +22,8 @@ class InterfaceConversionTest extends GroovyTestCase {
         def c2 = c1 as InterfaceConversionTestFoo
         assert !(c1 instanceof InterfaceConversionTestFoo)
         assert c2 instanceof InterfaceConversionTestFoo
-        assert c2.a() == null
-        assert c2.b(null) == 1
+        assert c2.a() == 0
+        assert c2.b(null) == null
     }
 
     void testMapConversion() {
@@ -34,6 +34,20 @@ class InterfaceConversionTest extends GroovyTestCase {
         assert m2 instanceof InterfaceConversionTestFoo
         assert m2.a() == 1
         assert m2.b(null) == 2
+    }
+
+    //GROOVY-7104
+    void testDefaultInterfaceMethodCallOnProxy() {
+        try {
+            // checks for Java 8
+            Class.forName("java.util.function.Consumer", false, this.class.classLoader);
+        } catch (e) {
+            return
+        }
+        Comparator c1 = {a,b -> a<=>b}
+        assert c1.compare("a","b") == -1
+        def c2 = c1.reversed()
+        assert c2.compare("a","b") == 1
     }
 }
 

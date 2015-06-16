@@ -1,3 +1,18 @@
+/*
+ * Copyright 2003-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package groovy.xml
 
 /**
@@ -62,5 +77,44 @@ class NamespaceNodeTest extends TestXmlSupport {
 
         def attrNode = root[xsd.complexType][xsd.attribute]
         assert attrNode[0].@name == 'orderDate'
+    }
+
+    void testNodeBuilderWithImplicitNamespace() {
+        def n = new Namespace('http://foo/bar')
+        def builder = NamespaceBuilder.newInstance(new NodeBuilder(), n.uri)
+
+        def result = builder.outer(id: "3") {
+            'ns1:innerWithNewNamespace'('xmlns:ns1': "http://foo/other", someAttr: 'someValue') {
+                'ns1:nested'("foo")
+            }
+            innerWithoutNewNamespace("bar")
+        }
+        
+        def expected = """<?xml version="1.0" encoding="UTF-8"?>\
+<outer xmlns="http://foo/bar" id="3">
+  <ns1:innerWithNewNamespace xmlns:ns1="http://foo/other" someAttr="someValue">
+    <ns1:nested>foo</ns1:nested>
+  </ns1:innerWithNewNamespace>
+  <innerWithoutNewNamespace>bar</innerWithoutNewNamespace>
+</outer>
+""".replaceAll('[\r\n]','')
+        def actual = XmlUtil.serialize(result).replaceAll("[\r\n]", "")
+        assert actual == expected
+    }
+
+    void testNamespaceBuilderWithoutNamespace() {
+        def builder = NamespaceBuilder.newInstance(new NodeBuilder())
+        def result = builder.outer(id: "3") {
+            inner(name: "foo")
+            inner("bar")
+        }
+        def expected = """<?xml version="1.0" encoding="UTF-8"?>\
+<outer id="3">
+  <inner name="foo"/>
+  <inner>bar</inner>
+</outer>
+""".replaceAll('[\r\n]','')
+        def actual = XmlUtil.serialize(result).replaceAll("[\r\n]", "")
+        assert actual == expected
     }
 }

@@ -43,10 +43,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static groovy.transform.Undefined.isUndefined;
+
 public abstract class AbstractASTTransformation implements Opcodes, ASTTransformation {
     public static final ClassNode RETENTION_CLASSNODE = ClassHelper.makeWithoutCaching(Retention.class);
 
     protected SourceUnit sourceUnit;
+
+    /**
+     * Copies all <tt>candidateAnnotations</tt> with retention policy {@link java.lang.annotation.RetentionPolicy#RUNTIME}
+     * and {@link java.lang.annotation.RetentionPolicy#CLASS}.
+     * <p>
+     * Annotations with {@link org.codehaus.groovy.runtime.GeneratedClosure} members are not supported for now.
+     */
+    protected List<AnnotationNode> copyAnnotatedNodeAnnotations(final AnnotatedNode annotatedNode, String myTypeName) {
+        final ArrayList<AnnotationNode> copiedAnnotations = new ArrayList<AnnotationNode>();
+        final ArrayList<AnnotationNode> notCopied = new ArrayList<AnnotationNode>();
+        GeneralUtils.copyAnnotatedNodeAnnotations(annotatedNode, copiedAnnotations, notCopied);
+        for (AnnotationNode annotation : notCopied) {
+            addError(myTypeName + " does not support keeping Closure annotation members.", annotation);
+        }
+        return copiedAnnotations;
+    }
 
     protected void init(ASTNode[] nodes, SourceUnit sourceUnit) {
         if (nodes == null || nodes.length != 2 || !(nodes[0] instanceof AnnotationNode) || !(nodes[1] instanceof AnnotatedNode)) {
@@ -66,16 +84,17 @@ public abstract class AbstractASTTransformation implements Opcodes, ASTTransform
         return null;
     }
 
-    public String getMemberStringValue(AnnotationNode node, String name, String defaultValue) {
+    public static String getMemberStringValue(AnnotationNode node, String name, String defaultValue) {
         final Expression member = node.getMember(name);
         if (member != null && member instanceof ConstantExpression) {
             Object result = ((ConstantExpression) member).getValue();
+            if (result != null && result instanceof String && isUndefined((String) result)) result = null;
             if (result != null) return result.toString();
         }
         return defaultValue;
     }
 
-    public String getMemberStringValue(AnnotationNode node, String name) {
+    public static String getMemberStringValue(AnnotationNode node, String name) {
         return getMemberStringValue(node, name, null);
     }
 
@@ -94,9 +113,9 @@ public abstract class AbstractASTTransformation implements Opcodes, ASTTransform
     public ClassNode getMemberClassValue(AnnotationNode node, String name, ClassNode defaultValue) {
         final Expression member = node.getMember(name);
         if (member != null) {
-            if (member instanceof ClassExpression)
-                return member.getType();
-            if (member instanceof VariableExpression) {
+            if (member instanceof ClassExpression) {
+                if (!isUndefined(member.getType())) return member.getType();
+            } else if (member instanceof VariableExpression) {
                 addError("Error expecting to find class value for '" + name + "' but found variable: " + member.getText() + ". Missing import?", node);
                 return null;
             } else if (member instanceof ConstantExpression) {

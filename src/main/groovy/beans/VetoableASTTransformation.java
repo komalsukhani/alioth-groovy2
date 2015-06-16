@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -354,7 +354,7 @@ public class VetoableASTTransformation extends BindableASTTransformation {
         declaringClass.addMethod(
                 new MethodNode(
                         "addVetoableChangeListener",
-                        ACC_PUBLIC | ACC_SYNTHETIC,
+                        ACC_PUBLIC,
                         ClassHelper.VOID_TYPE,
                         params(param(vclClassNode, "listener")),
                         ClassNode.EMPTY_ARRAY,
@@ -367,7 +367,7 @@ public class VetoableASTTransformation extends BindableASTTransformation {
         declaringClass.addMethod(
                 new MethodNode(
                         "addVetoableChangeListener",
-                        ACC_PUBLIC | ACC_SYNTHETIC,
+                        ACC_PUBLIC,
                         ClassHelper.VOID_TYPE,
                         params(param(ClassHelper.STRING_TYPE, "name"), param(vclClassNode, "listener")),
                         ClassNode.EMPTY_ARRAY,
@@ -380,7 +380,7 @@ public class VetoableASTTransformation extends BindableASTTransformation {
         declaringClass.addMethod(
                 new MethodNode(
                         "removeVetoableChangeListener",
-                        ACC_PUBLIC | ACC_SYNTHETIC,
+                        ACC_PUBLIC,
                         ClassHelper.VOID_TYPE,
                         params(param(vclClassNode, "listener")),
                         ClassNode.EMPTY_ARRAY,
@@ -390,7 +390,7 @@ public class VetoableASTTransformation extends BindableASTTransformation {
         declaringClass.addMethod(
                 new MethodNode(
                         "removeVetoableChangeListener",
-                        ACC_PUBLIC | ACC_SYNTHETIC,
+                        ACC_PUBLIC,
                         ClassHelper.VOID_TYPE,
                         params(param(ClassHelper.STRING_TYPE, "name"), param(vclClassNode, "listener")),
                         ClassNode.EMPTY_ARRAY,
@@ -405,7 +405,7 @@ public class VetoableASTTransformation extends BindableASTTransformation {
         declaringClass.addMethod(
                 new MethodNode(
                         "fireVetoableChange",
-                        ACC_PUBLIC | ACC_SYNTHETIC,
+                        ACC_PUBLIC,
                         ClassHelper.VOID_TYPE,
                         params(param(ClassHelper.STRING_TYPE, "name"), param(ClassHelper.OBJECT_TYPE, "oldValue"), param(ClassHelper.OBJECT_TYPE, "newValue")),
                         new ClassNode[] {ClassHelper.make(PropertyVetoException.class)},
@@ -418,7 +418,7 @@ public class VetoableASTTransformation extends BindableASTTransformation {
         declaringClass.addMethod(
                 new MethodNode(
                         "getVetoableChangeListeners",
-                        ACC_PUBLIC | ACC_SYNTHETIC,
+                        ACC_PUBLIC,
                         vclClassNode.makeArray(),
                         Parameter.EMPTY_ARRAY,
                         ClassNode.EMPTY_ARRAY,
@@ -431,7 +431,7 @@ public class VetoableASTTransformation extends BindableASTTransformation {
         declaringClass.addMethod(
                 new MethodNode(
                         "getVetoableChangeListeners",
-                        ACC_PUBLIC | ACC_SYNTHETIC,
+                        ACC_PUBLIC,
                         vclClassNode.makeArray(),
                         params(param(ClassHelper.STRING_TYPE, "name")),
                         ClassNode.EMPTY_ARRAY,

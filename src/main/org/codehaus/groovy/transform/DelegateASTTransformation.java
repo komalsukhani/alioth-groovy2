@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,23 @@ package org.codehaus.groovy.transform;
 import groovy.lang.Delegate;
 import groovy.lang.GroovyObject;
 
+import groovy.lang.Lazy;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotatedNode;
 import org.codehaus.groovy.ast.AnnotationNode;
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.FieldNode;
+import org.codehaus.groovy.ast.GenericsType;
 import org.codehaus.groovy.ast.MethodNode;
 import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.PropertyNode;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
-import org.codehaus.groovy.ast.expr.ConstantExpression;
-import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
-import org.codehaus.groovy.ast.tools.GeneralUtils;
 import org.codehaus.groovy.ast.tools.GenericsUtils;
 import org.codehaus.groovy.classgen.Verifier;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
-import org.codehaus.groovy.runtime.GeneratedClosure;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -55,6 +53,7 @@ import static org.codehaus.groovy.ast.tools.GeneralUtils.propX;
 import static org.codehaus.groovy.ast.tools.GeneralUtils.returnS;
 import static org.codehaus.groovy.ast.tools.GeneralUtils.stmt;
 import static org.codehaus.groovy.ast.tools.GeneralUtils.varX;
+import static org.codehaus.groovy.ast.tools.GenericsUtils.addMethodGenerics;
 import static org.codehaus.groovy.ast.tools.GenericsUtils.correctToGenericsSpec;
 import static org.codehaus.groovy.ast.tools.GenericsUtils.correctToGenericsSpecRecurse;
 import static org.codehaus.groovy.ast.tools.GenericsUtils.createGenericsSpec;
@@ -76,6 +75,7 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
     private static final String MY_TYPE_NAME = "@" + MY_TYPE.getNameWithoutPackage();
     private static final ClassNode DEPRECATED_TYPE = make(Deprecated.class);
     private static final ClassNode GROOVYOBJECT_TYPE = make(GroovyObject.class);
+    private static final ClassNode LAZY_TYPE = make(Lazy.class);
 
     private static final String MEMBER_DEPRECATED = "deprecated";
     private static final String MEMBER_INTERFACES = "interfaces";
@@ -111,8 +111,8 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
                 fieldMethods.addAll(getAllMethods(next));
             }
 
-            final boolean skipInterfaces = hasBooleanValue(node.getMember(MEMBER_INTERFACES), false);
-            final boolean includeDeprecated = hasBooleanValue(node.getMember(MEMBER_DEPRECATED), true) || (type.isInterface() && !skipInterfaces);
+            final boolean skipInterfaces = memberHasValue(node, MEMBER_INTERFACES, false);
+            final boolean includeDeprecated = memberHasValue(node, MEMBER_DEPRECATED, true) || (type.isInterface() && !skipInterfaces);
             List<String> excludes = getMemberList(node, MEMBER_EXCLUDES);
             List<String> includes = getMemberList(node, MEMBER_INCLUDES);
             List<ClassNode> excludeTypes = getClassList(node, MEMBER_EXCLUDE_TYPES);
@@ -128,8 +128,8 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
                 if (prop.isStatic() || !prop.isPublic())
                     continue;
                 String name = prop.getName();
-                addGetterIfNeeded(fieldNode, owner, prop, name);
-                addSetterIfNeeded(fieldNode, owner, prop, name);
+                addGetterIfNeeded(fieldNode, owner, prop, name, includes, excludes);
+                addSetterIfNeeded(fieldNode, owner, prop, name, includes, excludes);
             }
 
             if (skipInterfaces) return;
@@ -152,13 +152,11 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
         }
     }
 
-    private boolean hasBooleanValue(Expression expression, boolean bool) {
-        return expression instanceof ConstantExpression && ((ConstantExpression) expression).getValue().equals(bool);
-    }
-
-    private void addSetterIfNeeded(FieldNode fieldNode, ClassNode owner, PropertyNode prop, String name) {
+    private void addSetterIfNeeded(FieldNode fieldNode, ClassNode owner, PropertyNode prop, String name, List<String> includes, List<String> excludes) {
         String setterName = "set" + Verifier.capitalize(name);
-        if ((prop.getModifiers() & ACC_FINAL) == 0 && owner.getSetterMethod(setterName) == null) {
+        if ((prop.getModifiers() & ACC_FINAL) == 0
+                && owner.getSetterMethod(setterName) == null
+                && !shouldSkipPropertyMethod(name, setterName, excludes, includes)) {
             owner.addMethod(setterName,
                     ACC_PUBLIC,
                     ClassHelper.VOID_TYPE,
@@ -169,9 +167,10 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
         }
     }
 
-    private void addGetterIfNeeded(FieldNode fieldNode, ClassNode owner, PropertyNode prop, String name) {
+    private void addGetterIfNeeded(FieldNode fieldNode, ClassNode owner, PropertyNode prop, String name, List<String> includes, List<String> excludes) {
         String getterName = "get" + Verifier.capitalize(name);
-        if (owner.getGetterMethod(getterName) == null) {
+        if (owner.getGetterMethod(getterName) == null
+                && !shouldSkipPropertyMethod(name, getterName, excludes, includes)) {
             owner.addMethod(getterName,
                     ACC_PUBLIC,
                     GenericsUtils.nonGeneric(prop.getType()),
@@ -179,6 +178,12 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
                     null,
                     returnS(propX(varX(fieldNode), name)));
         }
+    }
+    
+    private boolean shouldSkipPropertyMethod(String propertyName, String methodName, List<String> excludes, List<String> includes) {
+        return (deemedInternalName(propertyName)
+                    || excludes != null && (excludes.contains(propertyName) || excludes.contains(methodName)) 
+                    || (includes != null && !includes.isEmpty() && !includes.contains(propertyName) && !includes.contains(methodName)));
     }
 
     private void addDelegateMethod(AnnotationNode node, FieldNode fieldNode, ClassNode owner, List<MethodNode> ownMethods, MethodNode candidate, boolean includeDeprecated, List<String> includes, List<String> excludes, List<ClassNode> includeTypes, List<ClassNode> excludeTypes) {
@@ -191,6 +196,7 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
         if (shouldSkip(candidate.getName(), excludes, includes)) return;
 
         Map<String,ClassNode> genericsSpec = createGenericsSpec(fieldNode.getDeclaringClass());
+        genericsSpec = addMethodGenerics(candidate, genericsSpec);
         extractSuperClassGenerics(fieldNode.getType(), candidate.getDeclaringClass(), genericsSpec);
 
         if (!excludeTypes.isEmpty() || !includeTypes.isEmpty()) {
@@ -224,27 +230,31 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
         }
         if (existingNode == null || existingNode.getCode() == null) {
 
-            final boolean includeParameterAnnotations = hasBooleanValue(node.getMember(MEMBER_PARAMETER_ANNOTATIONS), true);
-
             final ArgumentListExpression args = new ArgumentListExpression();
             final Parameter[] params = candidate.getParameters();
             final Parameter[] newParams = new Parameter[params.length];
+            List<String> currentMethodGenPlaceholders = genericPlaceholderNames(candidate);
             for (int i = 0; i < newParams.length; i++) {
-                Parameter newParam = new Parameter(correctToGenericsSpecRecurse(genericsSpec, params[i].getType()), getParamName(params, i, fieldNode.getName()));
+                ClassNode newParamType = correctToGenericsSpecRecurse(genericsSpec, params[i].getType(), currentMethodGenPlaceholders);
+                Parameter newParam = new Parameter(newParamType, getParamName(params, i, fieldNode.getName()));
                 newParam.setInitialExpression(params[i].getInitialExpression());
 
-                if (includeParameterAnnotations) newParam.addAnnotations(copyAnnotatedNodeAnnotations(params[i]));
+                if (memberHasValue(node, MEMBER_PARAMETER_ANNOTATIONS, true)) {
+                    newParam.addAnnotations(copyAnnotatedNodeAnnotations(params[i], MY_TYPE_NAME));
+                }
 
                 newParams[i] = newParam;
                 args.addExpression(varX(newParam));
             }
+            boolean alsoLazy = !fieldNode.getAnnotations(LAZY_TYPE).isEmpty();
             // addMethod will ignore attempts to override abstract or static methods with same signature on self
             MethodCallExpression mce = callX(
+                    alsoLazy ? propX(varX("this"), fieldNode.getName().substring(1)) :
                     varX(fieldNode.getName(), correctToGenericsSpecRecurse(genericsSpec, fieldNode.getType())),
                     candidate.getName(),
                     args);
             mce.setSourcePosition(fieldNode);
-            ClassNode returnType = correctToGenericsSpecRecurse(genericsSpec, candidate.getReturnType());
+            ClassNode returnType = correctToGenericsSpecRecurse(genericsSpec, candidate.getReturnType(), currentMethodGenPlaceholders);
             MethodNode newMethod = owner.addMethod(candidate.getName(),
                     candidate.getModifiers() & (~ACC_ABSTRACT) & (~ACC_NATIVE),
                     returnType,
@@ -253,10 +263,21 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
                     stmt(mce));
             newMethod.setGenericsTypes(candidate.getGenericsTypes());
 
-            if (hasBooleanValue(node.getMember(MEMBER_METHOD_ANNOTATIONS), true)) {
-                newMethod.addAnnotations(copyAnnotatedNodeAnnotations(candidate));
+            if (memberHasValue(node, MEMBER_METHOD_ANNOTATIONS, true)) {
+                newMethod.addAnnotations(copyAnnotatedNodeAnnotations(candidate, MY_TYPE_NAME));
             }
         }
+    }
+
+    private List<String> genericPlaceholderNames(MethodNode candidate) {
+        GenericsType[] candidateGenericsTypes = candidate.getGenericsTypes();
+        List<String> names = new ArrayList<String>();
+        if (candidateGenericsTypes != null) {
+            for (GenericsType gt : candidateGenericsTypes) {
+                names.add(gt.getName());
+            }
+        }
+        return names;
     }
 
     private String getParamName(Parameter[] params, int i, String fieldName) {
@@ -275,19 +296,4 @@ public class DelegateASTTransformation extends AbstractASTTransformation {
         return false;
     }
 
-    /**
-     * Copies all <tt>candidateAnnotations</tt> with retention policy {@link java.lang.annotation.RetentionPolicy#RUNTIME}
-     * and {@link java.lang.annotation.RetentionPolicy#CLASS}.
-     * <p>
-     * Annotations with {@link GeneratedClosure} members are not supported by now.
-     */
-    private List<AnnotationNode> copyAnnotatedNodeAnnotations(final AnnotatedNode annotatedNode) {
-        final ArrayList<AnnotationNode> delegateAnnotations = new ArrayList<AnnotationNode>();
-        final ArrayList<AnnotationNode> notCopied = new ArrayList<AnnotationNode>();
-        GeneralUtils.copyAnnotatedNodeAnnotations(annotatedNode, delegateAnnotations, notCopied);
-        for (AnnotationNode annotation : notCopied) {
-            addError(MY_TYPE_NAME + " does not support keeping Closure annotation members.", annotation);
-        }
-        return delegateAnnotations;
-    }
 }

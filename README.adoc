@@ -23,7 +23,7 @@ It also increases developer productivity by reducing scaffolding code when devel
 
 == Downloading
 
-Latest Groovy version is availble on Bintray image:{bintray-latest-version-image}[Bintray latest version, link={bintray-latest-version-link}]
+Latest Groovy version is available on Bintray image:{bintray-latest-version-image}[Bintray latest version, link={bintray-latest-version-link}]
 
 Binary distribution links are on the package page.
 
@@ -49,6 +49,10 @@ To build everything and launch unit tests, use
 
     ./gradlew test
 
+If you want to launch one unit test, use this. <TestClassName> is like `groovy.GroovyMethodsTest`.
+
+    ./gradlew :test --tests <TestClassName>
+
 To build from IntelliJ IDEA
 
     ./gradlew jarAll idea
@@ -59,7 +63,7 @@ To build from Eclipse
 
     ./gradlew jarAll eclipse
 
-Then open the generated project and the generated subprojects in Eclipse.
+Then open the generated project and the generated subprojects in Eclipse. But be aware that Eclipse tends to be more limited in its ability to reproduce a gradle build structure. The generated project files may contain a circular dependency which may or may not prevent Eclipse from using them. It depends on the Eclipse version, if this is an issue or not.
 
 == InvokeDynamic support
 
@@ -73,7 +77,7 @@ Please note that the following Gradle tasks generate both indy and non indy vari
 * install
 * uploadArchives
 
-== Continuous Integration
+== Continuous Integration Server
 
 The official CI server runs {groovy-ci}[here] (login as user guest and leave the password blank) and is sponsored by http://www.jetbrains.com[JetBrains].
 

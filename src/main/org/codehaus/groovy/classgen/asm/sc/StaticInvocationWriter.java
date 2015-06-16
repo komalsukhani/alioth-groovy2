@@ -25,6 +25,7 @@ import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.ast.stmt.ExpressionStatement;
 import org.codehaus.groovy.ast.stmt.ForStatement;
+import org.codehaus.groovy.ast.tools.WideningCategories;
 import org.codehaus.groovy.classgen.AsmClassGenerator;
 import org.codehaus.groovy.classgen.Verifier;
 import org.codehaus.groovy.classgen.asm.*;
@@ -46,6 +47,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.codehaus.groovy.ast.ClassHelper.CLOSURE_TYPE;
+import static org.codehaus.groovy.ast.ClassHelper.OBJECT_TYPE;
+import static org.codehaus.groovy.ast.ClassHelper.getWrapper;
 import static org.codehaus.groovy.transform.sc.StaticCompilationMetadataKeys.PRIVATE_BRIDGE_METHODS;
 import static org.objectweb.asm.Opcodes.*;
 
@@ -79,6 +82,22 @@ public class StaticInvocationWriter extends InvocationWriter {
     public StaticInvocationWriter(WriterController wc) {
         super(wc);
         controller = wc;
+    }
+
+    @Override
+    protected boolean makeDirectCall(final Expression origin, final Expression receiver, final Expression message, final Expression arguments, final MethodCallerMultiAdapter adapter, final boolean implicitThis, final boolean containsSpreadExpression) {
+        if (origin instanceof MethodCallExpression &&
+                receiver instanceof VariableExpression &&
+                ((VariableExpression) receiver).isSuperExpression()) {
+            ClassNode superClass = receiver.getNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER);
+            if (superClass!=null && !controller.getCompileStack().isLHS()) {
+                // GROOVY-7300
+                MethodCallExpression mce = (MethodCallExpression) origin;
+                MethodNode node = superClass.getDeclaredMethod(mce.getMethodAsString(), Parameter.EMPTY_ARRAY);
+                mce.setMethodTarget(node);
+            }
+        }
+        return super.makeDirectCall(origin, receiver, message, arguments, adapter, implicitThis, containsSpreadExpression);
     }
 
     @Override
@@ -152,7 +171,16 @@ public class StaticInvocationWriter extends InvocationWriter {
      * Attempts to make a direct method call on a bridge method, if it exists.
      */
     protected boolean tryBridgeMethod(MethodNode target, Expression receiver, boolean implicitThis, TupleExpression args) {
-        Map<MethodNode, MethodNode> bridges = target.getDeclaringClass().redirect().getNodeMetaData(PRIVATE_BRIDGE_METHODS);
+        ClassNode lookupClassNode;
+        if (target.isProtected()) {
+            lookupClassNode = controller.getClassNode();
+            if (controller.isInClosure()) {
+                lookupClassNode = lookupClassNode.getOuterClass();
+            }
+        } else {
+            lookupClassNode = target.getDeclaringClass().redirect();
+        }
+        Map<MethodNode, MethodNode> bridges = lookupClassNode.getNodeMetaData(PRIVATE_BRIDGE_METHODS);
         MethodNode bridge = bridges==null?null:bridges.get(target);
         if (bridge != null) {
             Expression fixedReceiver = receiver;
@@ -217,7 +245,7 @@ public class StaticInvocationWriter extends InvocationWriter {
             ClassNode classNode = controller.getClassNode();
             if (classNode.isDerivedFrom(ClassHelper.CLOSURE_TYPE)
                     && controller.isInClosure()
-                    && !(target.isPublic() || target.isProtected())
+                    && !target.isPublic()
                     && target.getDeclaringClass() != classNode) {
                 if (!tryBridgeMethod(target, receiver, implicitThis, args)) {
                     // replace call with an invoker helper call
@@ -416,6 +444,7 @@ public class StaticInvocationWriter extends InvocationWriter {
                     cce
             );
             declr.visit(controller.getAcg());
+            operandStack.pop();
             // if (receiver != null)
             receiver.visit(controller.getAcg());
             Label ifnull = compileStack.createLocalLabel("ifnull_" + counter);
@@ -432,6 +461,7 @@ public class StaticInvocationWriter extends InvocationWriter {
                     origMCE.getMethodAsString(),
                     origMCE.getArguments()
             );
+            newMCE.setImplicitThis(false);
             newMCE.setMethodTarget(origMCE.getMethodTarget());
             newMCE.setSafe(true);
             MethodCallExpression add = new MethodCallExpression(
@@ -439,6 +469,7 @@ public class StaticInvocationWriter extends InvocationWriter {
                     "add",
                     newMCE
             );
+            add.setImplicitThis(false);
             add.setMethodTarget(StaticCompilationVisitor.ARRAYLIST_ADD_METHOD);
             // for (e in receiver) { result.add(e?.method(arguments) }
             ForStatement stmt = new ForStatement(
@@ -499,7 +530,7 @@ public class StaticInvocationWriter extends InvocationWriter {
                 if (pname!=null && callSiteWriter instanceof StaticTypesCallSiteWriter) {
                     StaticTypesCallSiteWriter stcsw = (StaticTypesCallSiteWriter) callSiteWriter;
                     TypeChooser typeChooser = controller.getTypeChooser();
-                    if (stcsw.makeGetField(receiver, typeChooser.resolveType(receiver, controller.getClassNode()), pname, false, true)) {
+                    if (stcsw.makeGetField(receiver, typeChooser.resolveType(receiver, controller.getClassNode()), pname, safe, false, true)) {
                         return;
                     }
                 }
@@ -569,6 +600,8 @@ public class StaticInvocationWriter extends InvocationWriter {
         private final Expression receiver;
         private final MethodNode target;
 
+        private ClassNode resolvedType;
+
         public CheckcastReceiverExpression(final Expression receiver, final MethodNode target) {
             this.receiver = receiver;
             this.target = target;
@@ -584,12 +617,7 @@ public class StaticInvocationWriter extends InvocationWriter {
             receiver.visit(visitor);
             if (visitor instanceof AsmClassGenerator) {
                 ClassNode topOperand = controller.getOperandStack().getTopOperand();
-                ClassNode type;
-                if (target instanceof ExtensionMethodNode) {
-                    type = ((ExtensionMethodNode) target).getExtensionMethodNode().getDeclaringClass();
-                } else {
-                    type = target.getDeclaringClass();
-                }
+                ClassNode type = getType();
                 if (ClassHelper.GSTRING_TYPE.equals(topOperand) && ClassHelper.STRING_TYPE.equals(type)) {
                     // perform regular type conversion
                     controller.getOperandStack().doGroovyCast(type);
@@ -610,11 +638,40 @@ public class StaticInvocationWriter extends InvocationWriter {
 
         @Override
         public ClassNode getType() {
-            return controller.getTypeChooser().resolveType(receiver, controller.getClassNode());
+            if (resolvedType!=null) {
+                return resolvedType;
+            }
+            ClassNode type;
+            if (target instanceof ExtensionMethodNode) {
+                type = ((ExtensionMethodNode) target).getExtensionMethodNode().getDeclaringClass();
+            } else {
+                type = getWrapper(controller.getTypeChooser().resolveType(receiver, controller.getClassNode()));
+                ClassNode declaringClass = target.getDeclaringClass();
+                if (type.getClass() != ClassNode.class && type.getClass() !=InnerClassNode.class) {
+                    type = declaringClass; // ex: LUB type
+                }
+                if (OBJECT_TYPE.equals(type) && !OBJECT_TYPE.equals(declaringClass)) {
+                    // can happen for compiler rewritten code, where type information is missing
+                    type = declaringClass;
+                }
+                if (OBJECT_TYPE.equals(declaringClass)) {
+                    // check cast not necessary because Object never evolves
+                    // and it prevents a potential ClassCastException if the delegate of a closure
+                    // is changed in a statically compiled closure
+                    type = OBJECT_TYPE;
+                }
+            }
+            resolvedType = type;
+            return type;
         }
     }
 
     public MethodCallExpression getCurrentCall() {
         return currentCall;
+    }
+
+    @Override
+    protected boolean makeCachedCall(Expression origin, ClassExpression sender, Expression receiver, Expression message, Expression arguments, MethodCallerMultiAdapter adapter, boolean safe, boolean spreadSafe, boolean implicitThis, boolean containsSpreadExpression) {
+        return false;
     }
 }

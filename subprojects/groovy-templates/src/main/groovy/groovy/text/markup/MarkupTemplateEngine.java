@@ -31,6 +31,7 @@ import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
+import org.codehaus.groovy.classgen.asm.BytecodeDumper;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +60,9 @@ public class MarkupTemplateEngine extends TemplateEngine {
     static final ClassNode MARKUPTEMPLATEENGINE_CLASSNODE = ClassHelper.make(MarkupTemplateEngine.class);
     static final String MODELTYPES_ASTKEY = "MTE.modelTypes";
 
-    private static final Pattern LOCALIZED_RESOURCE_PATTERN = Pattern.compile("(.+?)(?:_([a-z]{2}(?:_[A-Z]{2,3})))?\\.(\\p{Alnum}+)");
+    private static final Pattern LOCALIZED_RESOURCE_PATTERN = Pattern.compile("(.+?)(?:_([a-z]{2}(?:_[A-Z]{2,3})))?\\.([\\p{Alnum}.]+)$");
+
+    private static final boolean DEBUG_BYTECODE = Boolean.valueOf(System.getProperty("markuptemplateengine.compiler.debug","false"));
 
     private static final AtomicLong counter = new AtomicLong();
 
@@ -68,6 +71,10 @@ public class MarkupTemplateEngine extends TemplateEngine {
     private final TemplateConfiguration templateConfiguration;
     private final Map<String, GroovyCodeSource> codeSourceCache = new LinkedHashMap<String, GroovyCodeSource>();
     private final TemplateResolver templateResolver;
+
+    public MarkupTemplateEngine() {
+        this(new TemplateConfiguration());
+    }
 
     public MarkupTemplateEngine(final TemplateConfiguration tplConfig) {
         this(MarkupTemplateEngine.class.getClassLoader(), tplConfig);
@@ -98,6 +105,9 @@ public class MarkupTemplateEngine extends TemplateEngine {
                 return new TemplateGroovyClassLoader(parentLoader, compilerConfiguration);
             }
         });
+        if (DEBUG_BYTECODE) {
+            compilerConfiguration.setBytecodePostprocessor(BytecodeDumper.STANDARD_ERR);
+        }
         templateResolver = resolver == null ? new DefaultTemplateResolver() : resolver;
         templateResolver.configure(groovyClassLoader, templateConfiguration);
     }

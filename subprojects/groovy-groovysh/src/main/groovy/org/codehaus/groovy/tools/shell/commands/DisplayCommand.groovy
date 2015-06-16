@@ -20,7 +20,7 @@ import org.codehaus.groovy.tools.shell.CommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
 
 /**
- * The 'display' command.
+ * The 'display' command. Displays the current buffer (e.g. while method declaration was not finished).
  *
  * @version $Id$
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
@@ -34,9 +34,10 @@ class DisplayCommand
         super(shell, COMMAND_NAME, ':d')
     }
 
+    @Override
     Object execute(final List<String> args) {
         assertNoArguments(args)
-        
+
         if (buffer.isEmpty()) {
             io.out.println('Buffer is empty') // TODO: i18n
         }

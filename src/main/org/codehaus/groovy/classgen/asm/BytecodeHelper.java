@@ -147,7 +147,8 @@ public class BytecodeHelper implements Opcodes {
         StringBuilder buf = new StringBuilder();
         ClassNode d = c;
         while (true) {
-            if (ClassHelper.isPrimitiveType(d)) {
+            if (ClassHelper.isPrimitiveType(d.redirect())) {
+                d = d.redirect();
                 char car;
                 if (d == ClassHelper.int_TYPE) {
                     car = 'I';
@@ -442,7 +443,7 @@ public class BytecodeHelper implements Opcodes {
 
     private static void writeGenericsBoundType(StringBuilder ret, ClassNode printType, boolean writeInterfaceMarker) {
         if (writeInterfaceMarker && printType.isInterface()) ret.append(":");
-        if (printType.equals(ClassHelper.OBJECT_TYPE) && printType.getGenericsTypes() != null) {
+        if (printType.isGenericsPlaceHolder() && printType.getGenericsTypes()!=null) {
             ret.append("T");
             ret.append(printType.getGenericsTypes()[0].getName());
             ret.append(";");

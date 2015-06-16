@@ -1,3 +1,18 @@
+/*
+ * Copyright 2003-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package groovy.util.logging
 
 import java.lang.reflect.Field
@@ -12,6 +27,8 @@ import org.apache.logging.log4j.core.appender.AbstractAppender
 import org.apache.logging.log4j.core.layout.PatternLayout
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Logger
+
+import java.nio.charset.Charset
 
 class Log4j2Test extends GroovyTestCase {
 
@@ -31,12 +48,12 @@ class Log4j2Test extends GroovyTestCase {
     }
 
     Log4j2InterceptingAppender appender
-    def logger
+    Logger logger
 
     protected void setUp() {
         super.setUp()
 
-        PatternLayout layout = PatternLayout.createLayout("%m", null, null, "UTF-8", "true", "false")
+        PatternLayout layout = PatternLayout.createLayout('%m', null, null, Charset.forName('UTF-8'), true, false, '', '')
         appender = new Log4j2InterceptingAppender('MyAppender', null, layout)
         logger = LogManager.getLogger('MyClass')
         logger.addAppender(appender)
@@ -216,7 +233,7 @@ class Log4j2Test extends GroovyTestCase {
     }
 
     void testCustomCategory() {
-        PatternLayout layout = PatternLayout.createLayout("%m", null, null, "UTF-8", "true", "false")
+        PatternLayout layout = PatternLayout.createLayout('%m', null, null, Charset.forName('UTF-8'), true, false, '', '')
         Log4j2InterceptingAppender appenderForCustomCategory = new Log4j2InterceptingAppender('Appender4CustomCategory', null, layout)
         def loggerForCustomCategory = LogManager.getLogger('customCategory')
         loggerForCustomCategory.addAppender(appenderForCustomCategory)
