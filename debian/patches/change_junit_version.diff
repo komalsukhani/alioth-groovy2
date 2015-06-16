@@ -1,0 +1,13 @@
+--- a/subprojects/groovy-test/build.gradle
++++ b/subprojects/groovy-test/build.gradle
+@@ -1,7 +1,7 @@
+ dependencies {
+     compile rootProject
+-    compile 'junit:junit:4.12'
++    compile 'junit:junit:4.x'
+     testRuntime project(':groovy-ant')
+ }
+ 
+-apply from: "${rootProject.projectDir}/gradle/jacoco/jacocofix.gradle"
+\ No newline at end of file
++apply from: "${rootProject.projectDir}/gradle/jacoco/jacocofix.gradle"

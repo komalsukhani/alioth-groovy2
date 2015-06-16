@@ -1,0 +1,13 @@
+--- a/subprojects/groovy-servlet/build.gradle
++++ b/subprojects/groovy-servlet/build.gradle
+@@ -1,8 +1,8 @@
+ dependencies {
+-    compile('javax.servlet:servlet-api:2.4') { dep ->
++    compile('javax.servlet:servlet-api:debian') { dep ->
+         provided dep
+     }
+-    compile('javax.servlet:jsp-api:2.0') { dep ->
++    compile('javax.servlet.jsp:jsp-api:debian') { dep ->
+         provided dep
+     }
+     compile rootProject

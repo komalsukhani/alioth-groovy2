@@ -1,0 +1,229 @@
+Index: debian-groovy2/build.gradle
+===================================================================
+--- debian-groovy2.orig/build.gradle
++++ debian-groovy2/build.gradle
+@@ -1,29 +1,25 @@
+ buildscript {
+     repositories {
+-        jcenter()
+-        maven {
+-            name 'Bintray Asciidoctor repo'
+-            url 'http://dl.bintray.com/content/aalmiray/asciidoctor'
+-        }
++      
++       mavenRepo url: "file:///usr/share/maven-repo"
+     }
+ 
+     dependencies {
+-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.2'
+-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.3'
++      
+         //classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.1.1'
+     }
+ }
+-
++/*
+ plugins {
+     //id "com.github.hierynomus.license" version "0.11.0"
+ }
+-
++*/
+ apply from: 'gradle/filter.gradle'
+ apply from: 'gradle/indy.gradle'
+-apply from: 'gradle/bintray.gradle'
+ 
+-File javaHome = new File(System.getProperty('java.home'))
+-logger.lifecycle "Using Java from $javaHome (version ${System.getProperty('java.version')})"
++
++//File javaHome = new File(System.getProperty('java.home'))
++//logger.lifecycle "Using Java from $javaHome (version ${System.getProperty('java.version')})"
+ indyBanner()
+ 
+ // TODO use antlr plugin
+@@ -39,14 +35,11 @@ allprojects {
+     group = 'org.codehaus.groovy'
+     version = groovyVersion
+     repositories {
+-        jcenter()
++         mavenRepo url: "file:///usr/share/maven-repo"
+     }
+ 
+     apply plugin: 'groovy'
+     apply from: "${rootProject.projectDir}/gradle/indy.gradle"
+-    if (JavaVersion.current().java7Compatible) {
+-        apply from: "${rootProject.projectDir}/gradle/asciidoctor.gradle"
+-    }
+ }
+ 
+ // todo: use the conventional "resources" directory for classpath resources
+@@ -85,8 +78,7 @@ subprojects {
+ 
+ repositories {
+     // todo Some repos are needed only for some configs. Declare them just for the configuration once Gradle allows this.
+-    maven { url 'http://www.aQute.biz/repo' } // tools
+-    maven { url 'http://repository.jboss.org/nexus/content/groups/m2-release-proxy' } // examples, tools
++       mavenRepo url: "file:///usr/share/maven-repo"
+ }
+ 
+ // todo do we need compile and runtime scope for examples?
+@@ -100,31 +92,31 @@ configurations {
+ }
+ 
+ ext {
+-    antVersion = '1.9.4'
++    antVersion = 'debian'
+     asmVersion = '5.0.3'
+     antlrVersion = '2.7.7'
+-    bndVersion = '0.0.401'
+-    checkstyleVersion = '4.4'
++    bndVersion = 'debian'
++    checkstyleVersion = 'debian'
+     coberturaVersion = '1.9.4.1'
+     commonsCliVersion = '1.2'
+     commonsHttpClientVersion = '3.1'
+     eclipseOsgiVersion = '3.9.1-v20140110-1610'
+     gparsVersion = '1.2.1'
+-    ivyVersion = '2.4.0'
+-    jansiVersion = '1.11'
+-    jarjarVersion = '1.3'
+-    jlineVersion = '2.12'
++    ivyVersion = 'debian'
++    jansiVersion = 'debian'
++    jarjarVersion = '1.4-SNAPSHOT'
++    jlineVersion = '2.x'
+     jmockVersion = '1.2.0'
+     logbackVersion = '1.1.2'
+     log4jVersion = '1.2.17'
+     log4j2Version = '2.1'
+     luceneVersion = '4.7.2'
+     openejbVersion = '1.0'
+-    qdoxVersion = '1.12.1'
++    qdoxVersion = 'debian'
+     simianVersion = '2.2.4'
+     slf4jVersion = '1.7.6'
+     xmlunitVersion = '1.5'
+-    xstreamVersion = '1.4.7'
++    xstreamVersion = 'debian'
+ }
+ 
+ dependencies {
+@@ -149,9 +141,9 @@ dependencies {
+     }
+     compile files("${buildDir}/generated-classes")
+ 
+-    runtime("org.codehaus.gpars:gpars:$gparsVersion") {
++   /* runtime("org.codehaus.gpars:gpars:$gparsVersion") {
+         exclude(group: 'org.codehaus.groovy', module: 'groovy-all')
+-    }
++    }*/
+     testCompile "jmock:jmock:$jmockVersion"
+     testCompile "jmock:jmock-cglib:$jmockVersion"
+     testCompile "xmlunit:xmlunit:$xmlunitVersion"
+@@ -162,10 +154,10 @@ dependencies {
+     testCompile "com.thoughtworks.qdox:qdox:$qdoxVersion"
+ 
+     tools "com.googlecode.jarjar:jarjar:$jarjarVersion"
+-    tools("checkstyle:checkstyle:$checkstyleVersion") {
++    tools("com.puppycrawl.tools:checkstyle:$checkstyleVersion") {
+         exclude(module: 'junit')
+     }
+-    tools "redhill:simian:$simianVersion"
++    //tools "redhill:simian:$simianVersion"
+     tools("net.sourceforge.cobertura:cobertura:$coberturaVersion") {
+         exclude(module: 'asm')
+         exclude(module: 'asm')
+Index: debian-groovy2/gradle/utils.gradle
+===================================================================
+--- debian-groovy2.orig/gradle/utils.gradle
++++ debian-groovy2/gradle/utils.gradle
+@@ -24,7 +24,8 @@ import static org.objectweb.asm.Opcodes.
+ 
+ buildscript {
+     repositories {
+-        mavenCentral()
++       // mavenCentral()
++       mavenRepo url: "file:///usr/share/maven-repo"
+     }
+     dependencies {
+         classpath "org.ow2.asm:asm:$asmVersion"
+Index: debian-groovy2/gradle/codehaus.gradle
+===================================================================
+--- debian-groovy2.orig/gradle/codehaus.gradle
++++ debian-groovy2/gradle/codehaus.gradle
+@@ -1,26 +1,27 @@
+-import com.github.sardine.*
++/*import com.github.sardine.*
+ import com.github.sardine.impl.*
+ import groovy.io.*
+ 
+ buildscript {
+     repositories {
+-        mavenCentral()
++       // mavenCentral()
++       mavenRepo url: "file:///usr/share/maven-repo"
+     }
+     dependencies {
+         classpath 'com.github.lookfirst:sardine:5.0.1'
+     }
+ }
+-
++*/
+ task htmlPush {
+     //inputs.files syncDoc.inputs.files
+ 
+-    doLast {
+-        def sardine = SardineFactory.begin(System.getProperty('groovy.deploy.username'), System.getProperty('groovy.deploy.password'))
+-        def serverBase = "https://dav.codehaus.org/groovy/"
++  //  doLast {
++    //    def sardine = SardineFactory.begin(System.getProperty('groovy.deploy.username'), System.getProperty('groovy.deploy.password'))
++      //  def serverBase = "https://dav.codehaus.org/groovy/"
+         //sardine.list(serverBase).each {println it}
+         def copyConf = ["gapi":file("$buildDir/allgroovydoc"), "api":file("$buildDir/alljavadoc")]
+ 
+-        copyConf.each { targetDirPart, base ->
++       /* copyConf.each { targetDirPart, base ->
+             def basePath = base.canonicalPath
+             base.eachFileRecurse {
+                 def name = it.canonicalPath.substring(basePath.length()+1)
+@@ -41,4 +42,5 @@ task htmlPush {
+             }
+         }
+     }
++*/
+ }
+Index: debian-groovy2/gradle/quality.gradle
+===================================================================
+--- debian-groovy2.orig/gradle/quality.gradle
++++ debian-groovy2/gradle/quality.gradle
+@@ -1,5 +1,5 @@
+-import groovy.text.markup.MarkupTemplateEngine
+-import groovy.text.markup.TemplateConfiguration
++//import groovy.text.markup.MarkupTemplateEngine
++//import groovy.text.markup.TemplateConfiguration
+ 
+ /*
+  * Copyright 2003-2014 the original author or authors.
+@@ -72,12 +72,12 @@ allprojects {
+ 
+             doLast {
+                 if (reportFile.exists()) {
+-                    def templateConfiguration = new TemplateConfiguration()
++                   // def templateConfiguration = new TemplateConfiguration()
+                     templateConfiguration.with {
+                         autoIndent = true
+                         autoNewLine = true
+                     }
+-                    def engine = new MarkupTemplateEngine(this.class.classLoader, configDir, templateConfiguration)
++                    //def engine = new MarkupTemplateEngine(this.class.classLoader, configDir, templateConfiguration)
+                     def xml = new XmlSlurper().parse(reportFile.newReader('utf-8'))
+                     def files = []
+                     xml.file.each { f ->
+@@ -105,7 +105,7 @@ allprojects {
+                 }
+             }
+         }
+-        finalizedBy "${name}Report"
++       // finalizedBy "${name}Report"
+     }
+ 
+ }

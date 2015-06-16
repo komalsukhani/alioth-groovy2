@@ -1,0 +1,13 @@
+Index: debian-groovy2/subprojects/groovy-bsf/build.gradle
+===================================================================
+--- debian-groovy2.orig/subprojects/groovy-bsf/build.gradle
++++ debian-groovy2/subprojects/groovy-bsf/build.gradle
+@@ -2,7 +2,7 @@ dependencies {
+     compile('bsf:bsf:2.4.0') {
+         exclude(group: 'commons-logging', module: 'commons-logging')
+     }
+-    compile 'commons-logging:commons-logging:1.2'
++    compile 'commons-logging:commons-logging:debian'
+     compile rootProject
+     testCompile project(':groovy-test')
+ }
