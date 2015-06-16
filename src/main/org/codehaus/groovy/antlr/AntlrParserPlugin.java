@@ -166,12 +166,14 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
 
     private void outputASTInVariousFormsIfNeeded(SourceUnit sourceUnit, SourceBuffer sourceBuffer) {
         // straight xstream output of AST
-        if ("xml".equals(System.getProperty("antlr.ast"))) {
+        String formatProp = System.getProperty("ANTLR.AST".toLowerCase()); // uppercase to hide from jarjar
+
+        if ("xml".equals(formatProp)) {
             saveAsXML(sourceUnit.getName(), ast);
         }
 
         // 'pretty printer' output of AST
-        if ("groovy".equals(System.getProperty("antlr.ast"))) {
+        if ("groovy".equals(formatProp)) {
             try {
                 PrintStream out = new PrintStream(new FileOutputStream(sourceUnit.getName() + ".pretty.groovy"));
                 Visitor visitor = new SourcePrinter(out, tokenNames);
@@ -184,7 +186,7 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
 
         // output AST in format suitable for opening in http://freemind.sourceforge.net
         // which is a really nice way of seeing the AST, folding nodes etc
-        if ("mindmap".equals(System.getProperty("antlr.ast"))) {
+        if ("mindmap".equals(formatProp)) {
             try {
                 PrintStream out = new PrintStream(new FileOutputStream(sourceUnit.getName() + ".mm"));
                 Visitor visitor = new MindMapPrinter(out, tokenNames);
@@ -196,7 +198,7 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
         }
 
         // include original line/col info and source code on the mindmap output
-        if ("extendedMindmap".equals(System.getProperty("antlr.ast"))) {
+        if ("extendedMindmap".equals(formatProp)) {
             try {
                 PrintStream out = new PrintStream(new FileOutputStream(sourceUnit.getName() + ".mm"));
                 Visitor visitor = new MindMapPrinter(out, tokenNames, sourceBuffer);
@@ -208,7 +210,7 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
         }
 
         // html output of AST
-        if ("html".equals(System.getProperty("antlr.ast"))) {
+        if ("html".equals(formatProp)) {
             try {
                 PrintStream out = new PrintStream(new FileOutputStream(sourceUnit.getName() + ".html"));
                 List<VisitorAdapter> v = new ArrayList<VisitorAdapter>();
@@ -281,6 +283,7 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
                     importDef(node);
                     break;
 
+                case TRAIT_DEF:
                 case CLASS_DEF:
                     classDef(node);
                     break;
@@ -548,6 +551,11 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
 
     protected void innerClassDef(AST classDef) {
         List<AnnotationNode> annotations = new ArrayList<AnnotationNode>();
+
+        if (isType(TRAIT_DEF, classDef)) {
+            annotations.add(new AnnotationNode(ClassHelper.make("groovy.transform.Trait")));
+        }
+
         AST node = classDef.getFirstChild();
         int modifiers = Opcodes.ACC_PUBLIC;
         if (isType(MODIFIERS, node)) {
@@ -646,6 +654,7 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
                     enumConstantDef(node);
                     break;
 
+                case TRAIT_DEF:
                 case CLASS_DEF:
                     innerClassDef(node);
                     break;
@@ -1432,8 +1441,7 @@ public class AntlrParserPlugin extends ASTHelper implements ParserPlugin, Groovy
         AST node = labelNode.getFirstChild();
         String label = identifier(node);
         Statement statement = statement(node.getNextSibling());
-        if (statement.getStatementLabel() == null) // if statement has multiple labels, retain the last one
-            statement.setStatementLabel(label);
+        statement.addStatementLabel(label);
         return statement;
     }
 

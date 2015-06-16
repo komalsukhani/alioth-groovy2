@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import groovy.xml.TraversalTestSupport
 import groovy.xml.GpathSyntaxTestSupport
 import groovy.xml.MixedMarkupTestSupport
 import groovy.xml.StreamingMarkupBuilder
+import static groovy.xml.XmlUtil.serialize
 
 class XmlSlurperTest extends GroovyTestCase {
 
@@ -32,17 +33,17 @@ class XmlSlurperTest extends GroovyTestCase {
                          xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                          xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
                          xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-                         xmlns="http://schemas.xmlsoap.org/wsdl/">                                              
-                <message name="SomeRequest">                                                          
-                    <part name="parameters" element="ns1:SomeReq" />                                  
-                </message>                                                                            
-                <message name="SomeResponse">                                                         
-                    <part name="result" element="ns1:SomeRsp" />                                      
-                </message>                                                                            
-            </definitions>                                                                            
-            '''
+                         xmlns="http://schemas.xmlsoap.org/wsdl/">
+                <message name="SomeRequest">
+                    <part name="parameters" element="ns1:SomeReq" />
+                </message>
+                <message name="SomeResponse">
+                    <part name="result" element="ns1:SomeRsp" />
+                </message>
+            </definitions>
+        '''
         def xml = new XmlSlurper().parseText(wsdl)
-        assert xml.message.part.@element.findAll {it =~ /.Req$/}.size() == 1
+        assert xml.message.part.@element*.text().findAll {it =~ /.Req$/}.size() == 1
         assert xml.message.part.findAll { true }.size() == 2
         assert xml.message.part.find { it.name() == 'part' }.name() == 'part'
         assert xml.message.findAll { true }.size() == 2
@@ -93,6 +94,7 @@ class XmlSlurperTest extends GroovyTestCase {
 
     void testMixedMarkup() {
         MixedMarkupTestSupport.checkMixedMarkup(getRoot)
+        MixedMarkupTestSupport.checkMixedMarkupText(getRoot)
     }
 
     void testReplace() {
@@ -138,6 +140,60 @@ class XmlSlurperTest extends GroovyTestCase {
         assert root.ChildElement.@'one:ItemId' == 'FirstItemId'
         assert root.ChildElement.@'two:ItemId' == 'SecondItemId'
         assert root.ChildElement.@'two:ItemId'[0].namespaceURI() == 'http://www.ivan.com/ns2'
+    }
+
+    // GROOVY-6255
+    void testXmlNamespacedAttributes() {
+        def xml = '''
+        <appendix version="5.0" xmlns="http://docbook.org/ns/docbook" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+            <section xml:id="a"/>
+        </appendix>
+        '''
+
+        def root = new XmlSlurper().parseText(xml).declareNamespace(docbook: 'http://docbook.org/ns/docbook')
+
+        assert root.section[0].@'xml:id' == 'a'
+    }
+
+    // GROOVY-6356
+    void testSetAndRemoveAttributesWithNamespace() {
+        def xmlSource = '''<bob:root
+                xmlns:bob="stuff"
+                xmlns:gmi="http://www.isotc211.org/2005/gmi"
+                xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmi:instrument xlink:title="$INSTRUMENT"/>
+        </bob:root>'''
+
+        def bobRoot = new XmlSlurper(false, true).parseText(xmlSource).declareNamespace(bob: 'stuff',
+                ns2: 'http://www.example.org/NS2', gmi: "http://www.isotc211.org/2005/gmi")
+
+        def instrument = bobRoot.'gmi:instrument'
+
+        assert serialize(instrument).contains('xlink:title="$INSTRUMENT"')
+        instrument[0].'@xlink:title' = 'XXX'
+        assert !serialize(instrument).contains('xlink:title="$INSTRUMENT"')
+        assert serialize(instrument).contains('xlink:title="XXX"')
+        instrument[0].attributes().remove('xlink:title')
+        assert !serialize(instrument).contains('xlink:title="XXX"')
+    }
+
+    // GROOVY-6356
+    void testSetAndRemoveAttributesNamespaceUnaware() {
+        def xmlSource = '''<bob:root
+                xmlns:bob="stuff"
+                xmlns:gmi="http://www.isotc211.org/2005/gmi"
+                xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmi:instrument xlink:title="$INSTRUMENT"/>
+        </bob:root>'''
+
+        def bobRoot = new XmlSlurper(false, false, true).parseText(xmlSource)
+
+        def instrument = bobRoot.children()[0]
+        assert instrument.'@xlink:title' == '$INSTRUMENT'
+        instrument.'@xlink:title' = 'XXX'
+        assert instrument.'@xlink:title' == 'XXX'
+        instrument.attributes().remove('xlink:title')
+        assert instrument.'@xlink:title' == ''
     }
 
     // GROOVY-5931

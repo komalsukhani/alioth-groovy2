@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 public class DefaultGroovyMethodsSupport {
 
     private static final Logger LOG = Logger.getLogger(DefaultGroovyMethodsSupport.class.getName());
+    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
     // helper method for getAt and putAt
     protected static RangeInfo subListBorders(int size, Range range) {
@@ -119,7 +120,7 @@ public class DefaultGroovyMethodsSupport {
     private static Object cloneObject(Object orig) {
         if (orig instanceof Cloneable) {
             try {
-                return InvokerHelper.invokeMethod(orig, "clone", new Object[0]);
+                return InvokerHelper.invokeMethod(orig, "clone", EMPTY_OBJECT_ARRAY);
             } catch (Exception ex) {
                 // ignore
             }
@@ -132,6 +133,14 @@ public class DefaultGroovyMethodsSupport {
             return createSimilarCollection((Collection<?>) object);
         }
         return new ArrayList();
+    }
+
+    protected static <T> Collection<T> createSimilarCollection(Iterable<T> iterable) {
+        if (iterable instanceof Collection) {
+            return createSimilarCollection((Collection<T>) iterable);
+        } else {
+            return new ArrayList<T>();
+        }
     }
 
     protected static <T> Collection<T> createSimilarCollection(Collection<T> collection) {

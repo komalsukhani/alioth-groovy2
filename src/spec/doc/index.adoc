@@ -1,80 +1,86 @@
 = Groovy Language Documentation
-:toc:
-:icons:
-:linkcss!:
-:numbered:
-:subprojroot: ../../../subprojects/groovy-
-:specfolder: /src/spec/doc/
+:doctype: book
+ifndef::projectdir[:projectdir: ../../..]
 
-include::core-introduction.adoc[]
+include::{projectdir}/src/spec/doc/core-introduction.adoc[]
 
 == Groovy Language Specification
 
-:leveloffset: 2
-include::core-syntax.adoc[]
-include::core-semantics.adoc[]
-include::core-operators.adoc[]
-include::core-program-structure.adoc[]
-include::core-object-orientation.adoc[]
-include::core-closures.adoc[]
-:leveloffset: 0
+include::{projectdir}/src/spec/doc/core-syntax.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-operators.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-program-structure.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-object-orientation.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-closures.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-semantics.adoc[leveloffset=+2]
 
 == Tools
 
-=== groovyc, the Groovy compiler
-==== Ant task
-==== Maven integration
-===== GMaven and GMavenPlus
-===== The Groovy Eclipse Maven plugin
-==== Command-line compiler
-==== Joint compilation
-=== groovysh, the Groovy shell
-=== groovyConsole, the Groovy swing console
-=== groovydoc, the Groovy & Java documentation generator
-=== IDE integration
+include::{projectdir}/src/spec/doc/tools-groovyc.adoc[leveloffset=+2]
+
+include::{projectdir}/subprojects/groovy-groovysh/{specfolder}/groovysh.adoc[leveloffset=+2]
+
+include::{projectdir}/subprojects/groovy-console/{specfolder}/groovy-console.adoc[leveloffset=+2]
+
+include::{projectdir}/subprojects/groovy-groovydoc/{specfolder}/groovydoc.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/tools-ide.adoc[leveloffset=+2]
 
 == User Guides
-:leveloffset: 2
-include::core-getting-started.adoc[]
-:leveloffset: 0
-=== Differences with Java
-==== Multi-methods
-==== Array initializers
-==== Package scope visibility
-==== ARM blocks
-==== Inner class instantiation
-=== Groovy Development Kit
-==== Working with IO
-==== Working with collections
-==== Handy utilities
-===== ConfigSlurper
-===== Expando
-===== Observable list, map and set
-:leveloffset: 2
-include::core-metaprogramming.adoc[]
-:leveloffset: 0
-=== Testing guide
+
+include::{projectdir}/src/spec/doc/core-getting-started.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-differences-java.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-gdk.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-metaprogramming.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/grape.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-testing-guide.adoc[leveloffset=+2]
+
+include::{projectdir}/subprojects/groovy-json/{specfolder}/json-userguide.adoc[leveloffset=+2]
+
 === Interacting with a SQL database
-:leveloffset: 2
-include::{subprojroot}json{specfolder}json-userguide.adoc[]
-:leveloffset: 0
-=== Processing XML
+
+(TBD)
+
+
+include::{projectdir}/subprojects/groovy-xml/{specfolder}/xml-userguide.adoc[leveloffset=+2]
+
 === Scripting Ant tasks
-=== Template engines
-=== Servlet support
-=== Integrating Groovy in a Java application
-==== Groovy integration mechanisms
-===== Eval
-===== GroovyShell
-===== GroovyClassLoader
-===== CompilationUnit
-===== Reloading
-==== Bean Scripting Framework
-==== JSR 223 javax.script API
-:leveloffset: 2
-include::core-domain-specific-languages.adoc[]
-:leveloffset: 0
-=== Working with JMX
+
+Groovy integrates very well with http://ant.apache.org[Apache Ant] thanks to <<_antbuilder,AntBuilder>>.
+
+include::{projectdir}/subprojects/groovy-templates/{specfolder}/template-engines.adoc[leveloffset=+2]
+
+include::{projectdir}/subprojects/groovy-servlet/{specfolder}/servlet-userguide.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/guide-integrating.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/core-domain-specific-languages.adoc[leveloffset=+2]
+
+include::{projectdir}/subprojects/groovy-jmx/src/spec/doc/jmx.adoc[leveloffset=+2]
+
 === Creating Swing UIs
+
+Creating Swing UIs is made easy thanks to the use of <<swingbuilder,SwingBuilder>>.
+
 === Security
-=== Design patterns in Groovy
+
+(TBD)
+
+
+include::{projectdir}/src/spec/doc/design-pattern-in-groovy.adoc[leveloffset=+2]
+
+== Acknowledgements
+
+include::{projectdir}/src/spec/doc/contributors.adoc[leveloffset=+2]
+
+include::{projectdir}/src/spec/doc/license.adoc[leveloffset=+2]
+

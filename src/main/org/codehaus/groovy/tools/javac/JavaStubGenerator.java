@@ -31,6 +31,7 @@ import org.codehaus.groovy.ast.stmt.Statement;
 import org.codehaus.groovy.classgen.Verifier;
 import org.codehaus.groovy.control.ResolveVisitor;
 import org.codehaus.groovy.tools.Utilities;
+import org.codehaus.groovy.transform.trait.Traits;
 import org.objectweb.asm.Opcodes;
 
 import java.io.File;
@@ -39,6 +40,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,6 +51,7 @@ import java.util.Map;
 
 public class JavaStubGenerator {
     private boolean java5 = false;
+	private String encoding;
     private boolean requireSuperResolved = false;
     private File outputPath;
     private List<String> toCompile = new ArrayList<String>();
@@ -56,15 +60,16 @@ public class JavaStubGenerator {
     private ArrayList<ConstructorNode> constructors = new ArrayList<ConstructorNode>();
     private ModuleNode currentModule;
 
-    public JavaStubGenerator(final File outputPath, final boolean requireSuperResolved, final boolean java5) {
+    public JavaStubGenerator(final File outputPath, final boolean requireSuperResolved, final boolean java5, String encoding) {
         this.outputPath = outputPath;
         this.requireSuperResolved = requireSuperResolved;
         this.java5 = java5;
+		this.encoding = encoding;
         outputPath.mkdirs();
     }
 
     public JavaStubGenerator(final File outputPath) {
-        this(outputPath, false, false);
+        this(outputPath, false, false, Charset.defaultCharset().name());
     }
 
     private void mkdirs(File parent, String relativeFile) {
@@ -93,7 +98,8 @@ public class JavaStubGenerator {
 
         File file = new File(outputPath, fileName + ".java");
         FileOutputStream fos = new FileOutputStream(file);
-        PrintWriter out = new PrintWriter(fos);
+        Charset charset = Charset.forName(encoding);
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(fos, charset));
 
         try {
             String packageName = classNode.getPackageName();
@@ -185,7 +191,7 @@ public class JavaStubGenerator {
             verifier.visitClass(classNode);
             currentModule = classNode.getModule();
 
-            boolean isInterface = classNode.isInterface();
+            boolean isInterface = isInterfaceOrTrait(classNode);
             boolean isEnum = (classNode.getModifiers() & Opcodes.ACC_ENUM) != 0;
             boolean isAnnotationDefinition = classNode.isAnnotationDefinition();
             printAnnotations(out, classNode);
@@ -274,6 +280,45 @@ public class JavaStubGenerator {
             }
             printMethod(out, classNode, method);
         }
+
+        for (ClassNode node : classNode.getAllInterfaces()) {
+            if (Traits.isTrait(node)) {
+                List<MethodNode> traitMethods = node.getMethods();
+                for (MethodNode traitMethod : traitMethods) {
+                    MethodNode method = classNode.getMethod(traitMethod.getName(), traitMethod.getParameters());
+                    if (method == null) {
+                        for (MethodNode methodNode : propertyMethods) {
+                            if (methodNode.getName().equals(traitMethod.getName())) {
+                                boolean sameParams = sameParameterTypes(methodNode);
+                                if (sameParams) {
+                                    method = methodNode;
+                                    break;
+                                }
+                            }
+                        }
+                        if (method==null) {
+                            printMethod(out, classNode, traitMethod);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    private static boolean sameParameterTypes(final MethodNode methodNode) {
+        Parameter[] a = methodNode.getParameters();
+        Parameter[] b = methodNode.getParameters();
+        boolean sameParams = a.length == b.length;
+        if (sameParams) {
+            for (int i = 0; i < a.length; i++) {
+                if (!a[i].getType().equals(b[i].getType())) {
+                    sameParams = false;
+                    break;
+                }
+            }
+        }
+        return sameParams;
     }
 
     private void printConstructors(PrintWriter out, ClassNode classNode) {
@@ -288,7 +333,7 @@ public class JavaStubGenerator {
     }
 
     private void printFields(PrintWriter out, ClassNode classNode) {
-        boolean isInterface = classNode.isInterface();
+        boolean isInterface = isInterfaceOrTrait(classNode);
         List<FieldNode> fields = classNode.getFields();
         if (fields == null) return;
         List<FieldNode> enumFields = new ArrayList<FieldNode>(fields.size());
@@ -308,15 +353,16 @@ public class JavaStubGenerator {
     }
 
     private void printEnumFields(PrintWriter out, List<FieldNode> fields) {
-        if (fields.size() == 0) return;
-        boolean first = true;
-        for (FieldNode field : fields) {
-            if (!first) {
-                out.print(", ");
-            } else {
-                first = false;
+        if (fields.size() != 0) {
+            boolean first = true;
+            for (FieldNode field : fields) {
+                if (!first) {
+                    out.print(", ");
+                } else {
+                    first = false;
+                }
+                out.print(field.getName());
             }
-            out.print(field.getName());
         }
         out.println(";");
     }
@@ -543,7 +589,13 @@ public class JavaStubGenerator {
         if (methodNode.isSynthetic() && methodNode.getName().equals("$getStaticMetaClass")) return;
 
         printAnnotations(out, methodNode);
-        if (!clazz.isInterface()) printModifiers(out, methodNode.getModifiers());
+        if (!isInterfaceOrTrait(clazz)) {
+            int modifiers = methodNode.getModifiers();
+            if (isDefaultTraitImpl(methodNode)) {
+                modifiers ^= Opcodes.ACC_ABSTRACT;
+            }
+            printModifiers(out, modifiers);
+        }
 
         printGenericsBounds(out, methodNode.getGenericsTypes());
         out.print(" ");
@@ -564,7 +616,9 @@ public class JavaStubGenerator {
             printType(out, exception);
         }
 
-        if ((methodNode.getModifiers() & Opcodes.ACC_ABSTRACT) != 0) {
+        if (Traits.isTrait(clazz)) {
+            out.println(";");
+        } else if (isAbstract(methodNode)) {
             if (clazz.isAnnotationDefinition() && methodNode.hasAnnotationDefault()) {
                 Statement fs = methodNode.getFirstStatement();
                 if (fs instanceof ExpressionStatement) {
@@ -597,8 +651,26 @@ public class JavaStubGenerator {
         }
     }
 
+    private boolean isAbstract(final MethodNode methodNode) {
+        if (isDefaultTraitImpl(methodNode)) {
+            return false;
+        }
+        if ((methodNode.getModifiers() & Opcodes.ACC_ABSTRACT) != 0) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isDefaultTraitImpl(final MethodNode methodNode) {
+        return Traits.isTrait(methodNode.getDeclaringClass()) && Traits.hasDefaultImplementation(methodNode);
+    }
+
     private void printValue(PrintWriter out, Expression re, boolean assumeClass) {
         if (assumeClass) {
+            if (re.getType().getName().equals("groovy.lang.Closure")) {
+                out.print("groovy.lang.Closure.class");
+                return;
+            }
             String className = re.getText();
             out.print(className);
             if (!className.endsWith(".class")) {
@@ -731,6 +803,7 @@ public class JavaStubGenerator {
             int lastIndex = parameters.length - 1;
             boolean vararg = parameters[lastIndex].getType().isArray();
             for (int i = 0; i != parameters.length; ++i) {
+                printAnnotations(out, parameters[i]);
                 if (i == lastIndex && vararg) {
                     printType(out, parameters[i].getType().getComponentType());
                     out.print("...");
@@ -862,5 +935,9 @@ public class JavaStubGenerator {
 
     private static String escapeSpecialChars(String value) {
         return value.replace("\n", "\\n").replace("\r", "\\r").replace("\"", "\\\"");
+    }
+
+    private static boolean isInterfaceOrTrait(ClassNode cn) {
+        return cn.isInterface() || Traits.isTrait(cn);
     }
 }

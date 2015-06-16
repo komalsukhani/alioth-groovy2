@@ -51,10 +51,10 @@ public class CompilerConfiguration {
     /** This (<code>"1.5"</code>) is the value for targetBytecode to compile for a JDK 1.5 or later JVM. **/
     public static final String POST_JDK5 = JDK5; // for backwards compatibility
 
-    /** This (<code>"1.4"<code/>) is the value for targetBytecode to compile for a JDK 1.4 JVM. **/
+    /** This (<code>"1.4"</code>) is the value for targetBytecode to compile for a JDK 1.4 JVM. **/
     public static final String PRE_JDK5 = JDK4;
 
-    private static final String[] ALLOWED_JDKS = { JDK4, JDK5, JDK6, JDK7 };
+    private static final String[] ALLOWED_JDKS = { JDK4, JDK5, JDK6, JDK7, JDK8 };
 
     // Just call getVMVersion() once.
     public static final String currentJVMVersion = getVMVersion();
@@ -160,6 +160,8 @@ public class CompilerConfiguration {
      * none is disabled.
      */
     private Set<String> disabledGlobalASTTransformations;
+
+    private BytecodeProcessor bytecodePostprocessor;
 
     /**
      * Sets the Flags to defaults.
@@ -827,5 +829,13 @@ public class CompilerConfiguration {
      */
     public void setDisabledGlobalASTTransformations(final Set<String> disabledGlobalASTTransformations) {
         this.disabledGlobalASTTransformations = disabledGlobalASTTransformations;
+    }
+
+    public BytecodeProcessor getBytecodePostprocessor() {
+        return bytecodePostprocessor;
+    }
+
+    public void setBytecodePostprocessor(final BytecodeProcessor bytecodePostprocessor) {
+        this.bytecodePostprocessor = bytecodePostprocessor;
     }
 }

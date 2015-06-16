@@ -18,19 +18,28 @@ package org.codehaus.groovy.ast;
 import groovy.lang.Binding;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
 import org.codehaus.groovy.ast.expr.ClassExpression;
+import org.codehaus.groovy.ast.expr.ConstructorCallExpression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.ast.stmt.BlockStatement;
 import org.codehaus.groovy.ast.stmt.ExpressionStatement;
 import org.codehaus.groovy.ast.stmt.Statement;
-import org.codehaus.groovy.control.ErrorCollector;
+import org.codehaus.groovy.classgen.GeneratorContext;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.runtime.InvokerHelper;
-import org.codehaus.groovy.syntax.SyntaxException;
+import org.codehaus.groovy.transform.BaseScriptASTTransformation;
 import org.objectweb.asm.Opcodes;
 
 import java.io.File;
-import java.util.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a module, which consists typically of a class declaration
@@ -58,6 +67,7 @@ public class ModuleNode extends ASTNode implements Opcodes {
     private boolean importsResolved = false;
     private ClassNode scriptDummy;
     private String mainClassName = null;
+    private final Parameter[] SCRIPT_CONTEXT_CTOR = {new Parameter(ClassHelper.BINDING_TYPE, "context")};
 
     public ModuleNode (SourceUnit context ) {
         this.context = context;
@@ -233,7 +243,7 @@ public class ModuleNode extends ASTNode implements Opcodes {
         if (getDescription() == null) {
             throw new RuntimeException("Cannot generate main(String[]) class for statements when we have no file description");
         }
-        name += extractClassFromFileDescription();
+        name += GeneratorContext.encodeAsValidClassName(extractClassFromFileDescription());
 
         ClassNode classNode;
         if (isPackageInfo()) {
@@ -259,6 +269,8 @@ public class ModuleNode extends ASTNode implements Opcodes {
         if (baseClassName != null) {
             if (!cn.getSuperClass().getName().equals(baseClassName)) {
                 cn.setSuperClass(ClassHelper.make(baseClassName));
+                AnnotationNode annotationNode = new AnnotationNode(BaseScriptASTTransformation.MY_TYPE);
+                cn.addAnnotation(annotationNode);
             }
         }
     }
@@ -287,24 +299,30 @@ public class ModuleNode extends ASTNode implements Opcodes {
                                 new ClassExpression(classNode),
                                 new VariableExpression("args"))))));
 
-        MethodNode methodNode = hasRunMethod();
-        if (methodNode!=null) {
-            ErrorCollector ec = context.getErrorCollector();
-            ec.addError(new SyntaxException("You cannot define a 'run()' method in a script because it is used to wrap the script body. Please choose another name.",
-                        methodNode.getLineNumber(),
-                        methodNode.getLineNumber()),
-                    context);
-        } else {
-            classNode.addMethod(
-                    new MethodNode("run", ACC_PUBLIC, ClassHelper.OBJECT_TYPE, Parameter.EMPTY_ARRAY, ClassNode.EMPTY_ARRAY, statementBlock));
-        }
+        MethodNode methodNode = new MethodNode("run", ACC_PUBLIC, ClassHelper.OBJECT_TYPE, Parameter.EMPTY_ARRAY, ClassNode.EMPTY_ARRAY, statementBlock);
+        methodNode.setIsScriptBody();
+        classNode.addMethod(methodNode);
+
         classNode.addConstructor(ACC_PUBLIC, Parameter.EMPTY_ARRAY, ClassNode.EMPTY_ARRAY, new BlockStatement());
-        Statement stmt = new ExpressionStatement(
-                        new MethodCallExpression(
+
+        Statement stmt;
+        // A script's contextual constructor should call it's super class' contextual constructor, if it has one.
+        // In practice this will always be true because currently this visitor is run before the AST transformations
+        // (like @BaseScript) that could change this.  But this is cautious and anticipates possible compiler changes.
+        if (classNode.getSuperClass().getDeclaredConstructor(SCRIPT_CONTEXT_CTOR) != null) {
+            stmt = new ExpressionStatement(
+                    new ConstructorCallExpression(ClassNode.SUPER,
+                            new ArgumentListExpression(
+                                    new VariableExpression("context"))));
+        } else {
+            // Fallback for non-standard base "script" classes with no context (Binding) constructor.
+            stmt = new ExpressionStatement(
+                    new MethodCallExpression(
                             new VariableExpression("super"),
                             "setBinding",
                             new ArgumentListExpression(
-                                        new VariableExpression("context"))));
+                                    new VariableExpression("context"))));
+        }
 
         classNode.addConstructor(
             ACC_PUBLIC,
@@ -326,17 +344,6 @@ public class ModuleNode extends ASTNode implements Opcodes {
             classNode.addMethod(node);
         }
         return classNode;
-    }
-
-    private MethodNode hasRunMethod() {
-        MethodNode methodNode = null;
-        for (MethodNode method : methods) {
-            if ("run".equals(method.getName()) && method.getParameters().length==0) {
-                methodNode = method;
-                break;
-            }
-        }
-        return methodNode;
     }
 
     /*
@@ -373,8 +380,18 @@ public class ModuleNode extends ASTNode implements Opcodes {
     }
 
     protected String extractClassFromFileDescription() {
-        // let's strip off everything after the last '.'
         String answer = getDescription();
+        try {
+            URI uri = new URI(answer);
+            String path = uri.getPath();
+            String schemeSpecific = uri.getSchemeSpecificPart();
+            if (path!=null) {
+                answer = path;
+            } else if (schemeSpecific!=null) {
+                answer = schemeSpecific;
+            }
+        } catch (URISyntaxException e) {}
+        // let's strip off everything after the last '.'
         int slashIdx = answer.lastIndexOf('/');
         int separatorIdx = answer.lastIndexOf(File.separatorChar);
         int dotIdx = answer.lastIndexOf('.');

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2003-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.codehaus.groovy.tools.shell.completion
 
 import jline.console.completer.Completer
@@ -14,15 +29,11 @@ import jline.console.completer.Completer
 
 import jline.internal.Configuration;
 
-import java.io.File;
-import java.util.List;
-
 import static jline.internal.Preconditions.checkNotNull;
 
 /**
- * PATCHED copy from jline2.10, included
- * https://github.com/jline/jline2/pull/88
- * https://github.com/jline/jline2/issues/90
+ * PATCHED copy from jline 2.12, with
+ * https://github.com/jline/jline2/issues/90 (no trailing blank)
  *
  * A file name completer takes the buffer and issues a list of
  * potential completions.
@@ -52,6 +63,8 @@ implements Completer
 
     private final boolean blankSuffix = true;
 
+    private final handleLeadingHyphen = false;
+
     static {
         String os = Configuration.getOsName();
         OS_IS_WINDOWS = os.contains("windows");
@@ -64,9 +77,16 @@ implements Completer
         this.blankSuffix = blankSuffix;
     }
 
+
+    public FileNameCompleter(boolean blankSuffix, boolean handleLeadingHyphen) {
+        this(blankSuffix)
+        this.handleLeadingHyphen = handleLeadingHyphen
+    }
+
     public int complete(String buffer, final int cursor, final List<CharSequence> candidates) {
         // buffer can be null
         checkNotNull(candidates);
+        String hyphenChar = null;
 
         if (buffer == null) {
             buffer = "";
@@ -77,6 +97,10 @@ implements Completer
         }
 
         String translated = buffer;
+        if (handleLeadingHyphen && (translated.startsWith('\'') || translated.startsWith('"'))) {
+            hyphenChar = translated[0];
+            translated = translated.substring(1);
+        }
 
         File homeDir = getUserHome();
 
@@ -102,9 +126,9 @@ implements Completer
             dir = file.getParentFile();
         }
 
-        File[] entries = dir == null ? new File[0] : dir.listFiles();
+        File[] entries = (dir == null) ? new File[0] : dir.listFiles();
 
-        return matchFiles(buffer, translated, entries, candidates);
+        return matchFiles(buffer, translated, entries, candidates, hyphenChar);
     }
 
     protected String separator() {
@@ -119,7 +143,7 @@ implements Completer
         return new File(".");
     }
 
-    protected int matchFiles(final String buffer, final String translated, final File[] files, final List<CharSequence> candidates) {
+    protected int matchFiles(final String buffer, final String translated, final File[] files, final List<CharSequence> candidates, hyphenChar) {
         if (files == null) {
             return -1;
         }
@@ -139,12 +163,12 @@ implements Completer
                     if (file.isDirectory()) {
                         name += separator();
                     } else {
-                        if (blankSuffix) {
+                        if (blankSuffix && !hyphenChar) {
                             name += ' ';
                         }
                     }
                 }
-                candidates.add(render(file, name).toString());
+                candidates.add(render(name, hyphenChar).toString());
             }
         }
 
@@ -153,7 +177,18 @@ implements Completer
         return index + separator().length();
     }
 
-    protected CharSequence render(final File file, final CharSequence name) {
+    protected CharSequence render(final CharSequence name, final String hyphenChar) {
+        if (hyphenChar != null) {
+            return escapedNameInHyphens(name, hyphenChar);
+        }
+        if (name.contains(' ')) {
+            return escapedNameInHyphens(name, '\'');
+        }
         return name;
+    }
+
+    private String escapedNameInHyphens(String name, String hyphen) {
+        // need to escape every instance of chartoEscape, and every instance of the escape char backslash
+        return hyphen + name.replace('\\', '\\\\').replace(hyphen, '\\' + hyphen) + hyphen
     }
 }

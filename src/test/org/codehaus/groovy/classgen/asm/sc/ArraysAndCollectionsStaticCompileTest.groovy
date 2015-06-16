@@ -22,14 +22,7 @@ import groovy.transform.stc.ArraysAndCollectionsSTCTest
  *
  * @author Cedric Champeau
  */
-@Mixin(StaticCompilationTestSupport)
-class ArraysAndCollectionsStaticCompileTest extends ArraysAndCollectionsSTCTest {
-
-    @Override
-    protected void setUp() {
-        super.setUp()
-        extraSetup()
-    }
+class ArraysAndCollectionsStaticCompileTest extends ArraysAndCollectionsSTCTest implements StaticCompilationTestSupport {
 
     void testListStarWithMethodReturningVoid() {
         assertScript '''
@@ -82,6 +75,15 @@ class ArraysAndCollectionsStaticCompileTest extends ArraysAndCollectionsSTCTest 
             assert map['class'] == 'TEST'
             assert map['bytes'] == 'TEST'
         '''
+    }
+
+    @Override
+    void testForInLoop() {
+        try {
+            super.testForInLoop()
+        } finally {
+            println astTrees
+        }
     }
 }
 

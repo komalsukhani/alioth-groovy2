@@ -79,6 +79,7 @@ public class WriterController {
     private TypeChooser typeChooser;
     private int bytecodeVersion = Opcodes.V1_5;
     private int lineNumber = -1;
+    private int helperMethodIndex = 0;
 
     public void init(AsmClassGenerator asmClassGenerator, GeneratorContext gcon, ClassVisitor cv, ClassNode cn) {
         CompilerConfiguration config = cn.getCompileUnit().getConfig();
@@ -143,8 +144,10 @@ public class WriterController {
     }
 
     private static int chooseBytecodeVersion(final boolean invokedynamic, final String targetBytecode) {
-        // todo: support JDK 1.8 when ASM5 is out
         if (invokedynamic) {
+            if (CompilerConfiguration.JDK8.equals(targetBytecode)) {
+                return Opcodes.V1_8;
+            }
             return Opcodes.V1_7;
         } else {
             if (CompilerConfiguration.JDK4.equals(targetBytecode)) {
@@ -158,6 +161,9 @@ public class WriterController {
             }
             if (CompilerConfiguration.JDK7.equals(targetBytecode)) {
                 return Opcodes.V1_7;
+            }
+            if (CompilerConfiguration.JDK8.equals(targetBytecode)) {
+                return Opcodes.V1_8;
             }
         }
         throw new GroovyBugError("Bytecode version ["+targetBytecode+"] is not supported by the compiler");
@@ -393,4 +399,8 @@ public class WriterController {
 	public void resetLineNumber() {
 		setLineNumber(-1);
 	}
+
+    public int getNextHelperMethodIndex() {
+        return helperMethodIndex++;
+    }
 }

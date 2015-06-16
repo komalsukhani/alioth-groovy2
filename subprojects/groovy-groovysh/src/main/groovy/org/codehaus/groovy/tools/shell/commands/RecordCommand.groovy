@@ -19,7 +19,6 @@ package org.codehaus.groovy.tools.shell.commands
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.codehaus.groovy.tools.shell.ComplexCommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
-import org.codehaus.groovy.tools.shell.Shell
 
 /**
  * The 'record' command.
@@ -30,8 +29,10 @@ import org.codehaus.groovy.tools.shell.Shell
 class RecordCommand
     extends ComplexCommandSupport
 {
+    public static final String COMMAND_NAME = ':record'
+
     RecordCommand(final Groovysh shell) {
-        super(shell, 'record', '\\r', [ 'start', 'stop', 'status' ], 'status')
+        super(shell, COMMAND_NAME, ':r', [ 'start', 'stop', 'status' ], 'status')
 
         addShutdownHook {
             if (isRecording()) {
@@ -82,7 +83,7 @@ class RecordCommand
 
     def do_start = {List<String> args ->
         if (isRecording()) {
-            fail("Already recording to: $file")
+            fail("Already recording to: \"$file\"")
         }
 
         if (args.size() == 0) {
@@ -90,32 +91,32 @@ class RecordCommand
         } else if (args.size() == 1) {
             file = new File(args[0] as String)
         } else {
-            fail("Too many arguments. Usage: record start [filename]")
+            fail('Too many arguments. Usage: record start [filename]')
         }
 
         if (file.parentFile) file.parentFile.mkdirs()
 
         writer = file.newPrintWriter()
-        writer.println("// OPENED: " + new Date())
+        writer.println('// OPENED: ' + new Date())
         writer.flush()
-        
-        io.out.println("Recording session to: $file")
+
+        io.out.println("Recording session to: \"$file\"")
 
         return file
     }
 
     def do_stop = {
         if (!isRecording()) {
-            fail("Not recording")
+            fail('Not recording')
         }
 
-        writer.println("// CLOSED: " + new Date())
+        writer.println('// CLOSED: ' + new Date())
         writer.flush()
 
         writer.close()
         writer = null
 
-        io.out.println("Recording stopped; session saved as: $file (${file.length()} bytes)")
+        io.out.println("Recording stopped; session saved as: \"$file\" (${file.length()} bytes)")
 
         def tmp = file
         file = null
@@ -125,12 +126,12 @@ class RecordCommand
 
     def do_status = {
         if (!isRecording()) {
-            io.out.println("Not recording")
+            io.out.println('Not recording')
 
             return null
         }
 
-        io.out.println("Recording to file: $file (${file.length()} bytes)")
+        io.out.println("Recording to file: \"$file\" (${file.length()} bytes)")
 
         return file
     }

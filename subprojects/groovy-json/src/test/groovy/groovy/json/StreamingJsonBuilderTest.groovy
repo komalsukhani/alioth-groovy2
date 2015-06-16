@@ -23,14 +23,14 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testJsonBuilderConstructor() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w, [a: 1, b: true])
+            new StreamingJsonBuilder(w, [a: 1, b: true])
             assert w.toString() == '{"a":1,"b":true}'
         }
     }
 
     void testEmptyArray() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json([])
             assert w.toString() == '[]'
         }
@@ -38,7 +38,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testSimpleArray() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json 1, 2, "a", "b"
 
             assert w.toString() == '[1,2,"a","b"]'
@@ -47,7 +47,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testComplexArray() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json 1, 2, [k: true], "a", "b", [3, "c"]
 
             assert w.toString() == '[1,2,{"k":true},"a","b",[3,"c"]]'
@@ -56,7 +56,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testMap() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json a: 1, b: 2
 
             assert w.toString() == '{"a":1,"b":2}'
@@ -65,7 +65,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testEmptyObject() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json {}
 
             assert w.toString() == '{}'
@@ -74,7 +74,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testBasicObject() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json {
                 a 1
                 b true
@@ -87,7 +87,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
     
     void testNestedObjects() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json {
                 a {
                     b {
@@ -102,7 +102,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testStandardBuilderStyle() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json.person {
                 name "Guillaume"
                 age 33
@@ -114,7 +114,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testMethodCallWithNamedArguments() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json.person name: "Guillaume", age: 33
 
             assert w.toString() == '{"person":{"name":"Guillaume","age":33}}'
@@ -123,7 +123,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testThrowAnExceptionWhenPassingSomethingElseThanAClosure() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
 
             shouldFail(JsonException) {
                 json.something 1, 2, 3
@@ -133,7 +133,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testListWithAnEmptyObject() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json([[:]])
 
             assert w.toString() == '[{}]'
@@ -142,7 +142,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testListOfObjects() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json([name: "Guillaume"], [name: "Jochen"], [name: "Paul"])
 
             assert w.toString() == '[{"name":"Guillaume"},{"name":"Jochen"},{"name":"Paul"}]'
@@ -151,7 +151,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testElementHasListOfObjects() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json.response {
                 results 1, [a: 2]
             }
@@ -160,9 +160,54 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
         }
     }
 
+    private class Author {
+        String name
+    }
+
+    void testCollectionAndClosure() {
+        def authors = [new Author(name: "Guillaume"), new Author(name: "Jochen"), new Author(name: "Paul")]
+
+        new StringWriter().with { w ->
+            def json = new StreamingJsonBuilder(w)
+            json authors, { Author author ->
+                name author.name
+            }
+
+            assert w.toString() == '[{"name":"Guillaume"},{"name":"Jochen"},{"name":"Paul"}]'
+        }
+    }
+
+    void testMethodWithCollectionAndClosure() {
+        def authors = [new Author(name: "Guillaume"), new Author(name: "Jochen"), new Author(name: "Paul")]
+
+        new StringWriter().with { w ->
+            def json = new StreamingJsonBuilder(w)
+            json.authors authors, { Author author ->
+                name author.name
+            }
+
+            assert w.toString() == '{"authors":[{"name":"Guillaume"},{"name":"Jochen"},{"name":"Paul"}]}'
+        }
+    }
+
+    void testNestedMethodWithCollectionAndClosure() {
+        def theAuthors = [new Author(name: "Guillaume"), new Author(name: "Jochen"), new Author(name: "Paul")]
+
+        new StringWriter().with { w ->
+            def json = new StreamingJsonBuilder(w)
+            json {
+                authors theAuthors, { Author author ->
+                    name author.name
+                }
+            }
+
+            assert w.toString() == '{"authors":[{"name":"Guillaume"},{"name":"Jochen"},{"name":"Paul"}]}'
+        }
+    }
+
     void testComplexStructureFromTheGuardian() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json.response {
                 status "ok"
                 userTier "free"
@@ -199,9 +244,9 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testNestedListMap() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json.content {
-                list([:],[another:[a:[1,2,3]]])
+                list([:], [another: [a: [1, 2, 3]]])
             }
 
             assert w.toString() == '''{"content":{"list":[{},{"another":{"a":[1,2,3]}}]}}'''
@@ -210,7 +255,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testEmptyList() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json()
 
             assert w.toString() == '''[]'''
@@ -219,7 +264,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testTrendsFromTwitter() {
         new StringWriter().with { w ->
-            def json = new StreamingJsonBuilder( w )
+            def json = new StreamingJsonBuilder(w)
             json.trends {
                 "2010-06-22 17:20" ([
                         name: "Groovy rules",
@@ -245,7 +290,7 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testExampleFromTheGep7Page() {
         new StringWriter().with { w ->
-            def builder = new StreamingJsonBuilder( w )
+            def builder = new StreamingJsonBuilder(w)
             builder.people {
                 person {
                     firstName 'Guillame'
@@ -267,31 +312,32 @@ class StreamingJsonBuilderTest extends GroovyTestCase {
 
     void testEdgeCases() {
         new StringWriter().with { w ->
-            def builder = new StreamingJsonBuilder( w )
+            def builder = new StreamingJsonBuilder(w)
             builder { elem 1, 2, 3 }
             
             assert w.toString() == '{"elem":[1,2,3]}'
         }
         new StringWriter().with { w ->
-            def builder = new StreamingJsonBuilder( w )
+            def builder = new StreamingJsonBuilder(w)
             builder.elem()
-            
+
             assert w.toString() == '{"elem":{}}'
         }
         new StringWriter().with { w ->
-            def builder = new StreamingJsonBuilder( w )
+            def builder = new StreamingJsonBuilder(w)
             builder.elem(a: 1, b: 2) { c 3 }
             
             assert w.toString() == '{"elem":{"a":1,"b":2,"c":3}}'
         }
         new StringWriter().with { w ->
-            def builder = new StreamingJsonBuilder( w )
-            builder.elem( [:] ) { c 3 }
+            def builder = new StreamingJsonBuilder(w)
+            builder.elem([:]) { c 3 }
             
             assert w.toString() == '{"elem":{"c":3}}'
         }
         new StringWriter().with { w ->
-            def builder = new StreamingJsonBuilder( w )
+            def builder = new StreamingJsonBuilder(w)
+
             shouldFail(JsonException) {
                 builder.elem(a: 1, b: 2, "ABCD")
             }

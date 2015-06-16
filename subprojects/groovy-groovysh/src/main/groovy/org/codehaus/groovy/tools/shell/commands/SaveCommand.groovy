@@ -16,6 +16,7 @@
 
 package org.codehaus.groovy.tools.shell.commands
 
+import jline.console.completer.Completer
 import jline.console.completer.FileNameCompleter
 import org.codehaus.groovy.tools.shell.CommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
@@ -29,22 +30,26 @@ import org.codehaus.groovy.tools.shell.Groovysh
 class SaveCommand
     extends CommandSupport
 {
+    public static final String COMMAND_NAME = ':save'
+
     SaveCommand(final Groovysh shell) {
-        super(shell, 'save', '\\s')
+        super(shell, COMMAND_NAME, ':s')
     }
 
-    protected List createCompleters() {
+    @Override
+    protected List<Completer> createCompleters() {
         return [
             new FileNameCompleter(),
             null
         ]
     }
 
+    @Override
     Object execute(final List<String> args) {
         assert args != null
-        
+
         if (args.size() != 1) {
-            fail("Command 'save' requires a single file argument") // TODO: i18n
+            fail("Command '$COMMAND_NAME' requires a single file argument") // TODO: i18n
         }
 
         if (buffer.isEmpty()) {
@@ -55,20 +60,20 @@ class SaveCommand
         //
         // TODO: Support special '-' file to simply dump text to io.out
         //
-        
+
         def file = new File("${args[0]}")
 
         if (io.verbose) {
-            io.out.println("Saving current buffer to file: $file") // TODO: i18n
+            io.out.println("Saving current buffer to file: \"$file\"") // TODO: i18n
         }
 
         def dir = file.parentFile
         if (dir && !dir.exists()) {
-            log.debug("Creating parent directory path: $dir")
-            
+            log.debug("Creating parent directory path: \"$dir\"")
+
             dir.mkdirs()
         }
-        
+
         file.write(buffer.join(NEWLINE))
     }
 }

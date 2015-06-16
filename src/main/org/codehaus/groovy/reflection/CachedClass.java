@@ -19,6 +19,7 @@ import groovy.lang.*;
 
 import org.codehaus.groovy.classgen.asm.BytecodeHelper;
 import org.codehaus.groovy.runtime.callsite.CallSiteClassLoader;
+import org.codehaus.groovy.runtime.metaclass.ClosureMetaClass;
 import org.codehaus.groovy.util.LazyReference;
 import org.codehaus.groovy.util.FastArray;
 import org.codehaus.groovy.util.ReferenceBundle;
@@ -35,6 +36,7 @@ import java.util.*;
  * @author Alex.Tkachman
  */
 public class CachedClass {
+    private static final Method[] EMPTY_METHOD_ARRAY = new Method[0];
     private final Class cachedClass;
     public ClassInfo classInfo;
     
@@ -81,13 +83,18 @@ public class CachedClass {
             final Method[] declaredMethods = (Method[])
                AccessController.doPrivileged(new PrivilegedAction/*<Method[]>*/() {
                    public /*Method[]*/ Object run() {
-                       final Method[] dm = getTheClass().getDeclaredMethods();
                        try {
-                           AccessibleObject.setAccessible(dm, true);
-                       } catch (SecurityException e) {
-                           // swallow for strict security managers
+                           final Method[] dm = getTheClass().getDeclaredMethods();
+                           try {
+                               AccessibleObject.setAccessible(dm, true);
+                           } catch (SecurityException e) {
+                               // swallow for strict security managers
+                           }
+                           return dm;
+                       } catch (Throwable e) {
+                           // Typically, Android can throw ClassNotFoundException
+                           return EMPTY_METHOD_ARRAY;
                        }
-                       return dm;
                    }
                });
             List<CachedMethod> methods = new ArrayList<CachedMethod>(declaredMethods.length);
@@ -450,6 +457,10 @@ public class CachedClass {
         res.addAll(Arrays.asList(classInfo.newMetaMethods));
         res.addAll(arr);
         classInfo.newMetaMethods = res.toArray(new MetaMethod[res.size()]);
+        Class theClass = classInfo.getCachedClass().getTheClass();
+        if (theClass==Closure.class || theClass==Class.class) {
+            ClosureMetaClass.resetCachedMetaClasses();
+        }
     }
 
     public boolean isAssignableFrom(Class argument) {

@@ -16,9 +16,9 @@
 
 package org.codehaus.groovy.tools.shell.commands
 
+import jline.console.completer.Completer
 import org.codehaus.groovy.tools.shell.CommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
-import org.codehaus.groovy.tools.shell.Shell
 import org.codehaus.groovy.tools.shell.util.PackageHelper
 import org.codehaus.groovy.tools.shell.util.SimpleCompletor
 import org.codehaus.groovy.tools.shell.util.Preferences
@@ -32,11 +32,14 @@ import org.codehaus.groovy.tools.shell.util.Preferences
 class SetCommand
     extends CommandSupport
 {
+    public static final String COMMAND_NAME = ':set'
+
     SetCommand(final Groovysh shell) {
-        super(shell, 'set', '\\=')
+        super(shell, COMMAND_NAME, ':=')
     }
 
-    protected List createCompleters() {
+    @Override
+    protected List<Completer> createCompleters() {
         def loader = {
             Set<String> set = [] as Set<String>
 
@@ -49,7 +52,10 @@ class SetCommand
             set << Preferences.PARSER_FLAVOR_KEY
             set << Preferences.SANITIZE_STACK_TRACE_KEY
             set << Preferences.SHOW_LAST_RESULT_KEY
+            set << Groovysh.INTERPRETER_MODE_PREFERENCE_KEY
             set << Groovysh.AUTOINDENT_PREFERENCE_KEY
+            set << Groovysh.COLORS_PREFERENCE_KEY
+            set << Groovysh.METACLASS_COMPLETION_PREFIX_LENGTH_PREFERENCE_KEY
             set << PackageHelper.IMPORT_COMPLETION_PREFERENCE_KEY
 
             return set.toList()
@@ -61,42 +67,42 @@ class SetCommand
         ]
     }
 
+    @Override
     Object execute(final List<String> args) {
         assert args != null
-        
+
         if (args.size() == 0) {
             def keys = Preferences.keys()
-            
+
             if (keys.size() == 0) {
                 io.out.println('No preferences are set')
                 return
             }
-            else {
-                io.out.println('Preferences:')
-                keys.each { String key ->
-                    def keyvalue = Preferences.get(key, null)
-                    println("    $key=$keyvalue")
-                }
+
+            io.out.println('Preferences:')
+            keys.each { String key ->
+                def keyvalue = Preferences.get(key, null)
+                io.out.println("    $key=$keyvalue")
             }
             return
         }
-        
+
         if (args.size() > 2) {
             fail("Command '$name' requires arguments: <name> [<value>]")
         }
-        
+
         String name = args[0]
         def value
-        
+
         if (args.size() == 1) {
             value = true
         }
         else {
             value = args[1]
         }
-        
+
         log.debug("Setting preference: $name=$value")
-        
+
         Preferences.put(name, String.valueOf(value))
     }
 }

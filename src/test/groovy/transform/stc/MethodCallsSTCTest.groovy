@@ -188,7 +188,7 @@ class MethodCallsSTCTest extends StaticTypeCheckingTestCase {
             B c = new B<Integer>()
             String[] args = ['a','b','c']
             assert c.identity(args) == args
-        ''', 'Cannot find matching method groovy.transform.stc.MethodCallsSTCTest$MyMethodCallTestClass2#identity(java.lang.String[])'
+        ''', 'Cannot call groovy.transform.stc.MethodCallsSTCTest$MyMethodCallTestClass2 <Integer>#identity(java.lang.Integer[]) with arguments [java.lang.String[]]'
     }
 
     void testMethodCallFromSuperOwner() {
@@ -986,6 +986,55 @@ class MethodCallsSTCTest extends StaticTypeCheckingTestCase {
         shouldFailWithMessages '''
             String.doSomething()
         ''', 'Cannot find matching method java.lang.String#doSomething()'
+    }
+    
+    // GROOVY-6646
+    void testNPlusVargsCallInOverloadSituation() {
+        assertScript '''
+            def foo(Class... cs) { "Classes" }
+            def foo(String... ss) { "Strings" }
+
+            assert foo(List, Map) == "Classes"
+            assert foo("2","1") == "Strings"
+        '''
+        assertScript '''
+            def foo(Class<?>... cs) { "Classes" }
+            def foo(String... ss) { "Strings" }
+
+            assert foo(List, Map) == "Classes"
+            assert foo("2","1") == "Strings"
+        '''
+    }
+    
+    //GROOVY-6776
+    void testPrimtiveParameterAndNullArgument() {
+        shouldFailWithMessages '''
+            def foo(int i){}
+            def bar() {
+                foo null
+            }
+            bar()
+        ''',
+        '#foo(int) with arguments [<unknown parameter type>]'
+    }
+
+    // GROOVY-6751
+    void testMethodInBothInterfaceAndSuperclass() {
+        assertScript '''
+            interface Ifc {
+              Object getProperty(String s)
+            }
+
+            class DuplicateMethodInIfc implements Ifc {}  // implemented in groovy.lang.GroovyObject
+
+            class Tester {
+              DuplicateMethodInIfc dup = new DuplicateMethodInIfc()
+              Object obj = dup.getProperty("foo")
+            }
+
+            try { new Tester()}
+            catch(groovy.lang.MissingPropertyException expected) {}
+            '''
     }
 
     static class MyMethodCallTestClass {

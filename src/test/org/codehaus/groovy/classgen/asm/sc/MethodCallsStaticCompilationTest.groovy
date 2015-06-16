@@ -18,13 +18,7 @@ package org.codehaus.groovy.classgen.asm.sc;
 import groovy.transform.stc.MethodCallsSTCTest
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
-@Mixin(StaticCompilationTestSupport)
-public class MethodCallsStaticCompilationTest extends MethodCallsSTCTest {
-    @Override
-    protected void setUp() {
-        super.setUp()
-        extraSetup()
-    }
+public class MethodCallsStaticCompilationTest extends MethodCallsSTCTest implements StaticCompilationTestSupport {
 
     void testCallToSuper() {
         assertScript '''
@@ -170,4 +164,65 @@ import groovy.transform.TypeCheckingMode//import org.codehaus.groovy.classgen.as
         }
     }
 
+    // GROOVY-6647
+    void testInaccessibleConstructor() {
+        shouldFailWithMessages '''
+            class Foo {
+                private Foo(){}
+            }
+
+            class Bar {
+                def foo() {new Foo()}
+            }
+        ''', 'Cannot call private constructor'
+    }
+
+    // GROOVY-7063
+    void testCallToProtectedMethodFromClosureInSubclassAndDifferentPackage() {
+        assertScript ''' import org.codehaus.groovy.classgen.asm.sc.MethodCallsStaticCompilationTest.Base
+
+        class Ext extends Base {
+
+            int doSomething() {
+                def c = {
+                    foo()
+                }
+                c.call()
+            }
+        }
+        def ext = new Ext()
+        assert ext.doSomething() == 123
+        '''
+    }
+
+    // GROOVY-7264
+    void testCallProtectedMethodWithGenericTypes() {
+        assertScript '''
+            import org.codehaus.groovy.classgen.asm.sc.MethodCallsStaticCompilationTest.BaseGeneric
+
+            class Ext extends BaseGeneric<Integer> {
+
+                int doSomething() {
+                    def c = {
+                        foo(123)
+                    }
+                    c.call()?1:0
+                }
+            }
+            def ext = new Ext()
+            assert ext.doSomething() == 1
+        '''
+    }
+
+    public static class Base {
+        protected int foo() {
+            123
+        }
+    }
+
+    public static class BaseGeneric<T> {
+        protected boolean foo(T t) {
+            true
+        }
+    }
 }

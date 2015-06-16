@@ -19,7 +19,6 @@ package org.codehaus.groovy.tools.shell.commands
 import org.codehaus.groovy.tools.shell.ComplexCommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
 import org.codehaus.groovy.tools.shell.IO
-import org.codehaus.groovy.tools.shell.Shell
 import org.codehaus.groovy.tools.shell.util.Preferences
 
 /**
@@ -31,8 +30,10 @@ import org.codehaus.groovy.tools.shell.util.Preferences
 class ShadowCommand
     extends ComplexCommandSupport
 {
+    public static final String COMMAND_NAME = ':shadow'
+
     ShadowCommand(final Groovysh shell) {
-        super(shell, 'shadow', '\\&', [ 'debug', 'verbose', 'info', 'this' ])
+        super(shell, COMMAND_NAME, ':&', [ 'debug', 'verbose', 'info', 'this' ])
         
         this.hidden = true
     }

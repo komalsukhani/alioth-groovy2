@@ -1,6 +1,16 @@
 dependencies {
-    compile project(':')
+    compile rootProject
     compile project(':groovy-xml')
-    groovy project(':')
+    testCompile rootProject.sourceSets.test.runtimeClasspath
     testCompile project(':groovy-test')
+    testCompile("org.spockframework:spock-core:0.7-groovy-2.0") {
+        exclude module: 'groovy-all'
+    }
+}
+
+task backportJar(type:Jar) {
+    appendix = 'markup-backport'
+    dependsOn classes
+    from sourceSets.main.output
+    include 'groovy/text/markup/**'
 }

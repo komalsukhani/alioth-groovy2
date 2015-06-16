@@ -18,7 +18,6 @@ package org.codehaus.groovy.tools.shell.commands
 
 import org.codehaus.groovy.tools.shell.CommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
-import org.codehaus.groovy.tools.shell.Shell
 
 /**
  * The 'clear' command.
@@ -29,13 +28,16 @@ import org.codehaus.groovy.tools.shell.Shell
 class ClearCommand
     extends CommandSupport
 {
+    public static final String COMMAND_NAME = ':clear'
+
     ClearCommand(final Groovysh shell) {
-        super(shell, 'clear', '\\c')
+        super(shell, COMMAND_NAME, ':c')
     }
-    
+
+    @Override
     Object execute(final List<String> args) {
         assertNoArguments(args)
-        
+
         buffer.clear()
 
         if (io.verbose) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,17 +57,17 @@ class XmlParserTest extends GroovyTestCase {
         def text = """
 <p>Please read the <a href="index.html">Home</a> page</p>
 """
-        def node = new XmlParser().parseText(text)
+        def node = new XmlParser(trimWhitespace: true).parseText(text)
         StringWriter sw = new StringWriter()
         new NodePrinter(new PrintWriter(sw)).print(node)
         def result = fixEOLs(sw.toString())
         def expected = '''\
 p() {
-  builder.append(Please read the)
+  Please read the
   a(href:'index.html') {
-    builder.append(Home)
+    Home
   }
-  builder.append(page)
+  page
 }
 '''
         assert result == expected
@@ -77,7 +77,7 @@ p() {
         def text = """
 <p>Please read the <a href="index.html">Home</a> page</p>
 """
-        def node = new XmlParser().parseText(text)
+        def node = new XmlParser(trimWhitespace: true).parseText(text)
         StringWriter sw = new StringWriter()
         new XmlNodePrinter(new PrintWriter(sw)).print(node)
         def result = fixEOLs(sw.toString())
@@ -94,7 +94,7 @@ p() {
     }
 
     void testXmlNodePrinterNamespaces() {
-        def html = new XmlParser().parseText(bookXml)
+        def html = new XmlParser(trimWhitespace: true).parseText(bookXml)
         StringWriter sw = new StringWriter()
         new XmlNodePrinter(new PrintWriter(sw)).print(html)
         def result = fixEOLs(sw.toString())
@@ -239,11 +239,12 @@ p() {
 
     void testMixedMarkup() {
         MixedMarkupTestSupport.checkMixedMarkup(getRoot)
+        MixedMarkupTestSupport.checkMixedMarkupText(getRoot)
     }
 
     void testWhitespaceTrimming() {
         def text = '<outer><inner>   Here is some text    </inner></outer>'
-        def parser = new XmlParser()
+        def parser = new XmlParser(trimWhitespace: true)
         def outer = parser.parseText(text)
         assert outer.inner.text() == 'Here is some text'
         parser.setTrimWhitespace false

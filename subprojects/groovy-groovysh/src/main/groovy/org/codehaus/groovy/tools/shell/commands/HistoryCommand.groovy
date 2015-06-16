@@ -16,7 +16,6 @@
 
 package org.codehaus.groovy.tools.shell.commands
 
-import jline.console.history.FileHistory
 import jline.console.history.History
 import org.codehaus.groovy.tools.shell.ComplexCommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
@@ -31,15 +30,18 @@ import org.codehaus.groovy.tools.shell.util.SimpleCompletor
 class HistoryCommand
     extends ComplexCommandSupport
 {
+
+    public static final String COMMAND_NAME = ':history'
+
     HistoryCommand(final Groovysh shell) {
-        super(shell, 'history', '\\H', [ 'show', 'clear', 'flush', 'recall' ], 'show')
+        super(shell, COMMAND_NAME, ':H', [ 'show', 'clear', 'flush', 'recall' ], 'show')
     }
 
+    @Override
     protected List createCompleters() {
         def loader = {
             def list = []
-
-            getFunctions().each { String fun -> list << fun }
+            list.addAll(functions)
 
             return list
         }
@@ -50,9 +52,10 @@ class HistoryCommand
         ]
     }
 
+    @Override
     Object execute(List<String> args) {
         if (!history) {
-            fail("Shell does not appear to be interactive; Can not query history")
+            fail('Shell does not appear to be interactive; Can not query history')
         }
 
         super.execute(args)
@@ -64,7 +67,7 @@ class HistoryCommand
     def do_show = {
         Iterator<History.Entry> histIt = history.iterator()
         while (histIt.hasNext()) {
-            History.Entry next = histIt.next();
+            History.Entry next = histIt.next()
             if (next) {
                 io.out.println(" @|bold ${next.index().toString().padLeft(3, ' ')}|@  ${next.value()}")
             }
@@ -95,7 +98,7 @@ class HistoryCommand
         String line
 
         if (!args || ((List)args).size() != 1) {
-            fail("History recall requires a single history identifer")
+            fail('History recall requires a single history identifer')
         }
 
         String ids = ((List<String>)args)[0]
@@ -111,14 +114,14 @@ class HistoryCommand
                 // has been added to history before it actually gets executed
                 // so we need to shift by one
                 id--
-            };
+            }
 
             Iterator<History.Entry> listEntryIt = history.iterator()
             if (listEntryIt.hasNext()) {
                 History.Entry next = listEntryIt.next()
                 if (id < next.index() -1) {
                     // not using id on purpose, as might be decremented
-                    fail("Unknown index:" + ids)
+                    fail("Unknown index: $ids")
                 } else if (id == next.index() -1) {
                     line = shell.evictedLine
                 } else if (next.index() == id) {

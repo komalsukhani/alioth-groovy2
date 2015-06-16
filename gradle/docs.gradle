@@ -1,15 +1,20 @@
-task doc(dependsOn: ['asciidocAll', 'assembleAsciidoc', 'javadocAll', 'groovydocAll', 'docGDK']) {
-    ext.footer = 'Copyright &amp;copy; 2003-2013 The Codehaus. All rights reserved.'
+task doc(dependsOn: ['javadocAll', 'groovydocAll', 'docGDK']) {
+    if (JavaVersion.current().java7Compatible) {
+        dependsOn 'asciidocAll', 'assembleAsciidoc'
+    }
+    ext.footer = 'Copyright &amp;copy; 2003-2014 The Codehaus. All rights reserved.'
     ext.title = "Groovy ${groovyVersion}"
 }
 
-task assembleAsciidoc(type: Copy, dependsOn: 'asciidocAll') {
-    if (!isJava15()) {
+if (JavaVersion.current().java7Compatible) {
+    task assembleAsciidoc(type: Copy, dependsOn: 'asciidocAll') {
         subprojects {
             from project.asciidoctor
         }
         into "$buildDir/asciidoc"
     }
+
+    task asciidocAll(dependsOn: 'asciidoctor')
 }
 
 def javadocSpec = {
@@ -22,10 +27,10 @@ def javadocSpec = {
         version = true
         overview = rootProject.file('src/main/overviewj.html')
         footer = doc.footer
-        source = rootProject.useIndy()?'1.7':'1.5'
-        links('http://docs.oracle.com/javase/7/docs/api/', 'http://evgeny-goldin.org/javadoc/ant/api/',
-                'http://commons.apache.org/proper/commons-cli/javadocs/api-release', 'http://junit.org/javadoc/latest/',
-                'http://docs.oracle.com/javaee/6/api/', 'http://www.antlr2.org/javadoc')
+        source = rootProject.useIndy()?'1.7':'1.6'
+        links('http://docs.oracle.com/javase/8/docs/api/', 'http://docs.oracle.com/javaee/7/api/',
+                'http://commons.apache.org/proper/commons-cli/javadocs/api-release/', 'http://junit.org/apidocs/',
+                'http://docs.oracle.com/javaee/6/api/', 'http://www.antlr2.org/javadoc/')
     }
 }
 
@@ -39,21 +44,17 @@ def groovydocSpec = {
     footer = doc.footer
     overview = rootProject.file('src/main/overview.html')
     includePrivate = false
-    link 'http://docs.oracle.com/javaee/6/api/', 'javax.servlet.', 'javax.management.'
-    link 'http://docs.oracle.com/javase/7/docs/api/', 'java.', 'org.xml.', 'javax.', 'org.w3c.'
-    link 'http://evgeny-goldin.org/javadoc/ant/api/', 'org.apache.ant.', 'org.apache.tools.ant.'
-    link 'http://junit.org/javadoc/latest/', 'org.junit.', 'junit.'
-    link 'http://www.antlr2.org/javadoc', 'antlr.'
-    link 'http://commons.apache.org/proper/commons-cli/javadocs/api-release', 'org.apache.commons.cli.'
+    link 'http://docs.oracle.com/javaee/7/api/', 'javax.servlet.', 'javax.management.'
+    link 'http://docs.oracle.com/javase/8/docs/api/', 'java.', 'org.xml.', 'javax.', 'org.w3c.'
+    link 'http://docs.groovy-lang.org/docs/ant/api/', 'org.apache.ant.', 'org.apache.tools.ant.'
+    link 'http://junit.org/apidocs/', 'org.junit.', 'junit.'
+    link 'http://www.antlr2.org/javadoc/', 'antlr.'
+    link 'http://commons.apache.org/proper/commons-cli/javadocs/api-release/', 'org.apache.commons.cli.'
 }
 
 allprojects {
     javadoc javadocSpec
     groovydoc groovydocSpec
-
-    if (!isJava15()) {
-        task asciidocAll(dependsOn: 'asciidoctor')
-    }
 }
 
 // Root project has an extra 'all' javadoc task
@@ -103,7 +104,10 @@ task docGDK {
 //    ext.extraDocGDKclasses = []
     dependsOn([project(':groovy-groovydoc'), project(':groovy-docgenerator')]*.classes)
     // TODO don't hard-code these
-    dependsOn([project(':groovy-sql'), project(':groovy-sql'), project(':groovy-swing')]*.classes)
+    dependsOn([project(':groovy-sql'), project(':groovy-xml'), project(':groovy-swing')]*.classes)
+    if(JavaVersion.current().isJava7Compatible()) {
+        dependsOn([project(':groovy-nio')]*.classes)
+    }
     dependsOn docProjectVersionInfo
     ext.destinationDir = "$buildDir/html/groovy-jdk"
     inputs.files sourceSets.tools.runtimeClasspath
@@ -117,6 +121,12 @@ task docGDK {
                      classpath: (configurations.tools + groovydocAll.groovyClasspath).asPath,
                      errorproperty: 'edr',
                      outputproperty: 'odr') {
+                    arg(value: '-title')
+                    arg(value: 'Groovy JDK enhancements')
+                    arg(value: '-link')
+                    arg(value: 'groovy,org.codehaus.groovy=http://groovy.codehaus.org/gapi/')
+                    arg(value: '-link')
+                    arg(value: 'java,org.xml,javax,org.w3c=http://docs.oracle.com/javase/7/docs/api/')
                     // either package name if in core or fully qualified path otherwise
                     arg(value: 'org.codehaus.groovy.runtime.DefaultGroovyMethods')
                     arg(value: 'org.codehaus.groovy.runtime.DefaultGroovyStaticMethods')
@@ -134,6 +144,9 @@ task docGDK {
                     arg(value: 'subprojects/groovy-sql/src/main/java/org/codehaus/groovy/runtime/SqlGroovyMethods.java')
                     arg(value: 'subprojects/groovy-swing/src/main/java/org/codehaus/groovy/runtime/SwingGroovyMethods.java')
                     arg(value: 'subprojects/groovy-xml/src/main/java/org/codehaus/groovy/runtime/XmlGroovyMethods.java')
+                    if(JavaVersion.current().isJava7Compatible()) {
+                        arg(value: 'subprojects/groovy-nio/src/main/java/org/codehaus/groovy/runtime/NioGroovyMethods.java')
+                    }
                 }
             }
         } finally {
@@ -161,6 +174,19 @@ allprojects {
             javadocFix.recursive = true
             javadocFix.doPatch = true
             javadocFix.searchAndPatch(destinationDir)
+        }
+    }
+}
+
+if (JavaVersion.current().isJava7Compatible()) {
+    javadocAll.options.source = '1.7'
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            // disable the crazy super-strict doclint tool in Java 8
+            options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
 }

@@ -1,16 +1,22 @@
 package org.codehaus.groovy.transform
 
+import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
-import org.codehaus.groovy.ast.expr.ClassExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
+import org.codehaus.groovy.control.CompilationUnit
+import org.codehaus.groovy.control.CompilePhase
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.ErrorCollector
+import org.codehaus.groovy.control.Janitor
+import org.codehaus.groovy.control.ProcessingUnit
+import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.io.ReaderSource
 import org.codehaus.groovy.syntax.SyntaxException
 import org.codehaus.groovy.tools.Utilities
-import org.codehaus.groovy.control.*
 import groovy.transform.CompilationUnitAware
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport
 import org.codehaus.groovy.ast.stmt.Statement
@@ -18,21 +24,24 @@ import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.runtime.MethodClosure
 
+import static org.codehaus.groovy.ast.tools.GeneralUtils.classX
+import static org.codehaus.groovy.ast.tools.GeneralUtils.propX
+
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 class ASTTestTransformation extends AbstractASTTransformation implements CompilationUnitAware {
     private CompilationUnit compilationUnit
 
-    void visit(final org.codehaus.groovy.ast.ASTNode[] nodes, final org.codehaus.groovy.control.SourceUnit source) {
+    void visit(final ASTNode[] nodes, final SourceUnit source) {
         AnnotationNode annotationNode = nodes[0]
         def member = annotationNode.getMember('phase')
-        def phase = CompilePhase.SEMANTIC_ANALYSIS
+        def phase = null
         if (member) {
             if (member instanceof VariableExpression) {
                 phase = CompilePhase.valueOf(member.text)
             } else if (member instanceof PropertyExpression) {
                 phase = CompilePhase.valueOf(member.propertyAsString)
             }
-            annotationNode.setMember('phase', new PropertyExpression(new ClassExpression(ClassHelper.make(CompilePhase)), phase.toString()))
+            annotationNode.setMember('phase', propX(classX(ClassHelper.make(CompilePhase)), phase.toString()))
         }
         member = annotationNode.getMember('value')
         if (member && !(member instanceof ClosureExpression)) {
@@ -47,9 +56,11 @@ class ASTTestTransformation extends AbstractASTTransformation implements Compila
 
         def pcallback = compilationUnit.progressCallback
         def callback = new CompilationUnit.ProgressCallback() {
+            Binding binding = new Binding([:].withDefault {null})
+
             @Override
             void call(final ProcessingUnit context, final int phaseRef) {
-                if (phaseRef == phase.phaseNumber) {
+                if (phase==null ||  phaseRef == phase.phaseNumber) {
                     ClosureExpression testClosure = nodes[0].getNodeMetaData(ASTTestTransformation)
                     StringBuilder sb = new StringBuilder()
                     for (int i = testClosure.lineNumber; i <= testClosure.lastLineNumber; i++) {
@@ -60,9 +71,11 @@ class ASTTestTransformation extends AbstractASTTransformation implements Compila
                     CompilerConfiguration config = new CompilerConfiguration()
                     def customizer = new ImportCustomizer()
                     config.addCompilationCustomizers(customizer)
-                    def binding = new Binding()
+                    binding['sourceUnit'] = source
                     binding['node'] = nodes[1]
                     binding['lookup'] = new MethodClosure(LabelFinder, "lookup").curry(nodes[1])
+                    binding['compilationUnit'] = compilationUnit
+                    binding['compilePhase'] = CompilePhase.fromPhaseNumber(phaseRef)
 
                     GroovyShell shell = new GroovyShell(binding, config)
 
@@ -158,7 +171,6 @@ class ASTTestTransformation extends AbstractASTTransformation implements Compila
 
     public static class LabelFinder extends ClassCodeVisitorSupport {
 
-
         public static List<Statement> lookup(MethodNode node, String label) {
             LabelFinder finder = new LabelFinder(label, null)
             node.code.visit(finder)
@@ -177,7 +189,7 @@ class ASTTestTransformation extends AbstractASTTransformation implements Compila
         private final String label
         private final SourceUnit unit
 
-        private List<Statement> targets = new LinkedList<Statement>();
+        private final List<Statement> targets = new LinkedList<Statement>();
 
         LabelFinder(final String label, final SourceUnit unit) {
             this.label = label

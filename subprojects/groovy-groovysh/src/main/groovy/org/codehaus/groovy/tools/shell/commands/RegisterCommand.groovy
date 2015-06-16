@@ -16,10 +16,8 @@
 
 package org.codehaus.groovy.tools.shell.commands
 
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
 import org.codehaus.groovy.tools.shell.CommandSupport
 import org.codehaus.groovy.tools.shell.Groovysh
-import org.codehaus.groovy.tools.shell.Shell
 import org.codehaus.groovy.tools.shell.Command
 
 /**
@@ -33,22 +31,25 @@ import org.codehaus.groovy.tools.shell.Command
 class RegisterCommand
     extends CommandSupport
 {
+    static final String COMMAND_NAME = ':register'
+
     RegisterCommand(final Groovysh shell) {
-        super(shell, "register", "\\rc")
+        super(shell, COMMAND_NAME, ':rc')
     }
 
-    public Object execute(List<String> args) {
+    @Override
+    Object execute(final List<String> args) {
         assert args != null
 
         if (args.size() < 1) {
-            fail("Command 'register' requires at least 1 arguments") // TODO: i18n
+            fail("Command '$COMMAND_NAME' requires at least 1 arguments") // TODO: i18n
         }
 
         String classname = args.get(0)
 
-        Class type = getClassLoader().loadClass(classname)
+        Class type = classLoader.loadClass(classname)
 
-        Command command = null;
+        Command command = null
 
         if (args.size() == 1) {                   // use default name
             command = type.newInstance(shell) as Command
@@ -73,7 +74,7 @@ class RegisterCommand
         command = shell << command
 
         if (shell.runner) {
-            shell.runner.completer << command
+            shell.runner.completer.add(command)
         }
     }
 }

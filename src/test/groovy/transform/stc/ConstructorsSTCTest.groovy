@@ -315,5 +315,55 @@ class ConstructorsSTCTest extends StaticTypeCheckingTestCase {
         def constructor = fooClass.getDeclaredConstructor()
         assert constructor.declaredAnnotations.size() == 0
     }
+
+    // GROOVY-6616
+    void testConstructorsWithVarargsAndArrayParameters() {
+        assertScript '''
+            class MultipleConstructors {
+
+                public MultipleConstructors(String s, short[] arr) {}
+                public MultipleConstructors(String s, int... arr) {}
+                public MultipleConstructors(short[] arr) {}
+            }
+
+            class Clz {
+                  void run() {
+                        new MultipleConstructors('d',1)
+                }
+            }
+
+            new Clz().run()
+        '''
+    }
+
+    // GROOVY-6929
+    void testShouldNotThrowNPEDuringConstructorCallCheck() {
+        assertScript '''
+            class MyBean {
+                private String var
+                void setFoo(String foo) {
+                    var = foo
+                }
+                String toString() { var }
+            }
+            def b = new MyBean(foo: 'Test')
+            assert b.toString() == 'Test'
+        '''
+    }
+
+    void testMapStyleConstructorShouldNotCarrySetterInfoToOuterBinExp() {
+        assertScript '''
+            class Blah {
+                void setA(String a) {}
+            }
+
+            void blah(Map attrs) {
+               Closure c = {
+                  def blah = new Blah(a:attrs.a as String)
+               }
+            }
+            blah(a:'foo')
+        '''
+    }
 }
 

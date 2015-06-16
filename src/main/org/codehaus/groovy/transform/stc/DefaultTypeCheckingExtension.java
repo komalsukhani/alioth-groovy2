@@ -16,11 +16,13 @@
 
 package org.codehaus.groovy.transform.stc;
 
+import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.MethodNode;
 import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.ast.stmt.ReturnStatement;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,7 +105,13 @@ public class DefaultTypeCheckingExtension extends TypeCheckingExtension {
     public List<MethodNode> handleMissingMethod(final ClassNode receiver, final String name, final ArgumentListExpression argumentList, final ClassNode[] argumentTypes, final MethodCall call) {
         List<MethodNode> result = new LinkedList<MethodNode>();
         for (TypeCheckingExtension handler : handlers) {
-            result.addAll(handler.handleMissingMethod(receiver, name, argumentList, argumentTypes, call));
+            List<MethodNode> handlerResult = handler.handleMissingMethod(receiver, name, argumentList, argumentTypes, call);
+            for (MethodNode mn : handlerResult) {
+                if (mn.getDeclaringClass()==null) {
+                    mn.setDeclaringClass(ClassHelper.OBJECT_TYPE);
+                }
+            }
+            result.addAll(handlerResult);
         }
         return result;
     }
@@ -163,7 +171,9 @@ public class DefaultTypeCheckingExtension extends TypeCheckingExtension {
 
     @Override
     public void setup() {
-        for (TypeCheckingExtension handler : handlers) {
+        ArrayList<TypeCheckingExtension> copy = new ArrayList<TypeCheckingExtension>(handlers);
+        // we're using a copy here because new extensions can be added during the "setup" phase
+        for (TypeCheckingExtension handler : copy) {
             handler.setup();
         }
     }

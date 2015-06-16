@@ -16,9 +16,12 @@
 
 package org.codehaus.groovy.ast;
 
+import static org.codehaus.groovy.ast.ClassHelper.OBJECT_TYPE;
 import groovy.lang.*;
 
 import org.codehaus.groovy.runtime.GeneratedClosure;
+import org.codehaus.groovy.transform.stc.StaticTypeCheckingSupport;
+import org.codehaus.groovy.transform.trait.Traits;
 import org.codehaus.groovy.util.ManagedConcurrentMap;
 import org.codehaus.groovy.util.ReferenceBundle;
 import org.codehaus.groovy.vmplugin.VMPluginFactory;
@@ -66,7 +69,8 @@ public class ClassHelper {
         MAP_TYPE = makeWithoutCaching(Map.class), RANGE_TYPE = makeCached(Range.class),
         PATTERN_TYPE = makeCached(Pattern.class), STRING_TYPE = makeCached(String.class),
         SCRIPT_TYPE = makeCached(Script.class),   REFERENCE_TYPE = makeWithoutCaching(Reference.class),
-        
+        BINDING_TYPE = makeCached(Binding.class),
+
         boolean_TYPE = makeCached(boolean.class),     char_TYPE = makeCached(char.class),
         byte_TYPE = makeCached(byte.class),           int_TYPE = makeCached(int.class),
         long_TYPE = makeCached(long.class),           short_TYPE = makeCached(short.class),
@@ -398,6 +402,8 @@ public class ClassHelper {
             for (MethodNode mi : methods) {
                 // ignore methods, that are not abstract and from Object
                 if (!Modifier.isAbstract(mi.getModifiers())) continue;
+                // ignore trait methods which have a default implementation
+                if (Traits.hasDefaultImplementation(mi)) continue;
                 if (mi.getDeclaringClass().equals(OBJECT_TYPE)) continue;
                 if (OBJECT_TYPE.getDeclaredMethod(mi.getName(), mi.getParameters())!=null) continue;
 
@@ -432,5 +438,38 @@ public class ClassHelper {
         if (visible !=0 && asp == 0) return true;
         if (c.equals(OBJECT_TYPE)) return false;
         return hasUsableImplementation(c.getSuperClass(), m);
+    }
+
+    /**
+     * Returns a super class or interface for a given class depending on a given target.
+     * If the target is no super class or interface, then null will be returned.
+     * @param clazz the start class
+     * @param goalClazz the goal class
+     * @return the next super class or interface
+     */
+    public static ClassNode getNextSuperClass(ClassNode clazz, ClassNode goalClazz) {
+        if (clazz.isArray()) {
+            ClassNode cn = getNextSuperClass(clazz.getComponentType(),goalClazz.getComponentType());
+            if (cn!=null) cn = cn.makeArray();
+            return cn;
+        }
+
+        if (!goalClazz.isInterface()) {
+            if (clazz.isInterface()) {
+                if (OBJECT_TYPE.equals(clazz)) return null;
+                return OBJECT_TYPE;
+            } else {
+                return clazz.getUnresolvedSuperClass();
+            }
+        }
+
+        ClassNode[] interfaces = clazz.getUnresolvedInterfaces();
+        for (int i=0; i<interfaces.length; i++) {
+            if (StaticTypeCheckingSupport.implementsInterfaceOrIsSubclassOf(interfaces[i],goalClazz)) {
+                return interfaces[i];
+            }
+        }
+        //none of the interfaces here match, so continue with super class
+        return clazz.getUnresolvedSuperClass();
     }
 }

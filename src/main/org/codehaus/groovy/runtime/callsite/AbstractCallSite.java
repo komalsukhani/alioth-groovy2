@@ -23,6 +23,8 @@ import org.codehaus.groovy.reflection.ParameterTypes;
 import org.codehaus.groovy.runtime.ArrayUtil;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.runtime.NullObject;
+import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 import org.codehaus.groovy.runtime.wrappers.Wrapper;
 
 import java.lang.reflect.Method;
@@ -113,18 +115,34 @@ public class AbstractCallSite implements CallSite {
     }
 
     public Object call(Object receiver, Object arg1) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.call(receiver, arg1);
+        }
         return call(receiver, ArrayUtil.createArray(arg1));
     }
 
     public Object call(Object receiver, Object arg1, Object arg2) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.call(receiver, arg1, arg2);
+        }
         return call(receiver, ArrayUtil.createArray(arg1, arg2));
     }
 
     public Object call(Object receiver, Object arg1, Object arg2, Object arg3) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.call(receiver, arg1, arg2, arg3);
+        }
         return call(receiver, ArrayUtil.createArray(arg1, arg2, arg3));
     }
 
     public Object call(Object receiver, Object arg1, Object arg2, Object arg3, Object arg4) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.call(receiver, arg1, arg2, arg3, arg4);
+        }
         return call(receiver, ArrayUtil.createArray(arg1, arg2, arg3, arg4));
     }
 
@@ -138,18 +156,34 @@ public class AbstractCallSite implements CallSite {
     }
 
     public Object callCurrent(GroovyObject receiver, Object arg1) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callCurrent(receiver, arg1);
+        }
         return callCurrent(receiver, ArrayUtil.createArray(arg1));
     }
 
     public Object callCurrent(GroovyObject receiver, Object arg1, Object arg2) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callCurrent(receiver, arg1, arg2);
+        }
         return callCurrent(receiver, ArrayUtil.createArray(arg1, arg2));
     }
 
     public Object callCurrent(GroovyObject receiver, Object arg1, Object arg2, Object arg3) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callCurrent(receiver, arg1, arg2, arg3);
+        }
         return callCurrent(receiver, ArrayUtil.createArray(arg1, arg2, arg3));
     }
 
     public Object callCurrent(GroovyObject receiver, Object arg1, Object arg2, Object arg3, Object arg4) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callCurrent(receiver, arg1, arg2, arg3, arg4);
+        }
         return callCurrent(receiver, ArrayUtil.createArray(arg1, arg2, arg3, arg4));
     }
 
@@ -162,18 +196,34 @@ public class AbstractCallSite implements CallSite {
     }
 
     public Object callStatic(Class receiver, Object arg1) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callStatic(receiver, arg1);
+        }
         return callStatic(receiver, ArrayUtil.createArray(arg1));
     }
 
     public Object callStatic(Class receiver, Object arg1, Object arg2) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callStatic(receiver, arg1, arg2);
+        }
         return callStatic(receiver, ArrayUtil.createArray(arg1, arg2));
     }
 
     public Object callStatic(Class receiver, Object arg1, Object arg2, Object arg3) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callStatic(receiver, arg1, arg2, arg3);
+        }
         return callStatic(receiver, ArrayUtil.createArray(arg1, arg2, arg3));
     }
 
     public Object callStatic(Class receiver, Object arg1, Object arg2, Object arg3, Object arg4) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callStatic(receiver, arg1, arg2, arg3, arg4);
+        }
         return callStatic(receiver, ArrayUtil.createArray(arg1, arg2, arg3, arg4));
     }
 
@@ -187,18 +237,34 @@ public class AbstractCallSite implements CallSite {
     }
 
     public Object callConstructor(Object receiver, Object arg1) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callConstructor(receiver, arg1);
+        }
         return callConstructor(receiver, ArrayUtil.createArray(arg1));
     }
 
     public Object callConstructor(Object receiver, Object arg1, Object arg2) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callConstructor(receiver, arg1, arg2);
+        }
         return callConstructor(receiver, ArrayUtil.createArray(arg1, arg2));
     }
 
     public Object callConstructor(Object receiver, Object arg1, Object arg2, Object arg3) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callConstructor(receiver, arg1, arg2, arg3);
+        }
         return callConstructor(receiver, ArrayUtil.createArray(arg1, arg2, arg3));
     }
 
     public Object callConstructor(Object receiver, Object arg1, Object arg2, Object arg3, Object arg4) throws Throwable {
+        CallSite stored = array.array[index];
+        if (stored!=this) {
+            return stored.callConstructor(receiver, arg1, arg2, arg3, arg4);
+        }
         return callConstructor(receiver, ArrayUtil.createArray(arg1, arg2, arg3, arg4));
     }
 
@@ -228,7 +294,15 @@ public class AbstractCallSite implements CallSite {
     }
 
     public Object callGroovyObjectGetProperty(Object receiver) throws Throwable {
-        return acceptGroovyObjectGetProperty(receiver).getProperty(receiver);
+        if (receiver == null) {
+            try {
+                return InvokerHelper.getProperty(NullObject.getNullObject(), name);
+            } catch (GroovyRuntimeException gre) {
+                throw ScriptBytecodeAdapter.unwrap(gre);
+            }
+        } else {
+            return acceptGroovyObjectGetProperty(receiver).getProperty(receiver);
+        }
     }
 
     public CallSite acceptGetProperty(Object receiver) {
@@ -305,7 +379,7 @@ public class AbstractCallSite implements CallSite {
         if (metaClass.getClass() != MetaClassImpl.class || GroovyCategorySupport.hasCategoryInCurrentThread()) {
             site = new PogoMetaClassGetPropertySite(this, metaClass);
         } else {
-            final MetaProperty effective = ((MetaClassImpl) metaClass).getEffectiveGetMetaProperty(metaClass.getClass(), receiver, name, false);
+            final MetaProperty effective = ((MetaClassImpl) metaClass).getEffectiveGetMetaProperty(this.array.owner, receiver, name, false);
             if (effective != null) {
                 if (effective instanceof CachedField)
                     site = new GetEffectivePogoFieldSite(this, metaClass, (CachedField) effective);

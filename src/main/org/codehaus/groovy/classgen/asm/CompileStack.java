@@ -19,6 +19,7 @@ package org.codehaus.groovy.classgen.asm;
 import org.codehaus.groovy.GroovyBugError;
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
+import org.codehaus.groovy.ast.MethodNode;
 import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.Variable;
 import org.codehaus.groovy.ast.VariableScope;
@@ -216,7 +217,12 @@ public class CompileStack implements Opcodes {
         final BytecodeVariable head = (BytecodeVariable) temporaryVariables.removeFirst();
         if (head.getIndex() != tempIndex) {
             temporaryVariables.addFirst(head);
+            MethodNode methodNode = controller.getMethodNode();
+            if (methodNode==null) {
+                methodNode = controller.getConstructorNode();
+            }
             throw new GroovyBugError(
+                    "In method "+ (methodNode!=null?methodNode.getText():"<unknown>") + ", " +
                     "CompileStack#removeVar: tried to remove a temporary " +
                     "variable with index "+ tempIndex + " in wrong order. " +
                     "Current temporary variables=" + temporaryVariables);
@@ -254,7 +260,7 @@ public class CompileStack implements Opcodes {
     }
 
     public BytecodeVariable getVariable(String variableName ) {
-        return getVariable(variableName,true);
+        return getVariable(variableName, true);
     }
 
     /**
@@ -442,20 +448,49 @@ public class CompileStack implements Opcodes {
      * Should be called when descending into a loop that defines
      * also a scope. Calls pushVariableScope and prepares labels
      * for a loop structure. Creates a element for the state stack
-     * so pop has to be called later
+     * so pop has to be called later, TODO: @Deprecate
      */
     public void pushLoop(VariableScope el, String labelName) {
         pushVariableScope(el);
-        initLoopLabels(labelName);
+        continueLabel = new Label();
+        breakLabel = new Label();
+        if (labelName != null) {
+            initLoopLabels(labelName);
+        }
+    }
+
+    /**
+     * Should be called when descending into a loop that defines
+     * also a scope. Calls pushVariableScope and prepares labels
+     * for a loop structure. Creates a element for the state stack
+     * so pop has to be called later
+     */
+    public void pushLoop(VariableScope el, List<String> labelNames) {
+        pushVariableScope(el);
+        continueLabel = new Label();
+        breakLabel = new Label();
+        if (labelNames != null) {
+            for (String labelName : labelNames) {
+                initLoopLabels(labelName);
+            }
+        }
     }
 
     private void initLoopLabels(String labelName) {
+        namedLoopBreakLabel.put(labelName,breakLabel);
+        namedLoopContinueLabel.put(labelName,continueLabel);
+    }
+
+    /**
+     * Should be called when descending into a loop that does
+     * not define a scope. Creates a element for the state stack
+     * so pop has to be called later, TODO: @Deprecate
+     */
+    public void pushLoop(String labelName) {
+        pushState();
         continueLabel = new Label();
         breakLabel = new Label();
-        if (labelName!=null) {
-            namedLoopBreakLabel.put(labelName,breakLabel);
-            namedLoopContinueLabel.put(labelName,continueLabel);
-        }
+        initLoopLabels(labelName);
     }
 
     /**
@@ -463,9 +498,15 @@ public class CompileStack implements Opcodes {
      * not define a scope. Creates a element for the state stack
      * so pop has to be called later
      */
-    public void pushLoop(String labelName) {
+    public void pushLoop(List<String> labelNames) {
         pushState();
-        initLoopLabels(labelName);
+        continueLabel = new Label();
+        breakLabel = new Label();
+        if (labelNames != null) {
+            for (String labelName : labelNames) {
+                initLoopLabels(labelName);
+            }
+        }
     }
 
     /**
@@ -585,7 +626,7 @@ public class CompileStack implements Opcodes {
         mv.visitTypeInsn(NEW, "groovy/lang/Reference");
         mv.visitInsn(DUP_X1);
         mv.visitInsn(SWAP);
-        mv.visitMethodInsn(INVOKESPECIAL, "groovy/lang/Reference", "<init>", "(Ljava/lang/Object;)V");
+        mv.visitMethodInsn(INVOKESPECIAL, "groovy/lang/Reference", "<init>", "(Ljava/lang/Object;)V", false);
         mv.visitVarInsn(ASTORE, reference.getIndex());
     }
 

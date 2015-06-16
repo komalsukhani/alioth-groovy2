@@ -147,7 +147,8 @@ public class BytecodeHelper implements Opcodes {
         StringBuilder buf = new StringBuilder();
         ClassNode d = c;
         while (true) {
-            if (ClassHelper.isPrimitiveType(d)) {
+            if (ClassHelper.isPrimitiveType(d.redirect())) {
+                d = d.redirect();
                 char car;
                 if (d == ClassHelper.int_TYPE) {
                     car = 'I';
@@ -442,7 +443,7 @@ public class BytecodeHelper implements Opcodes {
 
     private static void writeGenericsBoundType(StringBuilder ret, ClassNode printType, boolean writeInterfaceMarker) {
         if (writeInterfaceMarker && printType.isInterface()) ret.append(":");
-        if (printType.equals(ClassHelper.OBJECT_TYPE) && printType.getGenericsTypes() != null) {
+        if (printType.isGenericsPlaceHolder() && printType.getGenericsTypes()!=null) {
             ret.append("T");
             ret.append(printType.getGenericsTypes()[0].getName());
             ret.append(";");
@@ -541,12 +542,7 @@ public class BytecodeHelper implements Opcodes {
      * @param targetType the primitive target type
      */
     public static void doCastToPrimitive(MethodVisitor mv, ClassNode sourceType, ClassNode targetType) {
-        mv.visitMethodInsn(
-                INVOKEVIRTUAL,
-                BytecodeHelper.getClassInternalName(sourceType),
-                targetType.getName()+"Value",
-                "()"+BytecodeHelper.getTypeDescription(targetType)
-        );
+        mv.visitMethodInsn(INVOKEVIRTUAL, BytecodeHelper.getClassInternalName(sourceType), targetType.getName() + "Value", "()" + BytecodeHelper.getTypeDescription(targetType), false);
     }
 
     /**
@@ -558,12 +554,7 @@ public class BytecodeHelper implements Opcodes {
      * @param targetType the wrapped target type
      */
     public static void doCastToWrappedType(MethodVisitor mv, ClassNode sourceType, ClassNode targetType) {
-        mv.visitMethodInsn(
-                INVOKESTATIC,
-                getClassInternalName(targetType),
-                "valueOf",
-                "("+getTypeDescription(sourceType)+")"+getTypeDescription(targetType)
-        );
+        mv.visitMethodInsn(INVOKESTATIC, getClassInternalName(targetType), "valueOf", "(" + getTypeDescription(sourceType) + ")" + getTypeDescription(targetType), false);
     }
 
     public static void doCast(MethodVisitor mv, Class type) {
@@ -585,11 +576,7 @@ public class BytecodeHelper implements Opcodes {
     public static void unbox(MethodVisitor mv, Class type) {
         if (type.isPrimitive() && type != Void.TYPE) {
             String returnString = "(Ljava/lang/Object;)" + BytecodeHelper.getTypeDescription(type);
-            mv.visitMethodInsn(
-                    INVOKESTATIC,
-                    DTT_CLASSNAME,
-                    type.getName() + "Unbox",
-                    returnString);
+            mv.visitMethodInsn(INVOKESTATIC, DTT_CLASSNAME, type.getName() + "Unbox", returnString, false);
         }
     }
 
@@ -601,6 +588,7 @@ public class BytecodeHelper implements Opcodes {
     /**
      * box top level operand
      */
+    @Deprecated
     public static boolean box(MethodVisitor mv, ClassNode type) {
         if (type.isPrimaryClassNode()) return false;
         return box(mv, type.getTypeClass());
@@ -610,10 +598,11 @@ public class BytecodeHelper implements Opcodes {
     /**
      * Generates the bytecode to autobox the current value on the stack
      */
+    @Deprecated
     public static boolean box(MethodVisitor mv, Class type) {
         if (ReflectionCache.getCachedClass(type).isPrimitive && type != void.class) {
             String returnString = "(" + BytecodeHelper.getTypeDescription(type) + ")Ljava/lang/Object;";
-            mv.visitMethodInsn(INVOKESTATIC, DTT_CLASSNAME, "box", returnString);
+            mv.visitMethodInsn(INVOKESTATIC, DTT_CLASSNAME, "box", returnString, false);
             return true;
         }
         return false;

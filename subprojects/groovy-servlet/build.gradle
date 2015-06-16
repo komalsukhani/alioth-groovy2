@@ -5,13 +5,13 @@ dependencies {
     compile('javax.servlet:jsp-api:2.0') { dep ->
         provided dep
     }
-    compile project(':')
-    groovy project(':')
-    testCompile 'jmock:jmock:1.2.0'
+    compile rootProject
+    testCompile "jmock:jmock:$jmockVersion"
     // needed for MarkupBuilder
     compile project(':groovy-xml')
     // needed by TemplateServlet
     compile project(':groovy-templates')
+    testCompile rootProject.sourceSets.test.runtimeClasspath
     testCompile project(':groovy-test')
     // for compilation, dependency is not necessary because the classes are loaded using Class.forName
     testCompile project(':groovy-json')

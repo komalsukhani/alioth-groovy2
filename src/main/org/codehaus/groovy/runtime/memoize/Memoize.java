@@ -22,6 +22,7 @@ import java.lang.ref.SoftReference;
 import java.util.Collections;
 
 import static java.util.Arrays.asList;
+import static java.util.Arrays.copyOf;
 
 /**
  * Implements memoize for Closures.
@@ -34,7 +35,7 @@ public abstract class Memoize {
     /**
      * A place-holder for null values in cache
      */
-    final static private MemoizeNullValue MEMOIZE_NULL = new MemoizeNullValue();
+    private static final MemoizeNullValue MEMOIZE_NULL = new MemoizeNullValue();
 
     /**
      * Creates a new closure delegating to the supplied one and memoizing all return values by the arguments.
@@ -91,7 +92,8 @@ public abstract class Memoize {
      */
     private static Object generateKey(final Object[] args) {
         if (args == null) return Collections.emptyList();
-        return asList(args);
+        Object[] copyOfArgs = copyOf(args, args.length);
+        return asList(copyOfArgs);
     }
 
     /**

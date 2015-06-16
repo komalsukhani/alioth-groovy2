@@ -44,7 +44,6 @@ public class StaticCompileTransformation extends StaticTypesTransformation {
 
     @Override
     public void visit(final ASTNode[] nodes, final SourceUnit source) {
-        StaticCompilationTransformer transformer = new StaticCompilationTransformer(source);
         AnnotationNode annotationInformation = (AnnotationNode) nodes[0];
         AnnotatedNode node = (AnnotatedNode) nodes[1];
         StaticTypeCheckingVisitor visitor = null;
@@ -53,6 +52,7 @@ public class StaticCompileTransformation extends StaticTypesTransformation {
         if (node instanceof ClassNode) {
             ClassNode classNode = (ClassNode) node;
             visitor = newVisitor(source, classNode);
+            visitor.setCompilationUnit(compilationUnit);
             addTypeCheckingExtensions(visitor, extensions);
             classNode.putNodeMetaData(WriterControllerFactory.class, factory);
             node.putNodeMetaData(STATIC_COMPILE_NODE, !visitor.isSkipMode(node));
@@ -62,6 +62,7 @@ public class StaticCompileTransformation extends StaticTypesTransformation {
             MethodNode methodNode = (MethodNode) node;
             ClassNode declaringClass = methodNode.getDeclaringClass();
             visitor = newVisitor(source, declaringClass);
+            visitor.setCompilationUnit(compilationUnit);
             addTypeCheckingExtensions(visitor, extensions);
             methodNode.putNodeMetaData(STATIC_COMPILE_NODE, !visitor.isSkipMode(node));
             if (declaringClass.getNodeMetaData(WriterControllerFactory.class) == null) {
@@ -77,6 +78,7 @@ public class StaticCompileTransformation extends StaticTypesTransformation {
         if (visitor != null) {
             visitor.performSecondPass();
         }
+        StaticCompilationTransformer transformer = new StaticCompilationTransformer(source, visitor);
         if (node instanceof ClassNode) {
             transformer.visitClass((ClassNode) node);
         } else if (node instanceof MethodNode) {
@@ -88,5 +90,4 @@ public class StaticCompileTransformation extends StaticTypesTransformation {
     protected StaticTypeCheckingVisitor newVisitor(final SourceUnit unit, final ClassNode node) {
         return new StaticCompilationVisitor(unit, node);
     }
-
 }

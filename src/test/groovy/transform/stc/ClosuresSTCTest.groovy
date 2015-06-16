@@ -84,7 +84,7 @@ class ClosuresSTCTest extends StaticTypeCheckingTestCase {
                 }
             }
             byte res = cl(0) // should throw an error because return type inference should be a long
-        ''', 'Possible loose of precision from long to byte'
+        ''', 'Possible loss of precision from long to byte'
     }
 
     void testClosureWithoutParam() {
@@ -476,6 +476,25 @@ class ClosuresSTCTest extends StaticTypeCheckingTestCase {
             def cl = { it }.curry(42)
             def val = cl.call()
             assert val == 42
+        '''
+    }
+
+    // GROOVY-6343
+    void testAccessStaticFieldFromNestedClosures() {
+        assertScript '''
+            class A {
+
+              public static final CONST = "a"
+
+              public static List doSomething() {
+                return (0..1).collect{ int x ->
+                  (0..1).collect{ int y ->
+                    return CONST
+                  }
+                }
+              }
+            }
+            A.doSomething()
         '''
     }
 }

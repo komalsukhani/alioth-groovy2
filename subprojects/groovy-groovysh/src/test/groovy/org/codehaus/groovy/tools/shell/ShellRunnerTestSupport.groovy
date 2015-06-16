@@ -26,16 +26,16 @@ import jline.console.ConsoleReader
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @author tkruse
  */
-abstract class ShellRunnerTestSupport
-extends GroovyTestCase {
+abstract class ShellRunnerTestSupport extends GroovyTestCase {
 
-    IO testio
-    BufferedOutputStream mockOut
-    BufferedOutputStream mockErr
+    protected IO testio
+    protected BufferedOutputStream mockOut
+    protected BufferedOutputStream mockErr
 
-    MockFor shellMocker
-    StubFor readerStubber
+    protected MockFor shellMocker
+    protected StubFor readerStubber
 
+    @Override
     void setUp() {
         super.setUp()
         mockOut = new BufferedOutputStream(new ByteArrayOutputStream())
@@ -49,14 +49,14 @@ extends GroovyTestCase {
         // when run with compileStatic
         shellMocker.demand.getClass(0..1) {Groovysh}
         shellMocker.demand.getIo(2) { testio }
-        shellMocker.demand.getRegistry(1) {[]}
+        shellMocker.demand.getRegistry(1) {new Object() {def commands() {[]} }}
         shellMocker.demand.getHistory(1) {new Serializable(){def size() {0}; def getMaxSize() {1}}}
         shellMocker.demand.setHistoryFull(1) {}
         shellMocker.demand.getHistoryFull(1) {false}
         // adding number of commands from xml file
         for (i in 1..19) {
             shellMocker.demand.getIo(0..1) { testio }
-            shellMocker.demand.leftShift(0..1) { testio }
+            shellMocker.demand.add(0..1) { testio }
             shellMocker.demand.getIo(0..1) { testio }
         }
 

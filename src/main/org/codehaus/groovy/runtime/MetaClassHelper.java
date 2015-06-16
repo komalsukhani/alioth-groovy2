@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007 the original author or authors.
+ * Copyright 2003-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -707,9 +707,11 @@ public class MetaClassHelper {
     }
 
     public static boolean isAssignableFrom(Class classToTransformTo, Class classToTransformFrom) {
-        if (classToTransformTo == classToTransformFrom) return true;
-        if (classToTransformFrom == null) return true;
-        if (classToTransformTo == Object.class) return true;
+        if (classToTransformTo == classToTransformFrom
+                || classToTransformFrom == null
+                || classToTransformTo == Object.class) {
+            return true;
+        }
 
         classToTransformTo = ReflectionCache.autoboxType(classToTransformTo);
         classToTransformFrom = ReflectionCache.autoboxType(classToTransformFrom);
@@ -717,14 +719,12 @@ public class MetaClassHelper {
 
         // note: there is no coercion for boolean and char. Range matters, precision doesn't
         if (classToTransformTo == Integer.class) {
-            if (classToTransformFrom == Integer.class
-                    || classToTransformFrom == Short.class
+            if (classToTransformFrom == Short.class
                     || classToTransformFrom == Byte.class
                     || classToTransformFrom == BigInteger.class)
                 return true;
         } else if (classToTransformTo == Double.class) {
-            if (classToTransformFrom == Double.class
-                    || classToTransformFrom == Integer.class
+            if (classToTransformFrom == Integer.class
                     || classToTransformFrom == Long.class
                     || classToTransformFrom == Short.class
                     || classToTransformFrom == Byte.class
@@ -739,36 +739,30 @@ public class MetaClassHelper {
                     || classToTransformFrom == Short.class
                     || classToTransformFrom == Byte.class
                     || classToTransformFrom == Float.class
-                    || classToTransformFrom == BigDecimal.class
                     || classToTransformFrom == BigInteger.class)
                 return true;
         } else if (classToTransformTo == BigInteger.class) {
             if (classToTransformFrom == Integer.class
                     || classToTransformFrom == Long.class
                     || classToTransformFrom == Short.class
-                    || classToTransformFrom == Byte.class
-                    || classToTransformFrom == BigInteger.class)
+                    || classToTransformFrom == Byte.class)
                 return true;
         } else if (classToTransformTo == Long.class) {
-            if (classToTransformFrom == Long.class
-                    || classToTransformFrom == Integer.class
+            if (classToTransformFrom == Integer.class
                     || classToTransformFrom == Short.class
                     || classToTransformFrom == Byte.class)
                 return true;
         } else if (classToTransformTo == Float.class) {
-            if (classToTransformFrom == Float.class
-                    || classToTransformFrom == Integer.class
+            if (classToTransformFrom == Integer.class
                     || classToTransformFrom == Long.class
                     || classToTransformFrom == Short.class
                     || classToTransformFrom == Byte.class)
                 return true;
         } else if (classToTransformTo == Short.class) {
-            if (classToTransformFrom == Short.class
-                    || classToTransformFrom == Byte.class)
+            if (classToTransformFrom == Byte.class)
                 return true;
         } else if (classToTransformTo == String.class) {
-            if (classToTransformFrom == String.class ||
-                    GString.class.isAssignableFrom(classToTransformFrom)) {
+            if (GString.class.isAssignableFrom(classToTransformFrom)) {
                 return true;
             }
         }
@@ -1006,5 +1000,18 @@ public class MetaClassHelper {
         } else {
             DefaultGroovyMethods.setMetaClass(self, mc);
         }
+    }
+
+    /**
+     * Converts a String into a standard property name.
+     *
+     * @param prop the original name
+     * @return the converted name
+     */
+    public static String convertPropertyName(String prop) {
+        if (Character.isDigit(prop.charAt(0))) {
+            return prop;
+        }
+        return java.beans.Introspector.decapitalize(prop);
     }
 }

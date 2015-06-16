@@ -22,141 +22,205 @@ import org.codehaus.groovy.tools.shell.Interpreter
 import static org.codehaus.groovy.tools.shell.completion.TokenUtilTest.tokenList
 import static org.codehaus.groovy.tools.shell.completion.TokenUtilTest.tokensString
 
-class ReflectionCompletorUnitTest extends GroovyTestCase {
+class ReflectionCompletorTest extends GroovyTestCase {
+
+    void testBeanAccessorPattern() {
+        assert 'getX'.matches(ReflectionCompletor.BEAN_ACCESSOR_PATTERN)
+        assert 'setX'.matches(ReflectionCompletor.BEAN_ACCESSOR_PATTERN)
+        assert 'isX'.matches(ReflectionCompletor.BEAN_ACCESSOR_PATTERN)
+        assert !('get'.matches(ReflectionCompletor.BEAN_ACCESSOR_PATTERN))
+        assert !('getx'.matches(ReflectionCompletor.BEAN_ACCESSOR_PATTERN))
+        assert !('foo'.matches(ReflectionCompletor.BEAN_ACCESSOR_PATTERN))
+    }
+
+    void testAddDefaultMethods() {
+        List<String> result = ReflectionCompletor.getDefaultMethods(3, '')
+        assert 'abs()' in result
+        assert 'times(' in result
+
+        result = ReflectionCompletor.getDefaultMethods([1, 2, 3], '')
+        assert 'any(' in result
+        assert 'count(' in result
+        assert 'take(' in result
+        assert 'unique()' in result
+
+        result = ReflectionCompletor.getDefaultMethods(new String[2], '')
+        assert 'any(' in result
+        assert 'collect(' in result
+        assert 'count(' in result
+        assert 'take(' in result
+
+        result = ReflectionCompletor.getDefaultMethods(['a': 1, 'b': 2], '')
+        assert 'any(' in result
+        assert 'spread()' in result
+    }
+
 
     void testGetFieldsAndMethodsArray() {
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(([] as String[]), "")
-        assertTrue('length' in result)
-        assertTrue('clone()' in result)
-        assertTrue('size()' in result)
-        assertTrue('any()' in result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods([] as String[], "size")
-        assertEquals(["size()"], result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods([] as String[], "le")
-        assertEquals(["length"], result)
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(([] as String[]), '')*.value
+        assert 'length' in result
+        assert 'clone()' in result
+        result = ReflectionCompletor.getMetaclassMethods(([] as String[]), '', true)
+        assert 'size()' in result
+        assert 'any()' in result
+        assert 'take(' in result
+        result = ReflectionCompletor.getMetaclassMethods([] as String[], 'size', true)
+        assert ['size()'] == result
+        result = ReflectionCompletor.getPublicFieldsAndMethods([] as String[], 'le')*.value
+        assert ['length'] == result
     }
 
     void testGetFieldsAndMethodsMap() {
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(['id': '42'], "")
-        assertTrue('clear()' in result)
-        assertTrue('containsKey(' in result)
-        assertTrue('clear()' in result)
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(['id': '42'], '')*.value
+        assert 'clear()' in result
+        assert 'containsKey(' in result
+        assert 'clear()' in result
         // 'class' as key can cause bugs where .class is used instead of getClass()
-        result = ReflectionCompletor.getPublicFieldsAndMethods(['class': '42'], "")
-        assertTrue('clear()' in result)
-        assertTrue('containsKey(' in result)
-        assertTrue('clear()' in result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(['id': '42'], "size")
+        result = ReflectionCompletor.getPublicFieldsAndMethods(['class': '42', 'club': 53], '')*.value
+        assert 'clear()' in result
+        assert 'containsKey(' in result
+        assert 'class' in result
+        assert 'club' in result
+        result = ReflectionCompletor.getPublicFieldsAndMethods(['id': '42'], 'size')*.value
         // e.g. don't show non-public inherited size field
-        assertEquals(["size()"], result)
+        assert ['size()'] == result
     }
 
     void testGetFieldsAndMethodsString() {
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods("foo", "")
-        assertTrue('charAt(' in result)
-        assertTrue('normalize()' in result)
-        assertTrue('format(' in result)
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods('foo', '')*.value
+        assert 'charAt(' in result
+        assert 'contains(' in result
+        assert ! ('format(' in result)
+        result = ReflectionCompletor.getMetaclassMethods('foo', '', true)
+        assert 'normalize()' in result
         int foo = 3
-        result = ReflectionCompletor.getPublicFieldsAndMethods("$foo", "")
-        assertTrue('build(' in result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods("foo", "tok")
-        assertEquals(["tokenize(", "tokenize()"], result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(String, "tok")
-        assertEquals(["tokenize(", "tokenize()"], result)
+        result = ReflectionCompletor.getPublicFieldsAndMethods("$foo", '')*.value
+        assert 'build(' in result
+        result = ReflectionCompletor.getMetaclassMethods('foo', 'tok', true)
+        assert ['tokenize(', 'tokenize()'] == result
+        result = ReflectionCompletor.getMetaclassMethods(String, 'tok', true)
+        assert ['tokenize(', 'tokenize()'] == result
     }
 
     void testGetFieldsAndMethodsPrimitive() {
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(3, "")
-        assertTrue("byteValue()" in result)
-        assertTrue(result.toString(), "MAX_VALUE" in result)
-        assertTrue("abs()" in result)
-        assertTrue(result.toString(), "notify()" in result)
-        assertTrue("bitCount(" in result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(3, "una")
-        assertEquals(["unaryMinus()", "unaryPlus()"], result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(Integer, "una")
-        assertEquals(["unaryMinus()", "unaryPlus()"], result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(Integer, "MA")
-        assertEquals(["MAX_VALUE"], result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(Integer, "getI")
-        assertEquals(["getInteger("], result)
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(3, '')*.value
+        assert 'byteValue()' in result
+        assert ! ('MAX_VALUE' in result)
+        assert ! ('valueOf(' in result)
+        assert ! ('bitCount(' in result)
+        result = ReflectionCompletor.getMetaclassMethods(3, '', true)
+        assert 'abs()' in result
+        result = ReflectionCompletor.getMetaclassMethods(3, 'una', true)
+        assert ['unaryMinus()', 'unaryPlus()'] == result
+        result = ReflectionCompletor.getMetaclassMethods(Integer, 'una', true)
+        assert ['unaryMinus()', 'unaryPlus()'] == result
+        result = ReflectionCompletor.getPublicFieldsAndMethods(Integer, 'MA')*.value
+        assert ['MAX_VALUE'] == result
+        result = ReflectionCompletor.getPublicFieldsAndMethods(Integer, 'getI')*.value
+        assert ['getInteger('] == result
     }
 
-    interface ForTestInterface extends Comparable {
-        static final int forTestField = 1;
-        void forTestMethod();
+    interface ForTestInterface extends Comparable<Object> {
+        static final int FOR_TEST_FIELD = 1
+        void forTestMethod()
     }
 
     void testGetFieldsAndMethodsAnonymousClass() {
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(new ForTestInterface(){
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(new ForTestInterface() {
             @Override
             void forTestMethod() {}
 
             @Override
             int compareTo(Object o) {return 0}
-        }, "")
-        assertTrue('forTestField' in result)
-        assertTrue('forTestMethod()' in result)
-        assertTrue('compareTo(' in result)
+        }, '')*.value
+        assert ! ('FOR_TEST_FIELD' in result)
+        assert 'forTestMethod()' in result
+        assert 'compareTo(' in result
         GroovyLexer
-        result = ReflectionCompletor.getPublicFieldsAndMethods(Set, "toA")
-        assertEquals([], result)
+        result = ReflectionCompletor.getPublicFieldsAndMethods(Set, 'toA')
+        assert []== result
     }
 
     enum ForTestEnum {
-        val1, val2;
-        public static final ForTestEnum val3;
+        VAL1, VAL2
+        static final ForTestEnum VAL_3
         int enumMethod() {return 0}
         static int staticMethod() {return 1}
     }
 
     void testEnum() {
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(ForTestEnum, "")
-        assertTrue(result.toString(), 'val1' in result)
-        assertFalse(result.toString(), 'enumMethod()' in result)
-        assertTrue(result.toString(), 'staticMethod()' in result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(ForTestEnum.val1, "")
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(ForTestEnum, '')
+        result = result*.value
+        assert 'VAL1' in result
+        assert ! ( 'enumMethod()' in result)
+        assert 'staticMethod()' in result
+        result = ReflectionCompletor.getPublicFieldsAndMethods(ForTestEnum.VAL1, '')
+        result = result*.value
         // User will probably not want this
-        assertFalse(result.toString(), 'val1' in result)
-        assertTrue(result.toString(), 'enumMethod()' in result)
-        assertTrue(result.toString(), 'staticMethod()' in result)
+        assert ! ( 'VAL1' in result)
+        assert 'enumMethod()' in result
+        assert ! ('staticMethod()' in result)
     }
 
     void testGetAbstractClassFields() {
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(GroovyLexer, "")
-        assertTrue(result.toString(), 'ABSTRACT' in result)
-        assertTrue(result.toString(), 'isCase(' in result)
-        assertTrue(result.toString(), 'tracing' in result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(new GroovyLexer(new ByteArrayInputStream()), "")
-        assertTrue(result.toString(), 'ABSTRACT' in result)
-        assertTrue(result.toString(), 'isCase(' in result)
-        assertTrue(result.toString(), 'tracing' in result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(GroovyLexer, "LITERAL_as")
-        assertEquals(["LITERAL_as", "LITERAL_assert"], result)
-        GroovyLexer lexer = new GroovyLexer(new ByteArrayInputStream("".getBytes()))
-        result = ReflectionCompletor.getPublicFieldsAndMethods(lexer, "LITERAL_as")
-        assertEquals(["LITERAL_as", "LITERAL_assert"], result)
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(GroovyLexer, '')
+        result = result*.value
+        assert 'ABSTRACT' in result
+        assert 'tracing' in result
+        result = ReflectionCompletor.getMetaclassMethods(GroovyLexer, '', true)
+        assert 'collect()' in result
+        result = ReflectionCompletor.getPublicFieldsAndMethods(new GroovyLexer(new ByteArrayInputStream()), '')
+        result = result*.value
+        assert ! ('ABSTRACT' in result)
+        assert ! ('tracing' in result)
+        result = ReflectionCompletor.getMetaclassMethods(new GroovyLexer(new ByteArrayInputStream()), '', true)
+        assert 'isCase(' in result
+        result = ReflectionCompletor.getPublicFieldsAndMethods(GroovyLexer, 'LITERAL_as')
+        result = result*.value
+        assert ['LITERAL_as', 'LITERAL_assert'] == result
+        // static members only shown for prefix of sufficient length
+        GroovyLexer lexer = new GroovyLexer(new ByteArrayInputStream(''.bytes))
+        result = ReflectionCompletor.getPublicFieldsAndMethods(lexer, 'LI')
+        result = result*.value
+        assert !('LITERAL_as' in result)
+        result = ReflectionCompletor.getPublicFieldsAndMethods(lexer, 'LITERAL_as')
+        result = result*.value
+        assert ['LITERAL_as', 'LITERAL_assert'] == result
     }
 
     void testGetFieldsAndMethodsClass() {
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(Arrays, "")
-        assertTrue(result.toString(), 'sort(' in result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(HashSet, "pro")
-        assertEquals([], result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(HashSet, "toA")
-        assertEquals([], result)
-        result = ReflectionCompletor.getPublicFieldsAndMethods(new HashSet(), "toA")
-        assertEquals(["toArray(", "toArray()"], result)
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(Arrays, '')
+        result = result*.value
+        assert 'sort(' in result
+        result = ReflectionCompletor.getPublicFieldsAndMethods(HashSet, 'pro')
+        result = result*.value
+        assert [] == result
+        result = ReflectionCompletor.getPublicFieldsAndMethods(HashSet, 'to')
+        result = result*.value
+        assert !('toArray(' in result)
+        result = ReflectionCompletor.getPublicFieldsAndMethods(new HashSet(), 'toA')
+        result = result*.value
+        assert ['toArray(', 'toArray()'] == result
+    }
+
+    void testSuppressMetaAndDefaultMethods() {
+        Collection<String> result = ReflectionCompletor.getMetaclassMethods('foo', '', true)
+        assert 'getMetaClass()' in result
+        assert 'asBoolean()' in result
+        result = ReflectionCompletor.getMetaclassMethods('foo', '', false)
+        result = result*.value
+        assert ! ('getMetaClass()' in result)
+        assert ! ('asBoolean()' in result)
     }
 
     void testGetFieldsAndMethodsCustomClass() {
         Interpreter interp = new Interpreter(Thread.currentThread().contextClassLoader, new Binding())
-        Object instance = interp.evaluate(["class Foo extends HashSet implements Comparable {int compareTo(Object) {0}}; Foo"])
-        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(instance, "")
+        Object instance = interp.evaluate(['class Foo extends HashSet implements Comparable {int compareTo(Object) {0}}; Foo'])
+        Collection<String> result = ReflectionCompletor.getPublicFieldsAndMethods(instance, '')*.value
         assertFalse('compareTo(' in result)
-        instance = interp.evaluate(["class Foo extends HashSet implements Comparable {int compareTo(Object) {0}}; new Foo()"])
-        result = ReflectionCompletor.getPublicFieldsAndMethods(instance, "")
-        assertTrue(result.toString(), 'compareTo(' in result)
+        instance = interp.evaluate(['class Foo extends HashSet implements Comparable {int compareTo(Object) {0}}; new Foo()'])
+        result = ReflectionCompletor.getPublicFieldsAndMethods(instance, '')*.value
+        assert 'compareTo(' in result
     }
 }
 
@@ -164,48 +228,58 @@ class ReflectionCompletorUnitTest extends GroovyTestCase {
 class InvokerParsingTest extends GroovyTestCase {
 
     void testTokenListToEvalString() {
-        assertEquals('', ReflectionCompletor.tokenListToEvalString(tokenList("")))
-        assertEquals('1', ReflectionCompletor.tokenListToEvalString(tokenList("1")))
-        assertEquals('1.', ReflectionCompletor.tokenListToEvalString(tokenList("1.")))
-        assertEquals('foo', ReflectionCompletor.tokenListToEvalString(tokenList("foo")))
-        assertEquals('"foo"', ReflectionCompletor.tokenListToEvalString(tokenList("'foo'")))
+        assert '' == ReflectionCompletor.tokenListToEvalString(tokenList(''))
+        assert '1' == ReflectionCompletor.tokenListToEvalString(tokenList('1'))
+        assert '1.' == ReflectionCompletor.tokenListToEvalString(tokenList('1.'))
+        assert 'foo' == ReflectionCompletor.tokenListToEvalString(tokenList('foo'))
+        assert '\'foo\'' == ReflectionCompletor.tokenListToEvalString(tokenList('\'foo\''))
     }
 
     void testGetInvokerTokens() {
         // must make sure no token list is returned that could be evaluated with side effects.
-        assertEquals(null, tokensString(ReflectionCompletor.getInvokerTokens(tokenList(''))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo'))))
-        assertEquals('bar.foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('bar.foo'))))
-        assertEquals('bar.&foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('bar.&foo'))))
+        assert null == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo')))
+        assert 'bar.foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('bar.foo')))
+        assert 'bar.&foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('bar.&foo')))
         // literal (simple join of token text forgets hyphens)
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('"foo"'))))
-        assertEquals('1', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('1'))))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('"foo"')))
+        assert '1' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('1')))
         // operator
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('1+"foo"'))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('bar == foo'))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('bar = foo'))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('1+foo'))))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('1+"foo"')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('bar == foo')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('bar = foo')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('1+foo')))
         // begin
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList(';foo'))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('(foo'))))
-        assertEquals('[foo[][2]].bar', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[[foo[][2]].bar'))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('${foo'))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('"$foo'))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1,foo'))))
-        assertEquals('foo', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1: foo'))))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList(';foo')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('(foo')))
+        assert '[foo[][2]].bar' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[[foo[][2]].bar')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('${foo')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('"$foo')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1,foo')))
+        assert 'foo' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1: foo')))
         // Collections
-        assertEquals('[1+2]', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1+2]'))))
-        assertEquals('[1..2]', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1..2]'))))
-        assertEquals('[1,2]', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1, 2]'))))
-        assertEquals('[1:2]', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1: 2]'))))
+        assert '[1+2]' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1+2]')))
+        assert '[1..2]' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1..2]')))
+        assert '[1,2]' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1, 2]')))
+        assert '[1:2]' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('[1: 2]')))
         // allowed Parens
-        assertEquals('((Foo)foo).', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('((Foo) foo).'))))
-        assertEquals('((1+2>4)==(a&&b)).', tokensString(ReflectionCompletor.getInvokerTokens(tokenList('((1 + 2 > 4) == (a && b)).'))))
+        assert '((Foo)foo).' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('((Foo) foo).')))
+        assert '((1+2>4)==(a&&b)).' == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('((1 + 2 > 4) == (a && b)).')))
         // not allowed
-        assertEquals(null, tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo()'))))
-        assertEquals(null, tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo each'))))
-        assertEquals(null, tokensString(ReflectionCompletor.getInvokerTokens(tokenList('New Foo().'))))
-        assertEquals(null, tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo.each bar'))))
-        assertEquals(null, tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo++'))))
+        assert null == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo()')))
+        assert null == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo each')))
+        assert null == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('New Foo().')))
+        assert null == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo.each bar')))
+        assert null == tokensString(ReflectionCompletor.getInvokerTokens(tokenList('foo++')))
+    }
+
+    void testGetFieldnameForAccessor() {
+        assert 'foo' == ReflectionCompletor.getFieldnameForAccessor('getFoo', 0)
+        assert 'foo' == ReflectionCompletor.getFieldnameForAccessor('setFoo', 1)
+        assert 'foo' == ReflectionCompletor.getFieldnameForAccessor('isFoo', 0)
+
+        assert null == ReflectionCompletor.getFieldnameForAccessor('getFoo', 1)
+        assert null == ReflectionCompletor.getFieldnameForAccessor('setFoo', 0)
+        assert null == ReflectionCompletor.getFieldnameForAccessor('isFoo', 1)
     }
 }

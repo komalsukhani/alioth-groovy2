@@ -1,3 +1,18 @@
+/*
+ * Copyright 2003-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package groovy.swing
 /*
  * Copyright 2003-2013 the original author or authors.
@@ -124,7 +139,7 @@ class SwingBuilderConsoleTest extends GroovySwingTestCase {
             // GROOVY-3288
             def model = [wordValue: 'word']
             swing.tabbedPane {
-                panel(title: "a") {
+                panel(title: 'a') {
                     textField(id: 'wordValue', columns: 20)
                 }
                 bean(model, word: bind { wordValue.text })
@@ -187,7 +202,7 @@ class SwingBuilderConsoleTest extends GroovySwingTestCase {
         testInEDT {
             def swing = new SwingBuilder()
             final String ICON_PATH = '/groovy/ui/ConsoleIcon.png'
-            String baseDir = new File("src/main/resources").absolutePath
+            String baseDir = new File('src/main/resources').absolutePath
 
             String resource = ICON_PATH
             GString gresource = "${ICON_PATH}"
@@ -338,7 +353,7 @@ class SwingBuilderConsoleTest extends GroovySwingTestCase {
     void testMacOSXMenuBarHasBasicMenuBarSubElements() {
         testInEDT {
             def binding = new Binding()
-            binding.setVariable("controller", new Console())
+            binding.setVariable('controller', new Console())
 
             final basicMenuBarScript = new BasicMenuBar()
             final macOSXMenuBarScript = new MacOSXMenuBar()
@@ -369,7 +384,7 @@ class SwingBuilderConsoleTest extends GroovySwingTestCase {
     void testAutoSaveOnRunMenuBarCheckbox() {
         testInEDT {
             def binding = new Binding()
-            binding.setVariable("controller", new Console())
+            binding.setVariable('controller', new Console())
 
             final consoleActions = new ConsoleActions()
 
@@ -409,7 +424,7 @@ class SwingBuilderConsoleTest extends GroovySwingTestCase {
 
             try {
                 def binding = new Binding()
-                binding.setVariable("controller", new Console())
+                binding.setVariable('controller', new Console())
 
                 final consoleActions = new ConsoleActions()
                 final console = new Console()
@@ -424,7 +439,7 @@ class SwingBuilderConsoleTest extends GroovySwingTestCase {
                 console.runScript(new EventObject([:]))
 
                 def doc = console.outputArea.document
-                assert doc.getText(0, doc.getLength()) =~ /java.lang.Exception/
+                assert doc.getText(0, doc.length) =~ /java.lang.Exception/
             } finally {
                 GroovySystem.metaClassRegistry.removeMetaClass(Thread)
                 GroovySystem.metaClassRegistry.removeMetaClass(SwingUtilities)

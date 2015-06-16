@@ -81,6 +81,7 @@ class DelegatesToSTCTest extends StaticTypeCheckingTestCase {
             assert o.test() == 2
         '''
     }
+
     void testShouldAcceptMethodCall() {
         assertScript '''
             class ExecSpec {
@@ -401,6 +402,7 @@ class DelegatesToSTCTest extends StaticTypeCheckingTestCase {
             persons = Person.findBy { name == 'Cedric' }
         '''
     }
+
     void testDelegatesToInStaticContext2() {
         assertScript '''
             class QueryBuilder {
@@ -730,4 +732,78 @@ class DelegatesToSTCTest extends StaticTypeCheckingTestCase {
         '''
     }
 
+    // GROOVY-5998
+    void testSubscriptOperatorOnPropertiesWithBuilder() {
+        assertScript '''
+            import static groovy.lang.Closure.*
+
+            class DatasourceBuilder {
+                Map<String,String> attrs = [:]
+            }
+
+            void datasource(@DelegatesTo(strategy = DELEGATE_FIRST, value = DatasourceBuilder) Closure c) {}
+
+            void foo() {
+               datasource {
+                   attrs['some'] = 'foo'
+               }
+            }
+
+            foo()
+        '''
+    }
+
+    void testDelegatesToNestedGenericType() {
+        assertScript '''
+            trait Configurable<ConfigObject> {
+                ConfigObject configObject
+
+                void configure(Closure<Void> configSpec) {
+                    configSpec.resolveStrategy = Closure.DELEGATE_FIRST
+                    configSpec.delegate = configObject
+                    configSpec()
+                }
+            }
+            public <T,U extends Configurable<T>> U configure(Class<U> clazz, @DelegatesTo(type="T") Closure configSpec) {
+                Configurable<T> obj = (Configurable<T>) clazz.newInstance()
+                obj.configure(configSpec)
+                obj
+            }
+            class Module implements Configurable<ModuleConfig> {
+                String value
+
+                 Module(){
+                    configObject = new ModuleConfig()
+                 }
+
+                 @Override
+                 void configure(Closure<Void> configSpec) {
+                    Configurable.super.configure(configSpec)
+                    value = "${configObject.name}-${configObject.version}"
+                 }
+            }
+            class ModuleConfig {
+                String name
+                String version
+            }
+            def module = configure(Module) {
+                name = 'test'
+                version = '1.0'
+            }
+            assert module.value == 'test-1.0'
+        '''
+    }
+
+    void testDelegatesToWithType2() {
+        assertScript '''
+            public <T> boolean evalAsSet(List<T> list, @DelegatesTo(type="Set<T>") Closure<Boolean> cl) {
+                cl.delegate = list as Set
+                cl()
+            }
+            assert evalAsSet([1,1,2,3]) {
+                size() == 3
+            }
+        '''
+    }
 }
+

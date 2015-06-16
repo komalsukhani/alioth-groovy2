@@ -15,6 +15,8 @@
  */
 package groovy.grape
 
+import org.codehaus.groovy.reflection.ReflectionCache
+
 import java.util.regex.Pattern
 import org.apache.ivy.Ivy
 import org.apache.ivy.core.cache.ResolutionCacheManager
@@ -93,7 +95,8 @@ class GrapeIvy implements GrapeEngine {
         try {
             settings.load(grapeConfig) // exploit multi-methods for convenience
         } catch (java.text.ParseException ex) {
-            System.err.println "Local Ivy config file '$grapeConfig.canonicalPath' appears corrupt - ignoring it and using default config instead\nError was: " + ex.message
+            def configLocation = grapeConfig instanceof File ? grapeConfig.canonicalPath : grapeConfig.toString()
+            System.err.println "Local Ivy config file '$configLocation' appears corrupt - ignoring it and using default config instead\nError was: " + ex.message
             grapeConfig = GrapeIvy.getResource("defaultGrapeConfig.xml")
             settings.load(grapeConfig)
         }
@@ -289,17 +292,12 @@ class GrapeIvy implements GrapeEngine {
                         metaMethods.each { CachedClass c, List<MetaMethod> methods ->
                             // GROOVY-5543: if a module was loaded using grab, there are chances that subclasses
                             // have their own ClassInfo, and we must change them as well!
-                            def classesToBeUpdated = ClassInfo.allClassInfo.findAll {
-                                boolean found = false
-                                CachedClass current = it.cachedClass
-                                while (!found && current != null) {
-                                    if (current == c || current.interfaces.contains(c)) {
-                                        found = true
-                                    }
-                                    current = current.cachedSuperClass
+                            Set<CachedClass> classesToBeUpdated = [c]
+                            ClassInfo.onAllClassInfo { ClassInfo info ->
+                                if (c.theClass.isAssignableFrom(info.cachedClass.theClass)) {
+                                    classesToBeUpdated << info.cachedClass
                                 }
-                                found
-                            }.collect { it.cachedClass }
+                            }
                             classesToBeUpdated*.addNewMopMethods(methods)
                         }
                     }
@@ -462,10 +460,10 @@ class GrapeIvy implements GrapeEngine {
                             for (int j=0; j<artifacts.length; j++) {
                                 def artifact = artifacts.item(j)
                                 def attrs = artifact.attributes
-                                def name = attrs.getNamedItem('name')+ "-$rev"
-                                def classifier = attrs.getNamedItemNS("m", "classifier")
+                                def name = attrs.getNamedItem('name').getTextContent() + "-$rev"
+                                def classifier = attrs.getNamedItemNS("m", "classifier")?.getTextContent()
                                 if (classifier) name += "-$classifier"
-                                name += ".${attrs.getNamedItem('ext')}"
+                                name += ".${attrs.getNamedItem('ext').getTextContent()}"
                                 def jarfile = new File(jardir, name)
                                 if (jarfile.exists()) {
                                     println "Deleting ${jarfile.name}"

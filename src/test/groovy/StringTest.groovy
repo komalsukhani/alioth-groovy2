@@ -172,6 +172,16 @@ foo
         assert out == 'groovy.codehaus.org[19] and www.aboutgroovy.com[19]'
     }
 
+    void testDollarSlashyFirstCharEscaping() {
+        def VAR = 'foo'
+        def result = $/$/VAR/$
+        assert result == '/VAR'
+        result = $/$$VAR/$
+        assert result == '$VAR'
+        result = $/$VAR/$
+        assert result == 'foo'
+    }
+
     void testMultilineDollarSlashyRegexpEscaping() {
         def str = 'groovy.codehaus.org and www.aboutgroovy.com'
         def re = $/(?x)  # to enable whitespace and comments
@@ -299,6 +309,7 @@ foo
 
     void innerNormalizationFileRoundTrip(String s) {
         def f = File.createTempFile("groovy.StringTest", ".txt")
+        f.deleteOnExit()
 
         def sd = s.denormalize()
         f.write(sd)

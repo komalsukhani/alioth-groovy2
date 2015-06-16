@@ -1,7 +1,25 @@
+/*
+ * Copyright 2008-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package groovy.transform
 
 import groovy.mock.interceptor.StubFor
+import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.transform.ThreadInterruptibleASTTransformation
+
+import java.lang.reflect.Modifier
 
 /**
  * Test for @ThreadInterrupt.
@@ -9,8 +27,31 @@ import org.codehaus.groovy.transform.ThreadInterruptibleASTTransformation
  * @author Hamlet D'Arcy
  */
 class ThreadInterruptTest extends GroovyTestCase {
+    private Map<String,MethodNode> oldValues = [:]
     @Override protected void tearDown() {
         Thread.metaClass = null
+        ['CURRENTTHREAD_METHOD', 'ISINTERRUPTED_METHOD'].each {
+            def ov = ThreadInterruptibleASTTransformation.getDeclaredField(it)
+            def modifiersField = ov.class.getDeclaredField("modifiers")
+            modifiersField.accessible = true
+            modifiersField.setInt(ov, ov.modifiers & ~Modifier.FINAL);
+            ov.accessible = true
+            ov.set(ThreadInterruptibleASTTransformation, oldValues[it])
+        }
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp()
+        ['CURRENTTHREAD_METHOD', 'ISINTERRUPTED_METHOD'].each {
+            def ov = ThreadInterruptibleASTTransformation.getDeclaredField(it)
+            def modifiersField = ov.class.getDeclaredField("modifiers")
+            modifiersField.accessible = true
+            modifiersField.setInt(ov, ov.modifiers & ~Modifier.FINAL);
+            ov.accessible = true
+            oldValues[it] = ov.get(ThreadInterruptibleASTTransformation)
+            ov.set(ThreadInterruptibleASTTransformation, null)
+        }
     }
 
     void testDefaultParameters_Method() {
@@ -282,7 +323,7 @@ class ThreadInterruptTest extends GroovyTestCase {
         mocker.use {
             new GroovyShell().evaluate(script)
         }
-        // 2 is once for run() and once for scriptMethod()
+        // 4 is once for run() plus 3 for times loop
         assert 4 == counter.interruptedCheckCount
     }
 

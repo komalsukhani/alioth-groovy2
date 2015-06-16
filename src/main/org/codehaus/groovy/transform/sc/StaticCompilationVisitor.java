@@ -25,6 +25,7 @@ import org.codehaus.groovy.ast.stmt.ExpressionStatement;
 import org.codehaus.groovy.ast.stmt.ForStatement;
 import org.codehaus.groovy.ast.stmt.Statement;
 import org.codehaus.groovy.classgen.asm.*;
+import org.codehaus.groovy.classgen.asm.sc.StaticCompilationMopWriter;
 import org.codehaus.groovy.classgen.asm.sc.StaticTypesTypeChooser;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.transform.stc.StaticTypeCheckingSupport;
@@ -34,6 +35,7 @@ import org.objectweb.asm.Opcodes;
 
 import java.util.*;
 
+import static org.codehaus.groovy.ast.tools.GenericsUtils.*;
 import static org.codehaus.groovy.transform.sc.StaticCompilationMetadataKeys.*;
 import static org.codehaus.groovy.transform.stc.StaticTypesMarker.DIRECT_METHOD_CALL_TARGET;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
@@ -99,17 +101,31 @@ public class StaticCompilationVisitor extends StaticTypeCheckingVisitor {
     @Override
     public void visitClass(final ClassNode node) {
         boolean skip = shouldSkipClassNode(node);
+        if (!skip && !anyMethodSkip(node)) {
+            node.putNodeMetaData(MopWriter.Factory.class, StaticCompilationMopWriter.FACTORY);
+        }
         ClassNode oldCN = classNode;
         classNode = node;
         Iterator<InnerClassNode> innerClasses = classNode.getInnerClasses();
         while (innerClasses.hasNext()) {
             InnerClassNode innerClassNode = innerClasses.next();
-            innerClassNode.putNodeMetaData(STATIC_COMPILE_NODE, !(skip || isSkippedInnerClass(innerClassNode)));
+            boolean innerStaticCompile = !(skip || isSkippedInnerClass(innerClassNode));
+            innerClassNode.putNodeMetaData(STATIC_COMPILE_NODE, innerStaticCompile);
             innerClassNode.putNodeMetaData(WriterControllerFactory.class, node.getNodeMetaData(WriterControllerFactory.class));
+            if (innerStaticCompile && !anyMethodSkip(innerClassNode)) {
+                innerClassNode.putNodeMetaData(MopWriter.Factory.class, StaticCompilationMopWriter.FACTORY);
+            }
         }
         super.visitClass(node);
         addPrivateFieldAndMethodAccessors(node);
         classNode = oldCN;
+    }
+
+    private boolean anyMethodSkip(final ClassNode node) {
+        for (MethodNode methodNode : node.getMethods()) {
+            if (isSkipMode(methodNode)) return true;
+        }
+        return false;
     }
 
     /**
@@ -188,7 +204,7 @@ public class StaticCompilationVisitor extends StaticTypeCheckingVisitor {
     private void addPrivateBridgeMethods(final ClassNode node) {
         Set<ASTNode> accessedMethods = (Set<ASTNode>) node.getNodeMetaData(StaticTypesMarker.PV_METHODS_ACCESS);
         if (accessedMethods==null) return;
-        List<MethodNode> methods = new ArrayList<MethodNode>(node.getMethods());
+        List<MethodNode> methods = new ArrayList<MethodNode>(node.getAllDeclaredMethods());
         Map<MethodNode, MethodNode> privateBridgeMethods = (Map<MethodNode, MethodNode>) node.getNodeMetaData(PRIVATE_BRIDGE_METHODS);
         if (privateBridgeMethods!=null) {
             // private bridge methods already added
@@ -199,10 +215,21 @@ public class StaticCompilationVisitor extends StaticTypeCheckingVisitor {
         final int access = Opcodes.ACC_STATIC | Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC;
         for (MethodNode method : methods) {
             if (accessedMethods.contains(method)) {
+                List<String> methodSpecificGenerics = methodSpecificGenerics(method);
                 i++;
+                ClassNode declaringClass = method.getDeclaringClass();
+                Map<String,ClassNode> genericsSpec = createGenericsSpec(node);
+                genericsSpec = addMethodGenerics(method, genericsSpec);
+                extractSuperClassGenerics(node, declaringClass, genericsSpec);
                 Parameter[] methodParameters = method.getParameters();
                 Parameter[] newParams = new Parameter[methodParameters.length+1];
-                System.arraycopy(methodParameters, 0, newParams, 1, methodParameters.length);
+                for (int j = 1; j < newParams.length; j++) {
+                    Parameter orig = methodParameters[j-1];
+                    newParams[j] = new Parameter(
+                            correctToGenericsSpecRecurse(genericsSpec, orig.getOriginType(), methodSpecificGenerics),
+                            orig.getName()
+                    );
+                }
                 newParams[0] = new Parameter(node.getPlainNodeReference(), "$that");
                 Expression arguments;
                 if (method.getParameters()==null || method.getParameters().length==0) {
@@ -219,12 +246,34 @@ public class StaticCompilationVisitor extends StaticTypeCheckingVisitor {
                 mce.setMethodTarget(method);
 
                 ExpressionStatement returnStatement = new ExpressionStatement(mce);
-                MethodNode bridge = node.addMethod("access$"+i, access, method.getReturnType(), newParams, method.getExceptions(), returnStatement);
+                MethodNode bridge = node.addMethod(
+                        "access$"+i, access,
+                        correctToGenericsSpecRecurse(genericsSpec, method.getReturnType(), methodSpecificGenerics),
+                        newParams,
+                        method.getExceptions(),
+                        returnStatement);
+                GenericsType[] origGenericsTypes = method.getGenericsTypes();
+                if (origGenericsTypes !=null) {
+                    bridge.setGenericsTypes(applyGenericsContextToPlaceHolders(genericsSpec,origGenericsTypes));
+                }
                 privateBridgeMethods.put(method, bridge);
                 bridge.addAnnotation(new AnnotationNode(COMPILESTATIC_CLASSNODE));
             }
         }
-        node.setNodeMetaData(PRIVATE_BRIDGE_METHODS, privateBridgeMethods);
+        if (!privateBridgeMethods.isEmpty()) {
+            node.setNodeMetaData(PRIVATE_BRIDGE_METHODS, privateBridgeMethods);
+        }
+    }
+
+    private static List<String> methodSpecificGenerics(final MethodNode method) {
+        List<String> genericTypeTokens = new ArrayList<String>();
+        GenericsType[] candidateGenericsTypes = method.getGenericsTypes();
+        if (candidateGenericsTypes != null) {
+            for (GenericsType gt : candidateGenericsTypes) {
+                genericTypeTokens.add(gt.getName());
+            }
+        }
+        return genericTypeTokens;
     }
 
     private void memorizeInitialExpressions(final MethodNode node) {
@@ -317,25 +366,61 @@ public class StaticCompilationVisitor extends StaticTypeCheckingVisitor {
             public void visitField(final FieldNode node) {
                 if (visitor!=null) visitor.visitField(node);
                 ClassNode declaringClass = node.getDeclaringClass();
-                if (declaringClass!=null) rType.set(declaringClass);
+                if (declaringClass!=null) {
+                    if (StaticTypeCheckingSupport.implementsInterfaceOrIsSubclassOf(declaringClass, ClassHelper.LIST_TYPE)) {
+                        boolean spread = declaringClass.getDeclaredField(node.getName()) != node;
+                        pexp.setSpreadSafe(spread);
+                    }
+                    rType.set(declaringClass);
+                }
             }
 
             public void visitMethod(final MethodNode node) {
                 if (visitor!=null) visitor.visitMethod(node);
                 ClassNode declaringClass = node.getDeclaringClass();
-                if (declaringClass!=null) rType.set(declaringClass);
+                if (declaringClass!=null){
+                    if (StaticTypeCheckingSupport.implementsInterfaceOrIsSubclassOf(declaringClass, ClassHelper.LIST_TYPE)) {
+                        List<MethodNode> properties = declaringClass.getDeclaredMethods(node.getName());
+                        boolean spread = true;
+                        for (MethodNode mn : properties) {
+                            if (node==mn) {
+                                spread = false;
+                                break;
+                            }
+                        }
+                        // it's no real property but a property of the component
+                        pexp.setSpreadSafe(spread);
+                    }
+                    rType.set(declaringClass);
+                }
             }
 
             @Override
             public void visitProperty(final PropertyNode node) {
                 if (visitor!=null) visitor.visitProperty(node);
                 ClassNode declaringClass = node.getDeclaringClass();
-                if (declaringClass!=null) rType.set(declaringClass);
+                if (declaringClass!=null) {
+                    if (StaticTypeCheckingSupport.implementsInterfaceOrIsSubclassOf(declaringClass, ClassHelper.LIST_TYPE)) {
+                        List<PropertyNode> properties = declaringClass.getProperties();
+                        boolean spread = true;
+                        for (PropertyNode propertyNode : properties) {
+                            if (propertyNode==node) {
+                                spread = false;
+                                break;
+                            }
+                        }
+                        // it's no real property but a property of the component
+                        pexp.setSpreadSafe(spread);
+                    }
+                    rType.set(declaringClass);
+                }
             }
         };
         boolean exists = super.existsProperty(pexp, checkForReadOnly, receiverMemoizer);
         if (exists) {
-            objectExpression.putNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER, rType.get());
+            if (objectExpression.getNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER)==null) {
+                objectExpression.putNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER, rType.get());
+            }
             if (StaticTypeCheckingSupport.implementsInterfaceOrIsSubclassOf(objectExpressionType, ClassHelper.LIST_TYPE)) {
                 objectExpression.putNodeMetaData(COMPONENT_TYPE, inferComponentType(objectExpressionType, ClassHelper.int_TYPE));
             }
@@ -343,4 +428,12 @@ public class StaticCompilationVisitor extends StaticTypeCheckingVisitor {
         return exists;
     }
 
+    @Override
+    public void visitPropertyExpression(final PropertyExpression pexp) {
+        super.visitPropertyExpression(pexp);
+        Object dynamic = pexp.getNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION);
+        if (dynamic !=null) {
+            pexp.getObjectExpression().putNodeMetaData(StaticCompilationMetadataKeys.RECEIVER_OF_DYNAMIC_PROPERTY, dynamic);
+        }
+    }
 }

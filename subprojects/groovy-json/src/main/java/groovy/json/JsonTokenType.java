@@ -21,6 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * The original slurper and lexer use this class.
+ * This is kept around in case someone needs its exact behavior.
  * Enum listing all the possible JSON tokens that should be recognized by the lexer.
  *
  * @author Guillaume Laforge
@@ -86,10 +88,10 @@ public enum JsonTokenType {
      */
     public boolean matching(String input) {
         if (validator instanceof Pattern) {
-            Matcher matcher = ((Pattern)validator).matcher(input);
+            Matcher matcher = ((Pattern) validator).matcher(input);
             return matcher.matches();
         } else if (validator instanceof Closure) {
-            return (Boolean)((Closure) validator).call(input);
+            return (Boolean) ((Closure) validator).call(input);
         } else if (validator instanceof String) {
             return input.equals(validator);
         } else {

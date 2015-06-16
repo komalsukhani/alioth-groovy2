@@ -23,18 +23,25 @@
  */
 package groovy.lang;
 
+import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
+import org.codehaus.groovy.ast.FieldNode;
+import org.codehaus.groovy.ast.InnerClassNode;
 import org.codehaus.groovy.ast.ModuleNode;
+import org.codehaus.groovy.ast.expr.ConstantExpression;
+import org.codehaus.groovy.classgen.GeneratorContext;
 import org.codehaus.groovy.classgen.Verifier;
 import org.codehaus.groovy.control.*;
 import org.codehaus.groovy.runtime.IOGroovyMethods;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 
 import java.io.*;
 import java.net.*;
 import java.security.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * A ClassLoader which can load Groovy classes. The loaded classes are cached,
@@ -53,6 +60,8 @@ import java.util.*;
  * @version $Revision$
  */
 public class GroovyClassLoader extends URLClassLoader {
+
+    private static final URL[] EMPTY_URL_ARRAY = new URL[0];
 
     /**
      * this cache contains the loaded classes or PARSING, if the class is currently parsed
@@ -118,7 +127,7 @@ public class GroovyClassLoader extends URLClassLoader {
      * @param useConfigurationClasspath determines if the configurations classpath should be added
      */
     public GroovyClassLoader(ClassLoader parent, CompilerConfiguration config, boolean useConfigurationClasspath) {
-        super(new URL[0], parent);
+        super(EMPTY_URL_ARRAY, parent);
         if (config == null) config = CompilerConfiguration.DEFAULT;
         this.config = config;
         if (useConfigurationClasspath) {
@@ -265,11 +274,20 @@ public class GroovyClassLoader extends URLClassLoader {
         validate(codeSource);
         Class answer;  // Was neither already loaded nor compiling, so compile and add to cache.
         CompilationUnit unit = createCompilationUnit(config, codeSource.getCodeSource());
+        if (recompile!=null && recompile || recompile==null && config.getRecompileGroovySource()) {
+            unit.addFirstPhaseOperation(TimestampAdder.INSTANCE, CompilePhase.CLASS_GENERATION.getPhaseNumber());
+        }
         SourceUnit su = null;
-        if (codeSource.getFile() == null) {
-            su = unit.addSource(codeSource.getName(), codeSource.getScriptText());
+        File file = codeSource.getFile();
+        if (file != null) {
+            su = unit.addSource(file);
         } else {
-            su = unit.addSource(codeSource.getFile());
+            URL url = codeSource.getURL();
+            if (url != null) {
+                su = unit.addSource(url);
+            } else {
+                su = unit.addSource(codeSource.getName(), codeSource.getScriptText());
+            }
         }
 
         ClassCollector collector = createCollector(unit, su);
@@ -328,22 +346,27 @@ public class GroovyClassLoader extends URLClassLoader {
     protected PermissionCollection getPermissions(CodeSource codeSource) {
         PermissionCollection perms;
         try {
-            perms = super.getPermissions(codeSource);
-        } catch (SecurityException e) {
+            try {
+                perms = super.getPermissions(codeSource);
+            } catch (SecurityException e) {
+                // We lied about our CodeSource and that makes URLClassLoader unhappy.
+                perms = new Permissions();
+            }
+
+            ProtectionDomain myDomain = AccessController.doPrivileged(new PrivilegedAction<ProtectionDomain>() {
+                public ProtectionDomain run() {
+                    return getClass().getProtectionDomain();
+                }
+            });
+            PermissionCollection myPerms = myDomain.getPermissions();
+            if (myPerms != null) {
+                for (Enumeration<Permission> elements = myPerms.elements(); elements.hasMoreElements();) {
+                    perms.add(elements.nextElement());
+                }
+            }
+        } catch (Throwable e) {
             // We lied about our CodeSource and that makes URLClassLoader unhappy.
             perms = new Permissions();
-        }
-
-        ProtectionDomain myDomain = AccessController.doPrivileged(new PrivilegedAction<ProtectionDomain>() {
-            public ProtectionDomain run() {
-                return getClass().getProtectionDomain();
-            }
-        });
-        PermissionCollection myPerms = myDomain.getPermissions();
-        if (myPerms != null) {
-            for (Enumeration<Permission> elements = myPerms.elements(); elements.hasMoreElements();) {
-                perms.add(elements.nextElement());
-            }
         }
         perms.setReadOnly();
         return perms;
@@ -467,8 +490,13 @@ public class GroovyClassLoader extends URLClassLoader {
         }
 
         protected Class createClass(byte[] code, ClassNode classNode) {
+            BytecodeProcessor bytecodePostprocessor = unit.getConfiguration().getBytecodePostprocessor();
+            byte[] fcode = code;
+            if (bytecodePostprocessor!=null) {
+                fcode = bytecodePostprocessor.processBytecode(classNode.getName(), fcode);
+            }
             GroovyClassLoader cl = getDefiningClassLoader();
-            Class theClass = cl.defineClass(classNode.getName(), code, 0, code.length, unit.getAST().getCodeSource());
+            Class theClass = cl.defineClass(classNode.getName(), fcode, 0, fcode.length, unit.getAST().getCodeSource());
             this.loadedClasses.add(theClass);
 
             if (generatedClass == null) {
@@ -853,6 +881,8 @@ public class GroovyClassLoader extends URLClassLoader {
         // incorrect results (-1)
         if (isFile(source)) {
             // Coerce the file URL to a File
+            // See ClassNodeResolver.isSourceNewer for another method that replaces '|' with ':'.
+            // WTF: Why is this done and where is it documented?
             String path = source.getPath().replace('/', File.separatorChar).replace('|', ':');
             File file = new File(path);
             lastMod = file.lastModified();
@@ -875,20 +905,46 @@ public class GroovyClassLoader extends URLClassLoader {
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             public Void run() {
                 try {
-                    File f = new File(path);
-                    URL newURL = f.toURI().toURL();
+                    // As the java.net.URL Javadoc says, the recommended way to get a URL is via URI.
+                    // http://docs.oracle.com/javase/7/docs/api/java/net/URL.html
+                    // "Note, the URI class does perform escaping of its component fields in certain circumstances.
+                    // The recommended way to manage the encoding and decoding of URLs is to use URI, and to convert
+                    // between these two classes using toURI() and URI.toURL()."
+                    // A possibly better approach here is to construct a URI and then resolve it against
+                    // a URI for the current working directory.
+                    // But we use this string match for now so everyone can see it doesn't hurt file-only classpaths.
+                    URI newURI;
+                    if (!URI_PATTERN.matcher(path).matches()) {
+                        newURI = new File(path).toURI();
+                    } else {
+                        newURI = new URI(path);
+                    }
                     URL[] urls = getURLs();
                     for (URL url : urls) {
-                        if (url.equals(newURL)) return null;
+                        // Do not use URL.equals.  It uses the network to resolve names and compares ip addresses!
+                        // That is a violation of RFC and just plain evil.
+                        // http://michaelscharf.blogspot.com/2006/11/javaneturlequals-and-hashcode-make.html
+                        // http://docs.oracle.com/javase/7/docs/api/java/net/URL.html#equals(java.lang.Object)
+                        // "Since hosts comparison requires name resolution, this operation is a blocking operation.
+                        // Note: The defined behavior for equals is known to be inconsistent with virtual hosting in HTTP."
+                        if (newURI.equals(url.toURI())) return null;
                     }
-                    addURL(newURL);
+                    addURL(newURI.toURL());
                 } catch (MalformedURLException e) {
                     //TODO: fail through ?
+                } catch (URISyntaxException e) {
+                    // Just doing the same thing...
                 }
                 return null;
             }
         });
     }
+
+    // TODO remove duplication with GroovyMain#uriPattern
+    // RFC2396
+    // scheme        = alpha *( alpha | digit | "+" | "-" | "." )
+    // match URIs but not Windows filenames, e.g.: http://cnn.com but not C:\xxx\file.ext
+    private static final Pattern URI_PATTERN = Pattern.compile("\\p{Alpha}[-+.\\p{Alnum}]*:[^\\\\]*");
 
     /**
      * <p>Returns all Groovy classes loaded by this class loader.
@@ -915,6 +971,49 @@ public class GroovyClassLoader extends URLClassLoader {
         }
         synchronized (sourceCache) {
             sourceCache.clear();
+        }
+    }
+
+    private static class TimestampAdder extends CompilationUnit.PrimaryClassNodeOperation implements Opcodes {
+        private final static TimestampAdder INSTANCE = new TimestampAdder();
+
+        private TimestampAdder() {}
+
+        protected void addTimeStamp(ClassNode node) {
+            if (node.getDeclaredField(Verifier.__TIMESTAMP) == null) { // in case if verifier visited the call already
+                FieldNode timeTagField = new FieldNode(
+                        Verifier.__TIMESTAMP,
+                        ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC,
+                        ClassHelper.long_TYPE,
+                        //"",
+                        node,
+                        new ConstantExpression(System.currentTimeMillis()));
+                // alternatively, FieldNode timeTagField = SourceUnit.createFieldNode("public static final long __timeStamp = " + System.currentTimeMillis() + "L");
+                timeTagField.setSynthetic(true);
+                node.addField(timeTagField);
+
+                timeTagField = new FieldNode(
+                        Verifier.__TIMESTAMP__ + String.valueOf(System.currentTimeMillis()),
+                        ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC,
+                        ClassHelper.long_TYPE,
+                        //"",
+                        node,
+                        new ConstantExpression((long) 0));
+                // alternatively, FieldNode timeTagField = SourceUnit.createFieldNode("public static final long __timeStamp = " + System.currentTimeMillis() + "L");
+                timeTagField.setSynthetic(true);
+                node.addField(timeTagField);
+            }
+        }
+
+        @Override
+        public void call(final SourceUnit source, final GeneratorContext context, final ClassNode classNode) throws CompilationFailedException {
+            if ((classNode.getModifiers() & Opcodes.ACC_INTERFACE) > 0) {
+                // does not apply on interfaces
+                return;
+            }
+            if (!(classNode instanceof InnerClassNode)) {
+                addTimeStamp(classNode);
+            }
         }
     }
 }

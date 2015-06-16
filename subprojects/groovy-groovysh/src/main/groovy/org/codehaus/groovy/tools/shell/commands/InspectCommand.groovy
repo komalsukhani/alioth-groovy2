@@ -17,13 +17,13 @@
 package org.codehaus.groovy.tools.shell.commands
 
 import groovy.inspect.swingui.ObjectBrowser
+import jline.console.completer.Completer
 import org.codehaus.groovy.tools.shell.Groovysh
 
 import java.awt.HeadlessException
 import javax.swing.UIManager
 
 import org.codehaus.groovy.tools.shell.CommandSupport
-import org.codehaus.groovy.tools.shell.Shell
 import org.codehaus.groovy.tools.shell.util.SimpleCompletor
 
 /**
@@ -35,31 +35,35 @@ import org.codehaus.groovy.tools.shell.util.SimpleCompletor
 class InspectCommand
     extends CommandSupport
 {
+    public static final String COMMAND_NAME = ':inspect'
+
     InspectCommand(final Groovysh shell) {
-        super(shell, 'inspect', '\\n')
+        super(shell, COMMAND_NAME, ':n')
     }
-    
+
     def lafInitialized = false
     def headless
-    
-    protected List createCompleters() {
+
+    @Override
+    protected List<Completer> createCompleters() {
         return [
             new InspectCommandCompletor(binding),
             null
         ]
     }
 
+    @Override
     Object execute(final List<String> args) {
         assert args != null
-        
+
         log.debug("Inspecting w/args: $args")
-        
+
         if (args.size() > 1) {
             fail(messages.format('error.unexpected_args', args.join(' ')))
         }
-        
+
         def subject
-        
+
         if (args.size() == 1) {
             subject = binding.variables[args[0]]
         } else {
@@ -73,23 +77,23 @@ class InspectCommand
             if (!lafInitialized) {
                 lafInitialized = true
                 try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-                    
+                    UIManager.setLookAndFeel(UIManager.systemLookAndFeelClassName)
+
                     // The setLAF doesn't throw a HeadlessException on Mac.
                     // So try really creating a frame.
                     new java.awt.Frame().dispose()
-                    
+
                     headless = false
                 } catch (HeadlessException he) {
                     headless = true
                 }
             }
-            
+
             if (headless) {
                 io.err.println("@|red ERROR:|@ Running in AWT Headless mode, 'inspect' is not available.")
                 return
             }
-            
+
             if (io.verbose) {
                 io.out.println("Launching object browser to inspect: $subject") // TODO: i18n
             }
@@ -109,15 +113,16 @@ class InspectCommandCompletor
     extends SimpleCompletor
 {
     private final Binding binding
-    
+
     InspectCommandCompletor(final Binding binding) {
         assert binding
 
         this.binding = binding
     }
 
-    SortedSet getCandidates() {
-        def set = new TreeSet()
+    @Override
+    SortedSet<String> getCandidates() {
+        SortedSet<String> set = new TreeSet<String>()
 
         binding.variables.keySet().each {
             set << it

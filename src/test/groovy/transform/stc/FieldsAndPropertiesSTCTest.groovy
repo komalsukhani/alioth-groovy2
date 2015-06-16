@@ -15,6 +15,8 @@
  */
 package groovy.transform.stc
 
+import org.codehaus.groovy.ast.ASTNode
+
 /**
  * Unit tests for static type checking : fields and properties.
  *
@@ -563,7 +565,167 @@ class FooWorker {
     }
 }
 
-new FooWorker().doSomething()''', 'Incompatible generic argument types. Cannot assign java.util.ArrayList <Integer> to: java.util.List <java.lang.String>'
+new FooWorker().doSomething()''', 'Incompatible generic argument types. Cannot assign java.util.ArrayList <Integer> to: java.util.List <String>'
+    }
+
+    void testAICAsStaticProperty() {
+        assertScript '''
+            class Foo {
+                static x = new Object() {}
+            }
+            assert Foo.x instanceof Object
+        '''
+    }
+
+    public void testPropertyWithMultipleSetters() {
+        assertScript '''import org.codehaus.groovy.ast.expr.BinaryExpression
+import org.codehaus.groovy.ast.expr.BooleanExpression
+import org.codehaus.groovy.ast.stmt.AssertStatement
+            class A {
+                private field
+                void setX(Integer a) {field=a}
+                void setX(String b) {field=b}
+                def getX(){field}
+            }
+
+            @ASTTest(phase=INSTRUCTION_SELECTION,value={
+                lookup('test1').each { stmt ->
+                    def exp = stmt.expression
+                    assert exp instanceof BinaryExpression
+                    def left = exp.leftExpression
+                    def md = left.getNodeMetaData(DIRECT_METHOD_CALL_TARGET)
+                    assert md
+                    assert md.name == 'setX'
+                    assert md.parameters[0].originType == Integer_TYPE
+                }
+                lookup('test2').each { stmt ->
+                    def exp = stmt.expression
+                    assert exp instanceof BinaryExpression
+                    def left = exp.leftExpression
+                    def md = left.getNodeMetaData(DIRECT_METHOD_CALL_TARGET)
+                    assert md
+                    assert md.name == 'setX'
+                    assert md.parameters[0].originType == STRING_TYPE
+                }
+            })
+            void testBody() {
+                def a = new A()
+                test1:
+                a.x = 1
+                assert a.x==1
+                test2:
+                a.x = "3"
+                assert a.x == "3"
+            }
+            testBody()
+        '''
+    }
+
+    void testPropertyAssignmentAsExpression() {
+        assertScript '''
+            class Foo {
+                int x = 2
+            }
+            def f = new Foo()
+            def v = f.x = 3
+            assert v == 3
+'''
+    }
+
+    void testPropertyAssignmentInSubClassAndMultiSetter() {
+        10.times {
+            assertScript '''import org.codehaus.groovy.ast.PropertyNode
+
+            public class Activity {
+                int debug
+
+                Activity() {
+                    contentView = 1
+                }
+
+                public void setContentView(Date layoutResID) { debug = 2 }
+                public void setContentView(int layoutResID) { debug = 3 }
+            }
+
+            class MyActivity extends Activity {
+                void foo() {
+                    contentView = 1
+                    assert debug == 3
+                    contentView = new Date()
+                    assert debug == 2
+                }
+            }
+            new MyActivity().foo()
+        '''
+        }
+    }
+
+    void testPropertyAssignmentInSubClassAndMultiSetterThroughDelegation() {
+        10.times {
+            assertScript '''import org.codehaus.groovy.ast.PropertyNode
+
+            public class Activity {
+                int debug
+
+                Activity() {
+                    contentView = 1
+                }
+
+                public void setContentView(Date layoutResID) { debug = 2 }
+                public void setContentView(int layoutResID) { debug = 3 }
+            }
+
+            class MyActivity extends Activity {
+            }
+            def activity = new  MyActivity()
+            activity.with {
+                 contentView = 1
+                 assert debug == 3
+                 contentView = new Date()
+                 assert debug == 2
+            }
+        '''
+        }
+    }
+
+    void testShouldAcceptPropertyAssignmentEvenIfSetterOnlyBecauseOfSpecialType() {
+        assertScript '''
+            class BooleanSetterOnly {
+                void setFlag(boolean b) {}
+            }
+
+            def b = new BooleanSetterOnly()
+            b.flag = 'foo'
+        '''
+        assertScript '''
+            class StringSetterOnly {
+                void setFlag(String b) {}
+            }
+
+            def b = new StringSetterOnly()
+            b.flag = false
+        '''
+        assertScript '''
+            class ClassSetterOnly {
+                void setFlag(Class b) {}
+            }
+
+            def b = new ClassSetterOnly()
+            b.flag = 'java.lang.String'
+        '''
+    }
+
+    // GROOVY-6590
+    void testShouldFindStaticPropertyOnPrimitiveType() {
+        assertScript '''
+            int i=1
+            i.MAX_VALUE
+        '''
+        assertScript '''
+            def i="d"
+            i=1
+            i.MAX_VALUE
+        '''
     }
 
     public static interface InterfaceWithField {

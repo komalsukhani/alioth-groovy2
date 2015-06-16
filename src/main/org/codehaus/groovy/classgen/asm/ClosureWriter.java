@@ -18,6 +18,7 @@ package org.codehaus.groovy.classgen.asm;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.groovy.GroovyBugError;
 import org.codehaus.groovy.ast.ASTNode;
@@ -52,9 +53,9 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class ClosureWriter {
 
-    protected static interface UseExistingReference {}
+    protected interface UseExistingReference {}
 
-    private final HashMap<Expression,ClassNode> closureClassMap;
+    private final Map<Expression,ClassNode> closureClassMap;
     private final WriterController controller;
     private final WriterControllerFactory factory;
 
@@ -107,11 +108,7 @@ public class ClosureWriter {
 
         // we may need to pass in some other constructors
         //cv.visitMethodInsn(INVOKESPECIAL, innerClassinternalName, "<init>", prototype + ")V");
-        mv.visitMethodInsn(
-                INVOKESPECIAL,
-                closureClassinternalName,
-                "<init>",
-                BytecodeHelper.getMethodDescriptor(ClassHelper.VOID_TYPE, localVariableParams));
+        mv.visitMethodInsn(INVOKESPECIAL, closureClassinternalName, "<init>", BytecodeHelper.getMethodDescriptor(ClassHelper.VOID_TYPE, localVariableParams), false);
         controller.getOperandStack().replace(ClassHelper.CLOSURE_TYPE, localVariableParams.length);
     }
     
@@ -170,7 +167,7 @@ public class ClosureWriter {
         ClassNode classNode = controller.getClassNode();
         ClassNode outerClass = controller.getOutermostClass();
         MethodNode methodNode = controller.getMethodNode();
-        String name = outerClass.getName() + "$"
+        String name = classNode.getName() + "$"
                 + controller.getContext().getNextClosureInnerName(outerClass, classNode, methodNode); // add a more informative name
         boolean staticMethodOrInStaticClass = controller.isStaticMethod() || classNode.isStaticClass();
 
@@ -214,7 +211,9 @@ public class ClosureWriter {
         if (parameters.length > 1
                 || (parameters.length == 1
                 && parameters[0].getType() != null
-                && parameters[0].getType() != ClassHelper.OBJECT_TYPE)) {
+                && parameters[0].getType() != ClassHelper.OBJECT_TYPE
+                && !ClassHelper.OBJECT_TYPE.equals(parameters[0].getType().getComponentType())))
+        {
 
             // let's add a typesafe call method
             MethodNode call = answer.addMethod(
@@ -342,7 +341,7 @@ public class ClosureWriter {
         //TODO: replace with normal String, p not needed
         Parameter p = new Parameter(ClassHelper.OBJECT_TYPE,"_p");
         String descriptor = BytecodeHelper.getMethodDescriptor(ClassHelper.VOID_TYPE, new Parameter[]{p,p});
-        mv.visitMethodInsn(INVOKESPECIAL, BytecodeHelper.getClassInternalName(callNode), "<init>", descriptor);
+        mv.visitMethodInsn(INVOKESPECIAL, BytecodeHelper.getClassInternalName(callNode), "<init>", descriptor, false);
         operandStack.remove(2);
         return true;
     }
@@ -366,12 +365,7 @@ public class ClosureWriter {
         MethodVisitor mv = controller.getMethodVisitor();
         mv.visitVarInsn(ALOAD, 0);
         if (controller.isInClosure()) {
-            mv.visitMethodInsn(
-                    INVOKEVIRTUAL,
-                    "groovy/lang/Closure",
-                    "getThisObject",
-                    "()Ljava/lang/Object;"
-            );
+            mv.visitMethodInsn(INVOKEVIRTUAL, "groovy/lang/Closure", "getThisObject", "()Ljava/lang/Object;", false);
             controller.getOperandStack().push(ClassHelper.OBJECT_TYPE);
         } else {
             controller.getOperandStack().push(controller.getClassNode());
