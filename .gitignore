@@ -1,0 +1,6 @@
+.git
+.pc
+.gradlehome
+buildSrc/.gradle
+buildSrc/target
+subprojects/**/*.class
