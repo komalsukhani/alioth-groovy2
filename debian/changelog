@@ -1,4 +1,4 @@
-groovy2 (2.4.3+dfsg) UNRELEASED; urgency=medium
+groovy2 (2.4.3+dfsg-1) UNRELEASED; urgency=medium
 
   [ Emmanuel Bourg ]
   * Team upload.
@@ -7,7 +7,7 @@ groovy2 (2.4.3+dfsg) UNRELEASED; urgency=medium
   [ Komal ]
   * New upstream release 
 
- -- Komal <komaldsukhani@gmail.com>  Wed, 17 Jun 2015 19:01:38 +0530
+ -- Komal <komaldsukhani@gmail.com>  Wed, 17 Jun 2015 21:10:15 +0530
 
 groovy2 (2.2.2+dfsg-4) unstable; urgency=medium
 
