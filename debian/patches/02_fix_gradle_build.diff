@@ -1,7 +1,7 @@
-Index: debian-groovy2/build.gradle
+Index: groovy2-2.4.3/build.gradle
 ===================================================================
---- debian-groovy2.orig/build.gradle
-+++ debian-groovy2/build.gradle
+--- groovy2-2.4.3.orig/build.gradle
++++ groovy2-2.4.3/build.gradle
 @@ -1,29 +1,25 @@
  buildscript {
      repositories {
@@ -132,10 +132,10 @@ Index: debian-groovy2/build.gradle
      tools("net.sourceforge.cobertura:cobertura:$coberturaVersion") {
          exclude(module: 'asm')
          exclude(module: 'asm')
-Index: debian-groovy2/gradle/utils.gradle
+Index: groovy2-2.4.3/gradle/utils.gradle
 ===================================================================
---- debian-groovy2.orig/gradle/utils.gradle
-+++ debian-groovy2/gradle/utils.gradle
+--- groovy2-2.4.3.orig/gradle/utils.gradle
++++ groovy2-2.4.3/gradle/utils.gradle
 @@ -24,7 +24,8 @@ import static org.objectweb.asm.Opcodes.
  
  buildscript {
@@ -146,10 +146,10 @@ Index: debian-groovy2/gradle/utils.gradle
      }
      dependencies {
          classpath "org.ow2.asm:asm:$asmVersion"
-Index: debian-groovy2/gradle/codehaus.gradle
+Index: groovy2-2.4.3/gradle/codehaus.gradle
 ===================================================================
---- debian-groovy2.orig/gradle/codehaus.gradle
-+++ debian-groovy2/gradle/codehaus.gradle
+--- groovy2-2.4.3.orig/gradle/codehaus.gradle
++++ groovy2-2.4.3/gradle/codehaus.gradle
 @@ -1,26 +1,27 @@
 -import com.github.sardine.*
 +/*import com.github.sardine.*
@@ -191,10 +191,10 @@ Index: debian-groovy2/gradle/codehaus.gradle
      }
 +*/
  }
-Index: debian-groovy2/gradle/quality.gradle
+Index: groovy2-2.4.3/gradle/quality.gradle
 ===================================================================
---- debian-groovy2.orig/gradle/quality.gradle
-+++ debian-groovy2/gradle/quality.gradle
+--- groovy2-2.4.3.orig/gradle/quality.gradle
++++ groovy2-2.4.3/gradle/quality.gradle
 @@ -1,5 +1,5 @@
 -import groovy.text.markup.MarkupTemplateEngine
 -import groovy.text.markup.TemplateConfiguration
@@ -227,3 +227,17 @@ Index: debian-groovy2/gradle/quality.gradle
      }
  
  }
+Index: groovy2-2.4.3/gradle/assemble.gradle
+===================================================================
+--- groovy2-2.4.3.orig/gradle/assemble.gradle
++++ groovy2-2.4.3/gradle/assemble.gradle
+@@ -218,9 +218,6 @@ allprojects {
+                     taskdef name: 'jarjar', classname: 'com.tonicsystems.jarjar.JarJarTask', classpath: rootProject.configurations.tools.asPath
+                     jarjar(jarfile: target) {
+                         zipfileset(src: jarjar.archivePath)
+-                        if (isRootProject) {
+-                            zipfileset(src: rootProject.configurations.runtime.files.find { it.name.startsWith('openbeans') })
+-                        }
+                         rule pattern: 'com.googlecode.openbeans.**', result: 'groovyjarjaropenbeans.@1'
+                         rule pattern: 'org.apache.harmony.beans.**', result: 'groovyjarjarharmonybeans.@1'
+                         rule pattern: 'java.beans.**', result: 'groovyjarjaropenbeans.@1'
