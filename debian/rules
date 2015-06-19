@@ -34,7 +34,7 @@ override_dh_auto_install:
 	dh_auto_install
 	# embeddable groovy-all jar with indy feature is not installed through maven
 	dh_install \
-		target/distributions/bin/groovy-2.4.3/embeddable/groovy-all-$(DEB_VERSION_UPSTREAM)-indy.jar \
+		target/distributions/bin/groovy-2.4.3/embeddable/groovy-all-2.4.3-indy.jar \
 		usr/share/groovy2/embeddable
 	# groovy core
 	mh_installpom -o -v -pgroovy2 maven/groovy.pom
