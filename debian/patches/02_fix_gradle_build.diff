@@ -142,6 +142,15 @@ Index: groovy2-2.4.3/build.gradle
      tools("net.sourceforge.cobertura:cobertura:$coberturaVersion") {
          exclude(module: 'asm')
          exclude(module: 'asm')
+@@ -173,7 +165,7 @@ dependencies {
+     }
+     tools "org.ow2.asm:asm-all:$asmVersion"
+     tools "com.thoughtworks.qdox:qdox:$qdoxVersion"
+-    tools "biz.aQute:bnd:$bndVersion"
++    tools "biz.aQute.bnd:bnd:$bndVersion"
+ 
+     examplesCompile project(':groovy-test')
+     examplesCompile project(':groovy-swing')
 Index: groovy2-2.4.3/gradle/utils.gradle
 ===================================================================
 --- groovy2-2.4.3.orig/gradle/utils.gradle
