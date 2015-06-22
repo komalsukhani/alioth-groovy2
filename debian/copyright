@@ -3,7 +3,18 @@ Upstream-Name: Groovy
 Upstream-Contact: Groovy Development Team <dev@groovy.codehaus.org>
 Source: http://groovy.codehaus.org/
 Files-Excluded:
-  src/spec/assets/js/jquery-2.1.1.min.js
+  src/spec/assets/js/jquery-2.1.1.min.js gradle/wrapper/gradle-wrapper.jar lib/openbeans-1.0.jar security/GroovyJarTest.jar
+
+Files: src/main/org/codehaus/groovy/classgen/ClassCompletionVerifier.java
+Copyright:  2004 IBM Corporation and others
+            Groovy community
+License: CPL-1.0 and Apache-2.0
+
+License: CPL-1.0
+  All rights reserved.The initial API is made available under the terms of
+  the Common Public License v1.0 which is available at:
+  http://www.eclipse.org/legal/cpl-v10.html
+  Subsequent modifications are made available under the Apache 2.0 license.
 
 Files: *
 Copyright: 2003-2013 the original author or authors
