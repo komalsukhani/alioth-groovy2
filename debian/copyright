@@ -2,6 +2,8 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Groovy
 Upstream-Contact: Groovy Development Team <dev@groovy.codehaus.org>
 Source: http://groovy.codehaus.org/
+Files-Excluded:
+  src/spec/assets/js/jquery-2.1.1.min.js
 
 Files: *
 Copyright: 2003-2013 the original author or authors
