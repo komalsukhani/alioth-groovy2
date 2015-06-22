@@ -1,3 +1,9 @@
+Description: Remove code of asciidoctor-gradle-plugin
+Author: Komal Sukhani <komaldsukhani@gmail.com> 
+Forwarded: no 
+Last-Update: 2015-06-22
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 Index: debian-groovy2/gradle/docs.gradle
 ===================================================================
 --- debian-groovy2.orig/gradle/docs.gradle

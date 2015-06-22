@@ -6,7 +6,7 @@
 
 
 
-fix_for_gradle-1.12
+fix_for_gradle-1.12.diff
 change_bsf_dependencies_version.diff
 change_servlet_dependency_version.diff
 change_junit_version.diff

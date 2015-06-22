@@ -1,3 +1,9 @@
+Description: Change version of junit to one available in Debian
+Author: Komal Sukhani <komaldsukhani@gmail.com> 
+Forwarded: no 
+Last-Update: 2015-06-22
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 --- a/subprojects/groovy-test/build.gradle
 +++ b/subprojects/groovy-test/build.gradle
 @@ -1,7 +1,7 @@
