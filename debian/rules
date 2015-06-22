@@ -76,7 +76,7 @@ override_dh_link:
 	done
 
 get-orig-source:
-	-uscan --download-version 2.4.3 --force-download --rename
+	-uscan --download-current-version --force-download --rename
 
 get-orig-pom:
 	test '! -d maven' && mkdir -p maven
