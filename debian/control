@@ -29,7 +29,6 @@ Build-Depends: ant,
                testng,
                bnd,
                checkstyle
-
 Standards-Version: 3.9.6
 Vcs-Git: git://anonscm.debian.org/pkg-java/groovy2.git
 Vcs-Browser: http://anonscm.debian.org/cgit/pkg-java/groovy2.git
