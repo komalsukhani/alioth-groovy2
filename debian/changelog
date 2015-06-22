@@ -5,7 +5,7 @@ groovy2 (2.4.3+dfsg-1) UNRELEASED; urgency=medium
   * Depend on java6-runtime-headless instead of java6-runtime
 
   [ Komal ]
-  * New upstream release 
+  * New upstream release
 
  -- Komal <komaldsukhani@gmail.com>  Wed, 17 Jun 2015 21:10:15 +0530
 
@@ -24,7 +24,7 @@ groovy2 (2.2.2+dfsg-4) unstable; urgency=medium
 groovy2 (2.2.2+dfsg-3) unstable; urgency=medium
 
   * Relicense patches under Apache-2.0 license to make them compatible
-    with upstream and to address FTPmasters concerns. 
+    with upstream and to address FTPmasters concerns.
 
  -- Miguel Landaeta <nomadium@debian.org>  Thu, 28 Aug 2014 21:18:18 -0700
 
@@ -124,7 +124,7 @@ groovy (1.8.2-1) unstable; urgency=low
 groovy (1.8.1-2) unstable; urgency=low
 
   * Team upload.
-  
+
   [Miguel Landaeta]
   * Upload to unstable.
 
@@ -174,7 +174,7 @@ groovy (1.7.8-1) unstable; urgency=low
 
 groovy (1.7.7-1) unstable; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
   * Update dates in debian/copyright file.
   * Add call to mh_clean in clean target.
 
@@ -377,7 +377,7 @@ groovy (1.5.4-1) unstable; urgency=low
  -- Varun Hiremath <varun@debian.org>  Sun, 10 Feb 2008 17:29:48 +0530
 
 groovy (1.5.2-1) unstable; urgency=low
-  
+
   * New upstream release
   * Add antlr to Build-Depends-Indep and groovy Depends (Closes: #463147)
   * Bump debhelper compat to 6
