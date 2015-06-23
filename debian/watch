@@ -1,4 +1,3 @@
 version=3
 opts=uversionmangle=s/(\d)[_\.\-\+]?((RC|rc|pre|dev|beta|alpha|b|a)[\-\.]?\d*)$/$1~$2/,dversionmangle=s/\+dfsg// \
-http://www.groovy-lang.org/download.html .*/groovy-src-(\d.*)\.(?:tgz|tbz2|txz|tar\.(?:gz|bz2|xz)|zip) \
-debian debian/orig-tar.sh
+http://www.groovy-lang.org/download.html .*/groovy-src-(\d.*)\.(?:zip|tgz|tbz|txz|(?:tar\.(?:gz|bz2|xz))) 
