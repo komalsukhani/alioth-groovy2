@@ -37,16 +37,16 @@ override_dh_auto_install:
 		target/distributions/bin/groovy-2.4.3/embeddable/groovy-all-2.4.3-indy.jar \
 		usr/share/groovy2/embeddable
 	# groovy core
-	mh_installpom -o -v -pgroovy2 maven/groovy.pom
-	mh_installjar -pgroovy2 -l -s -j2.x maven/groovy.pom target/libs/groovy-2.4.3.jar
+	mh_installpom -o -v -pgroovy2 debian/poms/groovy.pom
+	mh_installjar -pgroovy2 -l -s -j2.x debian/poms/groovy.pom target/libs/groovy-2.4.3.jar
 	# groovy-all
-	mh_installpom -o -v -pgroovy2 maven/groovy-all.pom
-	mh_installjar -pgroovy2 -l -s -j2.x maven/groovy-all.pom \
+	mh_installpom -o -v -pgroovy2 debian/poms/groovy-all.pom
+	mh_installjar -pgroovy2 -l -s -j2.x debian/poms/groovy-all.pom \
 		target/distributions/bin/groovy-2.4.3/embeddable/groovy-all-2.4.3.jar
 	# all the remaining groovy modules
 	for MOD in $(MODULES); do \
-	   mh_installpom -o -v -pgroovy2 maven/groovy-$$MOD.pom; \
-	   mh_installjar -pgroovy2 -j2.x maven/groovy-$$MOD.pom \
+	   mh_installpom -o -v -pgroovy2 debian/poms/groovy-$$MOD.pom; \
+	   mh_installjar -pgroovy2 -j2.x debian/poms/groovy-$$MOD.pom \
 	      subprojects/groovy-$$MOD/target/libs/groovy-$$MOD-2.4.3.jar; \
 	done
 
@@ -82,12 +82,12 @@ get-orig-pom:
 	test '! -d maven' && mkdir -p maven
 	# groovy core pom
 	curl $(MAVEN_REPO_URL)/org/codehaus/groovy/groovy/2.4.3/groovy-2.4.3.pom \
-		--output maven/groovy.pom
+		--output debian/poms/groovy.pom
 	# groovy-all pom
 	curl $(MAVEN_REPO_URL)/org/codehaus/groovy/groovy-all/2.4.3/groovy-all-2.4.3.pom \
-		--output maven/groovy-all.pom
+		--output debian/poms/groovy-all.pom
 	# all the remaining groovy modules
 	for MOD in $(MODULES); do \
 		curl $(MAVEN_REPO_URL)/org/codehaus/groovy/groovy-$$MOD/2.4.3/groovy-$$MOD-2.4.3.pom \
-			--output maven/groovy-$$MOD.pom; \
+			--output debian/poms/groovy-$$MOD.pom; \
 	done
