@@ -4,10 +4,10 @@ Forwarded: no
 Last-Update: 2015-06-22
 ---
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
-Index: debian-groovy2/gradle/docs.gradle
+Index: alioth-groovy2/gradle/docs.gradle
 ===================================================================
---- debian-groovy2.orig/gradle/docs.gradle
-+++ debian-groovy2/gradle/docs.gradle
+--- alioth-groovy2.orig/gradle/docs.gradle
++++ alioth-groovy2/gradle/docs.gradle
 @@ -1,22 +1,8 @@
  task doc(dependsOn: ['javadocAll', 'groovydocAll', 'docGDK']) {
 -    if (JavaVersion.current().java7Compatible) {
@@ -98,6 +98,21 @@ Index: debian-groovy2/gradle/docs.gradle
  }
  
  // this will apply the javadoc fix tool to all generated javadocs
+@@ -170,10 +100,10 @@ allprojects {
+     tasks.withType(Javadoc).all {
+         doLast {
+             logger.lifecycle("Applying Javadoc fix tool (see http://www.kb.cert.org/vuls/id/225657) into $destinationDir".toString())
+-            def javadocFix = new JavadocFixTool()
+-            javadocFix.recursive = true
+-            javadocFix.doPatch = true
+-            javadocFix.searchAndPatch(destinationDir)
++          //  def javadocFix = new JavadocFixTool()
++           // javadocFix.recursive = true
++           // javadocFix.doPatch = true
++           // javadocFix.searchAndPatch(destinationDir)
+         }
+     }
+ }
 @@ -189,4 +119,4 @@ if (JavaVersion.current().isJava8Compati
              options.addStringOption('Xdoclint:none', '-quiet')
          }
