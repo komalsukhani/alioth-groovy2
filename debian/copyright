@@ -3,7 +3,7 @@ Upstream-Name: Groovy
 Upstream-Contact: Groovy Development Team <dev@groovy.codehaus.org>
 Source: http://groovy.codehaus.org/
 Files-Excluded:
-  src/spec/assets/js/jquery-2.1.1.min.js gradle/wrapper/gradle-wrapper.jar lib/openbeans-1.0.jar security/GroovyJarTest.jar
+  src/spec/assets/js/jquery-2.1.1.min.js gradle/wrapper/gradle-wrapper.jar lib/openbeans-1.0.jar security/GroovyJarTest.jar src/test-resources/jars/module-test/module-test/1.2-test/module-test-1.2-test.jar src/test-resources/jars/module-test/module-test/1.0.7225-test/module-test-1.0.7225-test.jar buildSrc/src/main/java/JavadocFixTool.java src/test/groovy/transform/stc/ClosureParamTypeInferenceSTCTest.groovy
 
 Files: src/main/org/codehaus/groovy/classgen/ClassCompletionVerifier.java
 Copyright:  2004 IBM Corporation and others
