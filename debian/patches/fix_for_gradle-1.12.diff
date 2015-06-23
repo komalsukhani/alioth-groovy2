@@ -1,0 +1,20 @@
+Description: Remove dependency on codeNarc v0.18 as it is not available in Debian
+Author: Komal Sukhani <komaldsukhani@gmail.com> 
+Forwarded: no 
+Last-Update: 2015-06-22
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+Index: debian-groovy2/gradle/quality.gradle
+===================================================================
+--- debian-groovy2.orig/gradle/quality.gradle	2015-06-06 13:24:16.403972433 +0530
++++ debian-groovy2/gradle/quality.gradle	2015-06-06 13:27:52.359978033 +0530
+@@ -46,8 +46,7 @@
+         codenarcClasspath = rootProject.sourceSets.main.output +
+                 project(':groovy-templates').sourceSets.main.output +
+                 project(':groovy-xml').sourceSets.main.output +
+-                configurations.compile +
+-                files(configurations.codenarc.findAll { !(it.name =~ /groovy|junit/)})
++                configurations.compile
+     }
+ 
+     tasks.withType(Checkstyle) {
